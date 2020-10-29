@@ -2,6 +2,13 @@ import mariadb
 import sys
 
 def connect():
+    """
+    Connects django to the mariadb database 'management_portal'.
+    It creates the database if it doesn't exist.
+
+    Returns:
+    sql connection
+    """
     user        = 'root'
     password    = 'test'
     host        = '127.0.0.1'
@@ -10,25 +17,40 @@ def connect():
 
     try:
         # try connect to database
-        return mariadb.connect(
-            user     = user,
-            password = password,
-            host     = host,
-            port     = port,
-            database = database
-        )
+        __connectDatabase(user, password, host, port, database)
     except mariadb.Error as e:
         # try connect to mysql in general instead
         try:
-            conn =  mariadb.connect(
-                user     = user,
-                password = password,
-                host     = host,
-                port     = port
-            )
-            cursor = conn.cursor()
-            # create database
-            cursor.execute('CREATE DATABASE `management_portal`')
+            __createDatabase(user, password, host, port, database)
+            __connectDatabase(user, password, host, port, database)
         except mariadb.Error as e:
             print(f"Error connecting to MariaDB Platform: {e}")
             sys.exit(1)
+
+def __connectDatabase(user, password, host, port, database):
+    """
+    Connect to database 'management_portal'
+
+    Returns:
+    sql connection
+    """
+    return mariadb.connect(
+        user     = user,
+        password = password,
+        host     = host,
+        port     = port,
+        database = database
+    )
+
+def __createDatabase(user, password, host, port, database):
+    """
+    Connect to mariadb in general and create database
+    """
+    conn =  mariadb.connect(
+        user     = user,
+        password = password,
+        host     = host,
+        port     = port
+    )
+    cursor = conn.cursor()
+    cursor.execute('CREATE DATABASE `' + database + '`')
