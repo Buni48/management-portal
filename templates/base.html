@@ -3,8 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title>
-            {% block title %} - Aubex Management Portal
+            {% block title %}{% endblock title %} - Aubex Management Portal
         </title>
+        {% load static %}
 
         <!-- Stylesheets -->
         <link rel="stylesheet"
@@ -13,6 +14,10 @@
             crossorigin="anonymous"
         >
         <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
+        <link rel='stylesheet' href="{% static 'css/base.css' %}" type='text/css'>
+
+        {% block custom_css %}
+        {% endblock custom_css %}
 
         <!-- Scripts -->
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -24,7 +29,10 @@
             crossorigin="anonymous"
         ></script>
 
-        <link rel="shortcut icon" href="/assets/img/favicon.ico">
+        {% block custom_js %}
+        {% endblock custom_js %}
+
+        <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     </head>
     <body>
         {% block content %}
