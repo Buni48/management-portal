@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+<!-- Title -->
+{% block title %}
+Login
+{% endblock title %}
+
+<!-- Content--> 
+{% block content %}
+    {% if request.user.is_authenticated %}
+        <div>
+            <h4 style="color: #29588c; text-align-last: center;">Sie sind bereits angemeldet</h4>
+            <button type="button">
+                <a href="{% url 'logout' %}">Abmelden</a>
+            </button>
+        </div>
+
+    {% else %}
+        <div style="margin-top: 20vh; margin-bottom: 20vh;">
+            <div class="shadow-lg p-3 mb-5 rounded" style="width: 25%;margin: 0 auto;background-color: #ffffff;display:table;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <h4 style="color: #29588c; text-align-last: center;">Anmelden</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-md-center">
+
+                    {% if messages %}
+                        <div class="col-md-auto" style="text-align: center;">
+                            {% for message in messages %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="row justify-content-md-center">
+                    <form action="{% url 'user_management:authentication' %}" method="POST" style="white-space: nowrap;">
+                        {% csrf_token %}
+                        <div class="col-md-auto">
+                            <label>Benutzername</label>
+                            <input type="text" name="username">
+                        </div>
+                        <div class="col-md-auto">
+                            <label>Passwort</label>
+                            <input type="password" name="password">
+                        </div>
+                        <div class="container container-fluid" style="padding-top: 0.05vw; padding-left: 25%; padding-right: 25%;margin-top: 15px;">
+                            <button class="btn btn-primary" type="submit">Anmelden</button>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}

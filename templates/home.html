@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+<!-- Title -->
+{% block title %}
+Login
+{% endblock title %}
+
+<!-- Content--> 
+{% block content %}
+    {% if request.user.is_authenticated %}
+        <h1>Startseite</h1>
+        <button type="button">
+            <a href="{% url 'logout' %}">Abmelden</a>
+        </button>
+
+    {% else %}
+        <h1>Sie müssen sich erst anmelden.</h1>
+        <button type="button">
+            <a href="{% url 'login' %}">Anmelden</a>
+        </button>
+
+    {% endif %}
+{% endblock content %}
