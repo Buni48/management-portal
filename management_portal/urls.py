@@ -8,6 +8,6 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('user/', include('user_management.urls'), name='user'),
     path('login/', views.login, name='login'),
-    path('logut/', views.logout, name='logout'),
+    path('logout/', views.logout, name='logout'),
     path('logged-out/', views.loggedOut, name='logged_out'),
 ]
