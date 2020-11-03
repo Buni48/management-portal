@@ -1,0 +1,29 @@
+/** general */
+.center {
+    text-align: center;
+}
+
+/** login */
+.user-page {
+    margin-top: 20vh;
+    margin-bottom: 20vh;
+}
+.login-page {
+    width: 25%;
+    margin: 0 auto;
+    background-color: #fff;
+    display:table;
+}
+.login-title {
+    color: #29588c;
+    text-align-last: center;
+}
+.login-form {
+    white-space: nowrap;
+}
+.login-button-container {
+    padding-top: 0.05vw;
+    padding-left: 25%;
+    padding-right: 25%;
+    margin-top: 15px;
+}
