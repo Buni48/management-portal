@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Title -->
+{% block title %}
+    Anmelden
+{% endblock title %}
+
+<!-- Content--> 
+{% block content %}
+<div class="content">
+    {% if request.user.is_authenticated %}
+        <div>
+            <h4 style="color: #29588c; text-align-last: center;">Sie sind bereits angemeldet</h4>
+            <button type="button">
+                <a href="{% url 'home' %}">Startseite</a>
+            </button>
+            <button type="button">
+                <a href="{% url 'logout' %}">Abmelden</a>
+            </button>
+        </div>
+
+    {% else %}
+        <div class="row justify-content-md-center">
+            {% if messages %}
+                <div class="col-md-auto center">
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="login-form">
+            <div class="image-Logo">
+                <img src="{% static 'img/logo.png' %}" class="rounded mx-auto d-block" alt="logo">
+            </div>
+
+            <form action="{% url 'user_management:authentication' %}" method="POST" class="login-form">
+                <h2 class="text-center">Web-Portal</h2>
+
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Benutzername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Passwort" name="password" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Anmelden</button>
+                </div>
+
+                <div class="clearfix">
+                    <label class="pull-left checkbox-inline">
+                        <input type="checkbox">
+                        Angemeldet bleiben
+                    </label><br>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
+    
+{% endblock content %}

@@ -1,0 +1,22 @@
+{% extends "site.html" %}
+
+<!-- Title -->
+{% block title %}
+    Lizenzen
+{% endblock title %}
+
+<!-- Content--> 
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <h1>Lizenzen</h1>
+
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+
+        {% endif %}
+    </div>
+{% endblock content %}

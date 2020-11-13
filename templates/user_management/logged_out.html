@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+<!-- Title -->
+{% block title %}
+    Abgemeldet
+{% endblock title %}
+
+<!-- Content--> 
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <h1>Du bist noch angemeldet.</h1>
+            <button type="button">
+                <a href="{% url 'home' %}">Startseite</a>
+            </button>
+
+        {% else %}
+            <h1>Du wurdest erfolgreich abgemeldet.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+        {% endif %}
+    </div>
+{% endblock content %}
