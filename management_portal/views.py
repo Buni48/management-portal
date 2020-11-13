@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 
 def index(request):
-    return redirect('home')
+    if request.user.is_authenticated:
+        return redirect('home')
+    else:
+        return redirect('login')
 
 def home(request):
     return render(request, 'home.html')
