@@ -21,12 +21,15 @@ def authentication(request: WSGIRequest) -> HttpResponse:
     else:
         return redirect('login')
 
-def login(request):
+def login(request: WSGIRequest) -> HttpResponse:
     return render(request, 'user_management/login.html')
 
 def logout(request: WSGIRequest) -> HttpResponse:
     auth_logout(request)
-    return redirect('logged_out')
+    return redirect('user_management:logged_out')
 
 def loggedOut(request: WSGIRequest) -> HttpResponse:
     return render(request, 'user_management/logged_out.html')
+
+def settings(request: WSGIRequest) -> HttpResponse:
+    return render(request, 'user_management/settings.html')
