@@ -14,6 +14,3 @@ def login(request):
 
 def logout(request):
     return redirect('user_management:logout')
-
-def loggedOut(request):
-    return redirect('user_management:logged_out')
