@@ -1,3 +1,5 @@
 from django.db import models
 
-# Create your models here.
+class Heartbeat(models.Model):
+    last_received = models.DateTimeField()
+    licence       = models.ForeignKey(to = 'licences.Licence', on_delete = models.CASCADE, null = False)
