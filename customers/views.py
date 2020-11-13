@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
-# Create your views here.
+def index(request):
+    return redirect('customers_list')
+
+def customerList(request):
+    return render(request, 'customers/list.html')
