@@ -16,15 +16,6 @@ Login
         </div>
 
     {% else %}
-        <div class="user-page">
-            <div class="shadow-lg p-3 mb-5 rounded login-page">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm">
-                            <h4 class="login-title">Anmelden</h4>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="row justify-content-md-center">
 
@@ -38,24 +29,45 @@ Login
                         </div>
                     {% endif %}
                 </div>
-                <div class="row justify-content-md-center">
-                    <form action="{% url 'user_management:authentication' %}" method="POST" class="login-form">
+
+                <div class="login-form">
+                       <div class="image-Logo">
+                           <img src= "https://www.aubex.de/sites/all/themes/aubex/logo.png"  class="rounded mx-auto d-block" alt="...">
+                     </div>
+
+                <form action="{% url 'user_management:authentication' %}" method="POST" class="login-form">
+
+
+
+
+                        <h2 class="text-center">Web-Portal</h2>
+
                         {% csrf_token %}
-                        <div class="col-md-auto">
-                            <label>Benutzername</label>
-                            <input type="text" name="username">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Benutzername" required="required">
                         </div>
-                        <div class="col-md-auto">
-                            <label>Passwort</label>
-                            <input type="password" name="password">
+
+
+                        <div class="form-group">
+                              <input type="password" class="form-control" placeholder="Passwort" required="required">
                         </div>
-                        <div class="container container-fluid" class="login-button-container">
-                            <button class="btn btn-primary" type="submit">Anmelden</button>
-                        </div>
-                    </form>
-                    
+
+                    <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Log in</button>
+                    </div>
+                     <div class="clearfix">
+                         <label class="pull-left checkbox-inline"><input type="checkbox"> Angemeldet bleiben</label>
+                         <br>
+
+                    </div>
+
+
+
+                </form>
                 </div>
-            </div>
-        </div>
+
+
+
+
     {% endif %}
 {% endblock content %}
