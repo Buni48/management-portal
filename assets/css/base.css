@@ -1,11 +1,18 @@
+/* general */
+.nav-logo {
+    width: 40%;
+    height: 40%;
+}
+.content {
+    margin: 10pt;
+}
 
+/* login */
 .login-form {
     width: 340px;
     margin: 50px auto;
     margin-top: 13%;
 }
-
-
 .login-form form {
     margin-bottom: 15px;
     background: #f7f7f7;
@@ -24,11 +31,12 @@
     font-weight: bold;
 }
 
-.image-Logo{
-         width: 100%;
-         height: 100%;
+.image-Logo {
+    width: 100%;
+    height: 100%;
 }
 
+/* footer */
 footer {
   position: fixed;
   left: 0;
