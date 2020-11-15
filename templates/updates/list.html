@@ -2,14 +2,14 @@
 
 <!-- Title -->
 {% block title %}
-    Startseite
+    Updates
 {% endblock title %}
 
 <!-- Content--> 
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
-            <h1>Startseite</h1>
+            <h1>Updates</h1>
 
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>

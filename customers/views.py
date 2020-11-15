@@ -3,7 +3,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 
 def index(request: WSGIRequest) -> HttpResponse:
-    return redirect('updates_list')
+    return redirect('customers_list')
 
-def updatesList(request: WSGIRequest) -> HttpResponse:
-    return render(request, 'updates/list.html')
+def customerList(request: WSGIRequest) -> HttpResponse:
+    return render(request, 'customers/list.html')
