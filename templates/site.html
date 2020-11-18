@@ -61,6 +61,78 @@
   </nav>
 {% endblock navbar %}
 
+{% block heartbeat_sidebar %}
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Heartbeats
+                </a>
+            </li>
+            <!-- @todo list element loop for heartbeats
+            <li>
+                <a href="#">Dashboard</a>
+            </li> -->
+            <li>
+                <a href="#">Shortcuts</a>
+            </li>
+            <li>
+                <a href="#">Overview</a>
+            </li>
+            <li>
+                <a href="#">Events</a>
+            </li>
+            <li>
+                <a href="#">About</a>
+            </li>
+            <li>
+                <a href="#">Services</a>
+            </li>
+            <li>
+                <a href="#">Contact</a>
+            </li>
+            <li>
+                <a href="#">Dashboard</a>
+            </li>
+            <li>
+                <a href="#">Shortcuts</a>
+            </li>
+            <li>
+                <a href="#">Overview</a>
+            </li>
+            <li>
+                <a href="#">Events</a>
+            </li>
+            <li>
+                <a href="#">About</a>
+            </li>
+            <li>
+                <a href="#">Services</a>
+            </li>
+            <li>
+                <a href="#">Contact</a>
+            </li>
+        </ul>
+    </div>
+{% endblock heartbeat_sidebar %}
+
+{% block sidebar_toggle %}
+    <button id="menu-toggle" class="btn btn-secondary">
+        <i id="toggleIcon" class="fa fa-angle-double-down"></i>
+        Heartbeats
+    </button>
+    <!-- Javascript -->
+    <script>
+        $("#menu-toggle").click((event) => {
+            console.log(event);
+            event.preventDefault();
+
+            $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+{% endblock sidebar_toggle %}
+
 {% block footer %}
     <footer>
         © 2020 <a href="https://www.aubex.de/"> aubex GmbH </a> - Gemeinsam für eine bessere Mobilität
