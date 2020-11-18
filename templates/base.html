@@ -29,6 +29,7 @@
             integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
             crossorigin="anonymous"
         ></script>
+        <script src="{% static 'js/base.js' %}"></script>
 
         {% block custom_js %}
         {% endblock custom_js %}
@@ -39,8 +40,18 @@
         {% block navbar %}
         {% endblock navbar %}
 
-        {% block content %}
-        {% endblock content %}
+        <div id="wrapper">
+            {% block heartbeat_sidebar %}
+            {% endblock heartbeat_sidebar %}
+
+            <div id="page-content-wrapper">
+                {% block content %}
+                {% endblock content %}
+
+                {% block sidebar_toggle %}
+                {% endblock sidebar_toggle %}
+            </div>
+        </div>
 
         {% block footer %}
         {% endblock footer %}
