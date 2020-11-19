@@ -40,18 +40,8 @@
         {% block navbar %}
         {% endblock navbar %}
 
-        <div id="wrapper">
-            {% block heartbeat_sidebar %}
-            {% endblock heartbeat_sidebar %}
-
-            <div id="page-content-wrapper">
-                {% block content %}
-                {% endblock content %}
-
-                {% block sidebar_toggle %}
-                {% endblock sidebar_toggle %}
-            </div>
-        </div>
+        {% block general_content %}
+        {% endblock general_content %}
 
         {% block footer %}
         {% endblock footer %}

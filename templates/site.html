@@ -61,7 +61,9 @@
   </nav>
 {% endblock navbar %}
 
-{% block heartbeat_sidebar %}
+{% block general_content %}
+<div id="wrapper">
+    <!-- Sidebar -->
     <div id="sidebar-wrapper">
         <ul class="sidebar-nav">
             <li class="sidebar-brand">
@@ -114,24 +116,29 @@
             </li>
         </ul>
     </div>
-{% endblock heartbeat_sidebar %}
+    <div id="page-content-wrapper">
+        <!-- Page Content-->
+        {% block content %}
+        {% endblock content %}
 
-{% block sidebar_toggle %}
-    <button id="menu-toggle" class="btn btn-secondary">
-        <i id="toggleIcon" class="fa fa-angle-double-down"></i>
-        Heartbeats
-    </button>
-    <!-- Javascript -->
-    <script>
-        $("#menu-toggle").click((event) => {
-            console.log(event);
-            event.preventDefault();
-
-            $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
-            $("#wrapper").toggleClass("toggled");
-        });
-    </script>
-{% endblock sidebar_toggle %}
+        <!-- Sidebar Toggle -->
+        <button id="menu-toggle" class="btn btn-secondary">
+            <i id="toggleIcon" class="fa fa-angle-double-down"></i>
+            Heartbeats
+        </button>
+        <!-- Javascript -->
+        <script>
+            $("#menu-toggle").click((event) => {
+                console.log(event);
+                event.preventDefault();
+    
+                $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
+                $("#wrapper").toggleClass("toggled");
+            });
+        </script>
+    </div>
+</div>
+{% endblock general_content %}
 
 {% block footer %}
     <footer>

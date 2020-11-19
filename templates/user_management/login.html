@@ -7,8 +7,8 @@
 {% endblock title %}
 
 <!-- Content--> 
-{% block content %}
-<div class="content">
+{% block general_content %}
+<div>
     {% if request.user.is_authenticated %}
         <div>
             <h4 style="color: #29588c; text-align-last: center;">Sie sind bereits angemeldet</h4>
@@ -63,4 +63,4 @@
     {% endif %}
 </div>
     
-{% endblock content %}
+{% endblock general_content %}
