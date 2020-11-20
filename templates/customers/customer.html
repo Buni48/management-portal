@@ -1,0 +1,164 @@
+{% extends "site.html" %}
+
+<!-- Title -->
+{% block title %}
+    Kunde "Assenheimer + Mulfinger Rhein-Neckar GmbH & Co.KG"
+{% endblock title %}
+
+<!-- Content-->
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <h1>Kunden</h1>
+
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+
+        {% endif %}
+    </div>
+
+<div class="container">
+<div class="accordion col" id="accordionExample">
+  <div class="card row-md-2">
+    <div class="card-header" id="headingOne">
+      <h2 class="mb-0">
+        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Autohaus Sinsheim-Rohrbach
+        </button>
+      </h2>
+    </div>
+    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+      <div class="card-body">
+          <table class="table">
+              <tbody>
+              {% for customer in customers %}
+                <tr>
+                  <th scope="row">Kundennummer</th>
+                  <td>{{customer.customer_number}}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ansprechpartner</th>
+                  <td>{{customer.name}}</td>
+                </tr>
+              {% endfor %}
+              {% for location in locations %}
+                <tr>
+                  <th scope="row">Anschrift</th>
+                  <td>{{location.name}}</td>
+                  <td>{{location.street}}</td>
+                  <td>{{location.house_number}}</td>
+                  <td>{{location.postcode}}</td>
+                  <td>{{location.city}}</td>
+                  <td>{{location.phone_number}}</td>
+                  <td>{{location.email_adress}}</td>
+                </tr>
+              {% endfor %}
+              <!-- Telefon
+                <tr>
+                  <th scope="row">Telefon</th>
+                  <td>{{location.phone_number}}</td>
+                </tr> -->
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+  <div class="card row-md-2">
+    <div class="card-header" id="headingTwo">
+      <h2 class="mb-0">
+        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Autohaus Bad Rappenau
+        </button>
+      </h2>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+      <div class="card-body">
+           <table class="table">
+              <tbody>
+                {% for customer in customers %}
+                <tr>
+                  <th scope="row">Kundennummer</th>
+                  <td>{{customer.customer_number}}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ansprechpartner</th>
+                  <td>{{customer.name}}</td>
+                </tr>
+              {% endfor %}
+              {% for location in locations %}
+                <tr>
+                  <th scope="row">Anschrift</th>
+                  <td>{{location.name}}</td>
+                  <td>{{location.street}}</td>
+                  <td>{{location.house_number}}</td>
+                  <td>{{location.postcode}}</td>
+                  <td>{{location.city}}</td>
+                  <td>{{location.phone_number}}</td>
+                  <td>{{location.email_adress}}</td>
+                </tr>
+              {% endfor %}
+              <!-- Telefon
+                <tr>
+                  <th scope="row">Telefon</th>
+                  <td>{{location.phone_number}}</td>
+                </tr> -->
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+  <div class="card row-md-2">
+    <div class="card-header" id="headingThree">
+      <h2 class="mb-0">
+        <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Autohaus Eppingen
+        </button>
+      </h2>
+    </div>
+    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+      <div class="card-body">
+          <table class="table">
+            <tbody>
+              {% for customer in customers %}
+                <tr>
+                  <th scope="row">Kundennummer</th>
+                  <td>{{customer.customer_number}}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Ansprechpartner</th>
+                  <td>{{customer.name}}</td>
+                </tr>
+              {% endfor %}
+              {% for location in locations %}
+                <tr>
+                  <th scope="row">Anschrift</th>
+                  <td>{{location.name}}</td>
+                  <td>{{location.street}}</td>
+                  <td>{{location.house_number}}</td>
+                  <td>{{location.postcode}}</td>
+                  <td>{{location.city}}</td>
+                  <td>{{location.phone_number}}</td>
+                  <td>{{location.email_adress}}</td>
+                </tr>
+              {% endfor %}
+              <!-- Telefon
+                <tr>
+                  <th scope="row">Telefon</th>
+                  <td>{{location.phone_number}}</td>
+                </tr> -->
+              </tbody>
+          </table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock content %}
+
+
+
+
+
