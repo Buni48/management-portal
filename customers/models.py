@@ -23,6 +23,7 @@ class Location(models.Model):
     house_number    (str): The house number of the location street
     postcode        (str): The postal code of the city where it's located
     city            (str): The city where it's located
+    customer        (int): Foreign key for the customer the location belongs to
     adviser         (int): Foreign key for the customer adviser of aubex who is responsible for the location
     """
     name            = models.CharField(max_length = 64)
@@ -32,11 +33,18 @@ class Location(models.Model):
     house_number    = models.CharField(max_length = 8)
     postcode        = models.CharField(max_length = 16)
     city            = models.CharField(max_length = 64)
+    customer        = models.ForeignKey(
+        to                  = 'Customer',
+        on_delete           = models.CASCADE,
+        related_name        = 'locations',
+        related_query_name  = 'location',
+        null                = False,
+    )
     adviser         = models.ForeignKey(
         to                  = 'CustomerAdviser',
         on_delete           = models.SET_NULL,
-        related_name        = 'advisers',
-        related_query_name  = 'adviser',
+        related_name        = 'locations',
+        related_query_name  = 'location',
         null                = True,
     )
 
