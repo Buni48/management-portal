@@ -1,0 +1,11 @@
+{% extends "nav_site.html" %}
+
+{% block general_content %}
+<div class="content">
+    <h1>Heartbeats</h1>
+    <em>Nicht erhalten: {{count_missing}}</em>
+    {% for heartbeat in heartbeats %}
+        <p>{{heartbeat.last_received}}, {{heartbeat.received}}, {{heartbeat.product}}, {{heartbeat.location}}</p>
+    {% endfor %}
+</div>
+{% endblock general_content %}

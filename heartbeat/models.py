@@ -1,4 +1,10 @@
 from django.db import models
+from datetime import datetime, timezone, timedelta
+from licences.models import UsedSoftwareProduct, SoftwareProduct
+from customers.models import Location
+
+EXPECTED_MAX_DURATION = timedelta(days = 1, minutes = -45)
+LIMIT = 1000
 
 class Heartbeat(models.Model):
     """
@@ -20,3 +26,45 @@ class Heartbeat(models.Model):
         related_query_name  = 'heartbeat',
         null                = False,
     )
+
+    def getHeartbeats(limit: int = LIMIT) -> list:
+        """
+        Returns heartbeats including information about product, location and if a heartbeat is missing.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: Heartbeats
+        """
+        heartbeats = Heartbeat.objects.all().order_by('last_received')[:limit]
+
+        for heartbeat in heartbeats:
+            duration = datetime.now(timezone.utc) - heartbeat.last_received
+            heartbeat.last_received = heartbeat.last_received.strftime("%d/%m/%Y %H:%M:%S")
+            if (duration <= EXPECTED_MAX_DURATION):
+                heartbeat.received = True
+            else:
+                heartbeat.received = False
+
+            usedProduct         = UsedSoftwareProduct.objects.get(heartbeat__id = heartbeat.id)
+            heartbeat.product   = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            heartbeat.location  = Location.objects.get(used_product__id = usedProduct.id)
+
+        return heartbeats
+
+    def getCountMissing(heartbeats: list) -> int:
+        """
+        Returns the amount of heartbeats not received in expected time.
+
+        Parameters:
+        heartbeats (list): List of heartbeat objects
+
+        Returns:
+        int: Amount of missing heartbeats
+        """
+        count = 0
+        for heartbeat in heartbeats:
+            if (heartbeat.received == False):
+                count += 1
+        return count

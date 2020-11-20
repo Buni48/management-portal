@@ -1,147 +1,81 @@
-{% extends "base.html" %}
+{% extends "nav_site.html" %}
 {% load static %}
 
-{% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="{% url 'home' %}">
-        <img src="{% static 'img/logo.png' %}" class="nav-logo" alt="logo">
-    </a>
-    <button class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
-      </ul>
-      <form class="form-inline my-2 my-lg-0">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'home' %}">Startseite</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'licences_list' %}">Lizenzen</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'updates_list' %}">Updates</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'customers_list' %}">Kunden</a>
-            </li>
-            {% if request.user.is_staff %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin/">Admin</a>
-                </li>
-            {% endif %}
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle"
-                    href=""
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                >
-                    <i class="fas fa-user"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="{% url 'user_management:settings' %}">Einstellungen</a>
-                    <a class="dropdown-item" href="{% url 'logout' %}">Abmelden</a>
-                </div>
-            </li>
-          </ul>
-      </form>
-    </div>
-  </nav>
-{% endblock navbar %}
-
 {% block general_content %}
-<div id="wrapper">
-    <!-- Sidebar -->
-    <div id="sidebar-wrapper">
-        <ul class="sidebar-nav">
-            <li class="sidebar-brand">
-                <a href="#">
-                    Heartbeats
-                </a>
-            </li>
-            <!-- @todo list element loop for heartbeats
-            <li>
-                <a href="#">Dashboard</a>
-            </li> -->
-            <li>
-                <a href="#">Shortcuts</a>
-            </li>
-            <li>
-                <a href="#">Overview</a>
-            </li>
-            <li>
-                <a href="#">Events</a>
-            </li>
-            <li>
-                <a href="#">About</a>
-            </li>
-            <li>
-                <a href="#">Services</a>
-            </li>
-            <li>
-                <a href="#">Contact</a>
-            </li>
-            <li>
-                <a href="#">Dashboard</a>
-            </li>
-            <li>
-                <a href="#">Shortcuts</a>
-            </li>
-            <li>
-                <a href="#">Overview</a>
-            </li>
-            <li>
-                <a href="#">Events</a>
-            </li>
-            <li>
-                <a href="#">About</a>
-            </li>
-            <li>
-                <a href="#">Services</a>
-            </li>
-            <li>
-                <a href="#">Contact</a>
-            </li>
-        </ul>
-    </div>
-    <div id="page-content-wrapper">
-        <!-- Page Content-->
-        {% block content %}
-        {% endblock content %}
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="{% url 'heartbeat_list' %}">
+                        Heartbeats
+                    </a>
+                </li>
+                <!-- @todo list element loop for heartbeats
+                <li>
+                    <a href="#">Dashboard</a>
+                </li> -->
+                <li>
+                    <a href="#">Shortcuts</a>
+                </li>
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+                <li>
+                    <a href="#">Events</a>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#">Services</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+                <li>
+                    <a href="#">Dashboard</a>
+                </li>
+                <li>
+                    <a href="#">Shortcuts</a>
+                </li>
+                <li>
+                    <a href="#">Overview</a>
+                </li>
+                <li>
+                    <a href="#">Events</a>
+                </li>
+                <li>
+                    <a href="#">About</a>
+                </li>
+                <li>
+                    <a href="#">Services</a>
+                </li>
+                <li>
+                    <a href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <div id="page-content-wrapper">
+            <!-- Page Content-->
+            {% block content %}
+            {% endblock content %}
 
-        <!-- Sidebar Toggle -->
-        <button id="menu-toggle" class="btn btn-secondary">
-            <i id="toggleIcon" class="fa fa-angle-double-down"></i>
-            Heartbeats
-        </button>
-        <!-- Javascript -->
-        <script>
-            $("#menu-toggle").click((event) => {
-                console.log(event);
-                event.preventDefault();
-    
-                $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
-                $("#wrapper").toggleClass("toggled");
-            });
-        </script>
+            <!-- Sidebar Toggle -->
+            <button id="menu-toggle" class="btn btn-secondary">
+                <i id="toggleIcon" class="fa fa-angle-double-down"></i>
+                Heartbeats
+            </button>
+            <!-- Javascript -->
+            <script>
+                $("#menu-toggle").click((event) => {
+                    console.log(event);
+                    event.preventDefault();
+        
+                    $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
+                    $("#wrapper").toggleClass("toggled");
+                });
+            </script>
+        </div>
     </div>
-</div>
 {% endblock general_content %}
-
-{% block footer %}
-    <footer>
-        © 2020 <a href="https://www.aubex.de/"> aubex GmbH </a> - Gemeinsam für eine bessere Mobilität
-    </footer>
-{% endblock footer %}
