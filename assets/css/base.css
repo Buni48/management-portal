@@ -59,8 +59,9 @@
 
 #page-content-wrapper {
     width: auto;
-    position: absolute;
+    position: relative;
     padding: 50px;
+
 }
 
 #wrapper.toggled #page-content-wrapper {

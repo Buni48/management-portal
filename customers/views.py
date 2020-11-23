@@ -9,8 +9,10 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 def customerList(request: WSGIRequest) -> HttpResponse:
     heartbeats = Heartbeat.getHeartbeatsMissing()
+    customers  = Customer.objects.all()
     context = {
         'heartbeats': heartbeats,
+        'customers' : customers,
     }
     return render(request, 'customers/list.html', context)
 
