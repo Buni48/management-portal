@@ -1,4 +1,4 @@
-{% extends "site.html" %}
+{% extends "nav_site.html" %}
 
 <!-- Title -->
 {% block title %}
@@ -6,7 +6,7 @@
 {% endblock title %}
 
 <!-- Content--> 
-{% block content %}
+{% block general_content %}
 <div class="content">
     {% if request.user.is_authenticated %}
         <h1>Einstellungen</h1>
@@ -19,4 +19,4 @@
 
     {% endif %}
 </div>
-{% endblock content %}
+{% endblock general_content %}
