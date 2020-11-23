@@ -1,8 +1,12 @@
 /* general */
+
 .nav-logo {
-    width: 40%;
-    height: 40%;
+    width: 80%;
+    height: 80%;
 }
+
+
+
 .content {
     margin: 10pt;
 }
@@ -139,6 +143,22 @@
     height: 100%;
 }
 
+/* Home */
+
+.Lage {
+   color:#585858;
+   text-align: center;
+}
+
+#charts {
+    margin-top: 20%;
+}
+.chartTitle {
+    padding-bottom: 6%;
+    color:#585858;
+    text-align: center;
+    font-size: medium;
+}
 /* footer */
 footer {
   position: fixed;
@@ -150,3 +170,6 @@ footer {
   text-align: center;
   padding: 50px;
 }
+
+
+
