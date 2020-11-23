@@ -9,6 +9,7 @@
 
 .content {
     margin: 10pt;
+
 }
 
 /* sidebar */
@@ -148,7 +149,7 @@
 }
 
 #charts {
-    margin-top: 20%;
+    margin-top: 10%;
 }
 .chartTitle {
     padding-bottom: 6%;
