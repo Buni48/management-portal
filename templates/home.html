@@ -7,9 +7,243 @@
 
 <!-- Content--> 
 {% block content %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
     <div class="content">
         {% if request.user.is_authenticated %}
-            <h1>Startseite</h1>
+            <h1 class="Lage">Derzeitige Lage des Portals</h1>
+
+        <div class ="row">
+
+          <div class = "col-10">
+             <div id = "charts" class="row">
+                 <div class="col-4">
+                     <h4 class ="chartTitle"> Aktuelle Updates</h4>
+                     <canvas id="barChart1"> </canvas>
+                 </div>
+              <div class="col-4">
+                  <h4 class ="chartTitle"> Aktuelle Lizenzen</h4>
+                 <canvas id="barChart2"> </canvas>
+             </div>
+                 <div class="col-4">
+                           <h4 class ="chartTitle"> Aktuelle Heartbeats</h4>
+                           <canvas id="barChart3"> </canvas>
+                 </div>
+             </div>
+          </div>
+
+          <div class = "col-2" style = "background-color:red;">
+              HISTORY PLATZHALTER
+          </div>
+
+
+
+        </div>
+
+
+        <script>
+           //bar
+           var ctxB = document.getElementById("barChart1").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["28%","72%"],
+            datasets: [
+                {
+                         label: ['Updates nicht installiert'],
+                         data: [28, 72],
+                         backgroundColor: [
+                                            'rgba(207, 0, 15, 1)',
+                                             'rgba(31, 58, 147, 1)',
+                                           ],
+                         borderColor: [
+                                        'rgba(207, 0, 15, 1)',
+                                        'rgba(31, 58, 147, 1)',
+                                        ],
+
+                },
+                {
+
+
+                label: 'Updates installiert',
+                backgroundColor: 'rgba(31, 58, 147, 1)',
+                borderColor:      'rgba(31, 58, 147, 1)',
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+
+
+
+
+
+
+            }
+
+        }
+
+    });
+
+         //bar2
+           var ctxB = document.getElementById("barChart2").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["30%","70%"],
+            datasets: [
+                {
+                         label: ['Lizenzen abgelaufen'],
+                         data: [30, 70],
+                         backgroundColor: [
+                                            'rgba(207, 0, 15, 1)',
+                                             'rgba(31, 58, 147, 1)',
+                                           ],
+                         borderColor: [
+                                        'rgba(207, 0, 15, 1)',
+                                        'rgba(31, 58, 147, 1)',
+                                        ],
+
+                },
+                {
+
+
+                label: 'Lizenzen aktuell',
+                backgroundColor: 'rgba(31, 58, 147, 1)',
+                borderColor:      'rgba(31, 58, 147, 1)',
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+
+
+
+
+
+
+            }
+
+        }
+
+    });
+
+
+         //bar3
+           var ctxB = document.getElementById("barChart3").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["13%","87%"],
+            datasets: [
+                {
+                         label: ['Heartbeats nicht angekommen'],
+                         data: [13, 87],
+                         backgroundColor: [
+                                            'rgba(207, 0, 15, 1)',
+                                             'rgba(31, 58, 147, 1)',
+                                           ],
+                         borderColor: [
+                                        'rgba(207, 0, 15, 1)',
+                                        'rgba(31, 58, 147, 1)',
+                                        ],
+
+                },
+                {
+
+
+                label: 'Hearbeats angekommen',
+                backgroundColor: 'rgba(31, 58, 147, 1)',
+                borderColor:      'rgba(31, 58, 147, 1)',
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+
+
+
+
+
+
+            }
+
+        }
+
+    });
+        </script>
+
 
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
