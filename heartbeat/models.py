@@ -68,3 +68,19 @@ class Heartbeat(models.Model):
             if (heartbeat.received == False):
                 count += 1
         return count
+
+    def getHeartbeatsMissing() -> list:
+        """
+        Returns the missing heartbeats including the location.
+
+        Returns:
+        list: Heartbeats
+        """
+        missingTime = datetime.now(timezone.utc) - EXPECTED_MAX_DURATION
+        heartbeats = Heartbeat.objects.filter(last_received__lte = missingTime).order_by('last_received')
+
+        for heartbeat in heartbeats:
+            usedProduct         = UsedSoftwareProduct.objects.get(heartbeat__id = heartbeat.id)
+            heartbeat.location  = Location.objects.get(used_product__id = usedProduct.id)
+
+        return heartbeats

@@ -11,6 +11,9 @@
     margin: 10pt;
 
 }
+.fa-times-circle {
+    color: #f00;
+}
 
 /* sidebar */
 #menu-toggle {
