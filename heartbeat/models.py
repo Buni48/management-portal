@@ -41,7 +41,7 @@ class Heartbeat(models.Model):
 
         for heartbeat in heartbeats:
             duration = datetime.now(timezone.utc) - heartbeat.last_received
-            heartbeat.last_received = heartbeat.last_received.strftime("%d/%m/%Y %H:%M:%S")
+            heartbeat.last_received = heartbeat.last_received.strftime("%Y/%m/%d %H:%M:%S")
             if (duration <= EXPECTED_MAX_DURATION):
                 heartbeat.received = True
             else:
