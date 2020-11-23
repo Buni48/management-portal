@@ -15,7 +15,8 @@
             integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
             crossorigin="anonymous"
         >
-        <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/css/mdb.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
         <link rel='stylesheet' href="{% static 'css/base.css' %}" type='text/css'>
 
         {% block custom_css %}
@@ -31,8 +32,8 @@
             crossorigin="anonymous"
         ></script>
         <script src="{% static 'js/base.js' %}"></script>
-
-
+        <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
 
         {% block custom_js %}
         {% endblock custom_js %}
