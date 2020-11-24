@@ -57,16 +57,16 @@
 {% endblock general_content %}
 
 {% block custom_js %}
-<script>
-    $(document).ready(function () {
-        $('#selectedColumn').DataTable({
-            "aaSorting": [],
-                columnDefs: [{
-                orderable : true,
-                targets   : 3
-            }]
+    <script>
+        $(document).ready(function () {
+            $('#selectedColumn').DataTable({
+                "aaSorting": [],
+                    columnDefs: [{
+                    orderable : true,
+                    targets   : 3
+                }]
+            });
+            $('.dataTables_length').addClass('bs-select');
         });
-        $('.dataTables_length').addClass('bs-select');
-    });
-</script>
+    </script>
 {% endblock custom_js %}
