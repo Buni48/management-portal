@@ -45,6 +45,9 @@ class SoftwareProduct(models.Model):
     category = models.CharField(max_length = 64)
     version  = models.CharField(max_length = 16)
 
+    def __str__(self):
+        return self.name
+
 class UsedSoftwareProduct(models.Model):
     """
     The model 'UsedSoftwareProduct' represents the used software product.
@@ -85,3 +88,6 @@ class SoftwareModule(models.Model):
         related_query_name  = 'module',
         null                = False,
     )
+
+    def __str__(self):
+        return self.name
