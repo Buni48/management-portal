@@ -9,10 +9,22 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 def customerList(request: WSGIRequest) -> HttpResponse:
     heartbeats = Heartbeat.getHeartbeatsMissing()
-    customers  = Customer.objects.all()
+    customersA  = Customer.objects.filter(name__startswith='A')
+    customersB  = Customer.objects.filter(name__startswith='B')
+    customersC  = Customer.objects.filter(name__startswith='C')
+    customersD  = Customer.objects.filter(name__startswith='D')
+    customersE  = Customer.objects.filter(name__startswith='E')
+    customersF  = Customer.objects.filter(name__startswith='F')
+
     context = {
         'heartbeats': heartbeats,
-        'customers' : customers,
+        'customersA' : customersA,
+        'customersB' : customersB,
+        'customersC' : customersC,
+        'customersD' : customersD,
+        'customersE' : customersE,
+        'customersF' : customersF,
+
     }
     return render(request, 'customers/list.html', context)
 
