@@ -47,16 +47,18 @@ class Licence(models.Model):
         Returns:
         list: licences
         """
-        licences = Licence.objects.all().order_by('-end_date')[:limit]
+        licences = Licence.objects.all().order_by('end_date')[:limit]
 
         for licence in licences:
             duration = licence.end_date - datetime.now(timezone.utc)
             licence.start_date = licence.start_date.strftime(DATE_TYPE)
             licence.end_date   = licence.end_date.strftime(DATE_TYPE)
-            if (duration <= EXPECTED_MAX_DURATION):
-                licence.valid = True
+            if (duration > EXPECTED_MAX_DURATION):
+                licence.valid = 1
+            elif (duration > timedelta(seconds=0)):
+                licence.valid = 0
             else:
-                licence.valid = False
+                licence.valid = -1
 
             usedProduct      = UsedSoftwareProduct.objects.get(licence__id = licence.id)
             licence.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)

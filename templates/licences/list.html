@@ -5,7 +5,7 @@
     Lizenzen
 {% endblock title %}
 
-<!-- Content--> 
+<!-- Content-->
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
@@ -46,7 +46,12 @@
                                 {{licence.start_date}}
                             </td>
                             <td>
-                                {{licence.end_date}}
+                                {{licence.end_date}}&nbsp;
+                                {% if licence.valid == 0 %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% elif licence.valid == -1 %}
+                                    <i class="fas fa-times-circle"></i>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
