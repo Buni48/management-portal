@@ -1,4 +1,10 @@
 from django.db import models
+from datetime import datetime, timezone, timedelta
+from customers.models import Location
+
+EXPECTED_MAX_DURATION = timedelta(weeks = 6)
+LIMIT                 = 1000
+DATE_TYPE             = '%Y/%m/%d %H:%M:%S'
 
 class Licence(models.Model):
     """
@@ -30,6 +36,35 @@ class Licence(models.Model):
         related_query_name  = 'licence',
         null                = False,
     )
+
+    def getLicences(limit: int = LIMIT) -> list:
+        """
+        Returns licences including information about product, location and if a licence is missing.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: licences
+        """
+        licences = Licence.objects.all().order_by('end_date')[:limit]
+
+        for licence in licences:
+            duration = licence.end_date - datetime.now(timezone.utc)
+            licence.start_date = licence.start_date.strftime(DATE_TYPE)
+            licence.end_date   = licence.end_date.strftime(DATE_TYPE)
+            if (duration > EXPECTED_MAX_DURATION):
+                licence.valid = 1
+            elif (duration > timedelta(seconds=0)):
+                licence.valid = 0
+            else:
+                licence.valid = -1
+
+            usedProduct      = UsedSoftwareProduct.objects.get(licence__id = licence.id)
+            licence.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            licence.location = Location.objects.get(used_product__id = usedProduct.id)
+
+        return licences
 
 class SoftwareProduct(models.Model):
     """
