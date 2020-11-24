@@ -1,5 +1,11 @@
 {% extends "nav_site.html" %}
 
+<!-- Title -->
+{% block title %}
+    Lizenzen
+{% endblock title %}
+
+<!-- Content-->
 {% block general_content %}
 <div class="content">
     <h1>Heartbeats</h1>
@@ -51,16 +57,16 @@
 {% endblock general_content %}
 
 {% block custom_js %}
-<script>
-    $(document).ready(function () {
-        $('#selectedColumn').DataTable({
-            "aaSorting": [],
-                columnDefs: [{
-                orderable : true,
-                targets   : 3
-            }]
+    <script>
+        $(document).ready(function () {
+            $('#selectedColumn').DataTable({
+                "aaSorting": [],
+                    columnDefs: [{
+                    orderable : true,
+                    targets   : 3
+                }]
+            });
+            $('.dataTables_length').addClass('bs-select');
         });
-        $('.dataTables_length').addClass('bs-select');
-    });
-</script>
+    </script>
 {% endblock custom_js %}

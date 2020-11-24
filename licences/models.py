@@ -1,4 +1,11 @@
 from django.db import models
+from datetime import datetime, timezone, timedelta
+from customers.models import Location
+from updates.models import Update
+
+EXPECTED_MAX_DURATION = timedelta(weeks = 6)
+LIMIT                 = 1000
+DATE_TYPE             = '%Y/%m/%d %H:%M:%S'
 
 class Licence(models.Model):
     """
@@ -31,6 +38,35 @@ class Licence(models.Model):
         null                = False,
     )
 
+    def getLicences(limit: int = LIMIT) -> list:
+        """
+        Returns licences including information about product, location and if a licence is expiring soon.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: licences
+        """
+        licences = Licence.objects.all().order_by('end_date')[:limit]
+
+        for licence in licences:
+            duration = licence.end_date - datetime.now(timezone.utc)
+            licence.start_date = licence.start_date.strftime(DATE_TYPE)
+            licence.end_date   = licence.end_date.strftime(DATE_TYPE)
+            if (duration > EXPECTED_MAX_DURATION):
+                licence.valid = 1
+            elif (duration > timedelta(seconds = 0)):
+                licence.valid = 0
+            else:
+                licence.valid = -1
+
+            usedProduct      = UsedSoftwareProduct.objects.get(licence__id = licence.id)
+            licence.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            licence.location = Location.objects.get(used_product__id = usedProduct.id)
+
+        return licences
+
 class SoftwareProduct(models.Model):
     """
     The model 'SoftwareProduct' is a software product which can be used by many customers.
@@ -56,20 +92,53 @@ class UsedSoftwareProduct(models.Model):
     location (int): Foreign key to the customer's location the software product is used by
     product  (int): Foreign key to the software product the customer's location uses
     """
-    location = models.ForeignKey(
+    version      = models.CharField(max_length = 16)
+    last_updated = models.DateTimeField(auto_now_add = True)
+    location     = models.ForeignKey(
         to                  = 'customers.Location',
         on_delete           = models.CASCADE,
         related_name        = 'used_products',
         related_query_name  = 'used_product',
         null                = False,
     )
-    product  = models.ForeignKey(
+    product      = models.ForeignKey(
         to                  = 'SoftwareProduct',
         on_delete           = models.CASCADE,
         related_name        = 'used_products',
         related_query_name  = 'used_product',
         null                = False,
     )
+
+    def getUsedProducts(limit: int = LIMIT) -> list:
+        """
+        Returns used products including information about product, location and if the used product uses the current software version.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: used products
+        """
+        usedProducts = UsedSoftwareProduct.objects.all()[:limit]
+
+        for usedProduct in usedProducts:
+            usedProduct.location     = Location.objects.get(used_product__id = usedProduct.id)
+            usedProduct.product      = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            usedProduct.last_updated = usedProduct.last_updated.strftime(DATE_TYPE)
+
+            if usedProduct.version == usedProduct.product.version:
+                usedProduct.current = True
+            else:
+                usedProduct.current = False
+
+            try:
+                updates = Update.objects.filter(product_id = usedProduct.product.id).order_by('-release_date')
+                usedProduct.last_released = updates[0].release_date.strftime(DATE_TYPE)
+            except:
+                usedProduct.last_released = 'Noch nie'
+                usedProduct.last_updated  = 'Noch nie'
+
+        return usedProducts
 
 class SoftwareModule(models.Model):
     """

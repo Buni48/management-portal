@@ -4,7 +4,8 @@ from licences.models import UsedSoftwareProduct, SoftwareProduct
 from customers.models import Location
 
 EXPECTED_MAX_DURATION = timedelta(days = 1, minutes = -45)
-LIMIT = 1000
+LIMIT                 = 1000
+DATE_TYPE             = '%Y/%m/%d %H:%M:%S'
 
 class Heartbeat(models.Model):
     """
@@ -41,7 +42,7 @@ class Heartbeat(models.Model):
 
         for heartbeat in heartbeats:
             duration = datetime.now(timezone.utc) - heartbeat.last_received
-            heartbeat.last_received = heartbeat.last_received.strftime("%Y/%m/%d %H:%M:%S")
+            heartbeat.last_received = heartbeat.last_received.strftime(DATE_TYPE)
             if (duration <= EXPECTED_MAX_DURATION):
                 heartbeat.received = True
             else:

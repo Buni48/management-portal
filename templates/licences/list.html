@@ -5,11 +5,58 @@
     Lizenzen
 {% endblock title %}
 
-<!-- Content--> 
+<!-- Content-->
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
             <h1>Lizenzen</h1>
+            <table id="selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th class="th-sm">
+                            Standort
+                        </th>
+                        <th class="th-sm">
+                            Produkt
+                        </th>
+                        <th class="th-sm">
+                            Modul
+                        </th>
+                        <th class="th-sm">
+                            Anfangsdatum
+                        </th>
+                        <th class="th-sm">
+                            Enddatum
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for licence in licences %}
+                        <tr>
+                            <td>
+                                {{licence.location}}
+                            </td>
+                            <td>
+                                {{licence.product}}
+                            </td>
+                            <td>
+                                {{licence.module}}
+                            </td>
+                            <td>
+                                {{licence.start_date}}
+                            </td>
+                            <td>
+                                {{licence.end_date}}&nbsp;
+                                {% if licence.valid == 0 %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% elif licence.valid == -1 %}
+                                    <i class="fas fa-times-circle"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
@@ -20,3 +67,18 @@
         {% endif %}
     </div>
 {% endblock content %}
+
+{% block custom_js %}
+    <script>
+        $(document).ready(function () {
+            $('#selectedColumn').DataTable({
+                "aaSorting": [],
+                    columnDefs: [{
+                    orderable : true,
+                    targets   : 3
+                }]
+            });
+            $('.dataTables_length').addClass('bs-select');
+        });
+    </script>
+{% endblock custom_js %}
