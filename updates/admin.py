@@ -12,6 +12,7 @@ models = [
     heartbeat_models.Heartbeat,
     licences_models.Licence,
     licences_models.SoftwareProduct,
+    licences_models.UsedSoftwareProduct,
     licences_models.SoftwareModule,
     updates_models.Update,
 ]

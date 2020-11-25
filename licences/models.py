@@ -5,7 +5,7 @@ from updates.models import Update
 
 EXPECTED_MAX_DURATION = timedelta(weeks = 6)
 LIMIT                 = 1000
-DATE_TYPE             = '%Y/%m/%d %H:%M:%S'
+DATE_TYPE             = '%Y/%m/%d'
 
 class Licence(models.Model):
     """
