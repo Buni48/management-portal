@@ -8,23 +8,20 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('customers_list')
 
 def customerList(request: WSGIRequest) -> HttpResponse:
-    heartbeats = Heartbeat.getHeartbeatsMissing()
-    customersA  = Customer.objects.filter(name__startswith='A')
-    customersB  = Customer.objects.filter(name__startswith='B')
-    customersC  = Customer.objects.filter(name__startswith='C')
-    customersD  = Customer.objects.filter(name__startswith='D')
-    customersE  = Customer.objects.filter(name__startswith='E')
-    customersF  = Customer.objects.filter(name__startswith='F')
+    heartbeats    = Heartbeat.getHeartbeatsMissing()
+    customerList  = []
+    for i in range(65, 91):
+        char            = chr(i)
+        customers       = list(Customer.objects.filter(name__startswith = char).values('id', 'name'))
+        obj             = {
+            'letter'   : char,
+            'customers': customers,
+        }
+        customerList.append(obj)
 
     context = {
         'heartbeats': heartbeats,
-        'customersA' : customersA,
-        'customersB' : customersB,
-        'customersC' : customersC,
-        'customersD' : customersD,
-        'customersE' : customersE,
-        'customersF' : customersF,
-
+        'customer_list' : customerList,
     }
     return render(request, 'customers/list.html', context=context)
 
