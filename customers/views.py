@@ -26,15 +26,18 @@ def customerList(request: WSGIRequest) -> HttpResponse:
         'customersF' : customersF,
 
     }
-    return render(request, 'customers/list.html', context)
+    return render(request, 'customers/list.html', context=context)
 
-def customer(request: WSGIRequest) -> HttpResponse:
+def customer(request: WSGIRequest, id:int=0) -> HttpResponse:
+    if id==0:
+        return redirect('customers_list')
+
     heartbeats = Heartbeat.getHeartbeatsMissing()
-    customers  = Customer.objects.all()
-    locations  = Location.objects.all()
+    customer = Customer.objects.get(id = id)
+    locations  = Location.objects.filter(customer_id = id)
     context = {
         'heartbeats': heartbeats,
-        'customers' : customers,
         'locations' : locations,
+        'customer' : customer,
     }
-    return render(request, 'customers/customer.html', context)
+    return render(request, 'customers/customer.html', context=context)

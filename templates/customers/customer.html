@@ -34,7 +34,6 @@
       <div class="card-body">
           <table class="table">
               <tbody>
-              {% for customer in customers %}
                 <tr>
                   <th scope="row">Kundennummer</th>
                   <td>{{customer.customer_number}}</td>
@@ -43,7 +42,6 @@
                   <th scope="row">Ansprechpartner</th>
                   <td>{{customer.name}}</td>
                 </tr>
-              {% endfor %}
               {% for location in locations %}
                 <tr>
                   <th scope="row">Anschrift</th>
