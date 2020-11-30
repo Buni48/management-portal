@@ -1,0 +1,62 @@
+{% extends "site.html" %}
+
+<!-- Title -->
+{% block title %}
+    Suche
+{% endblock title %}
+
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <h1>Globale Suche</h1>
+
+            <form id="form" class="form-inline mr-auto mb-4">
+                <input class="form-control mr-sm-2 input-search"
+                    id="search_word"
+                    type="text"
+                    placeholder="Suchbegriff eingeben"
+                    aria-label="Search"
+                    min="3"
+                    max="64"
+                >
+                <button class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light" type="submit">
+                    Suche
+                </button>
+            </form>
+
+            <div id="output"></div>
+
+            <script>
+                $('#form').on('submit', (event) => {
+                    event.preventDefault();
+            
+                    $.ajax({
+                        type : "POST", 
+                        url  : "{% url 'search_result' %}",
+                        data : {
+                            search_word         : $('#search_word').val(),
+                            csrfmiddlewaretoken : '{{ csrf_token }}',
+                            dataType            : "json",
+                        },
+                        success: (data) => {
+                            console.log(data);
+                            // $('#output').html(data.msg);
+                        },
+                        failure: () => {}
+                    });
+                });
+            </script>
+
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+
+        {% endif %}
+    </div>
+{% endblock content %}
+
+{% block custom_js}
+
+{% endblock custom_js}

@@ -18,6 +18,10 @@
     color: rgb(219, 219, 15);
 }
 
+.input-search {
+    width: 75% !important;
+}
+
 /* sidebar */
 #menu-toggle {
     color:#000;
