@@ -16,12 +16,12 @@
                     type="text"
                     placeholder="Suchbegriff eingeben"
                     aria-label="Search"
-                    min="3"
-                    max="64"
+                    required
                 >
-                <button class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light" type="submit">
+                <button id="button" class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light disabled" type="submit">
                     Suche
                 </button>
+                <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
             </form>
 
             <div id="customers">
@@ -31,6 +31,9 @@
             </div>
 
             <script>
+                $('#search_word').on('keyup', (event) => {
+                    checkValidity();
+                });
                 $('#form').on('submit', (event) => {
                     event.preventDefault();
             
@@ -45,7 +48,6 @@
                         success: (result) => {
                             console.log(result);
                             if (!Object.entries(result).length) {
-                                /* @todo prevent this or show error message */
                                 return;
                             }
                             if (result.customers == '[]') {
@@ -126,6 +128,19 @@
                     key = key.replace('_', ' ');
                     return key;
                 };
+
+                checkValidity = () => {
+                    let value     = document.getElementById('search_word').value;
+                    let button    = document.getElementById('button');
+                    let paragraph = document.getElementById('invalid');
+                    if (value.length < 3 || value.length > 64) {
+                        button.classList.add('disabled');
+                        paragraph.classList.remove('hidden');
+                    } else {
+                        button.classList.remove('disabled');
+                        paragraph.classList.add('hidden');
+                    }
+                };
             </script>
 
         {% else %}
@@ -139,5 +154,4 @@
 {% endblock content %}
 
 {% block custom_js}
-
 {% endblock custom_js}
