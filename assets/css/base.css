@@ -8,6 +8,7 @@
     margin: 10pt;
 
 }
+
 .fa-times-circle {
     color: #f00;
 }
@@ -17,9 +18,12 @@
 .fa-exclamation-circle {
     color: rgb(219, 219, 15);
 }
-
 .input-search {
     width: 75% !important;
+}
+
+.hidden {
+    visibility: hidden;
 }
 
 /* sidebar */
