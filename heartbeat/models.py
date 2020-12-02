@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime, timezone, timedelta
-from licences.models import UsedSoftwareProduct, SoftwareProduct
+from licenses.models import UsedSoftwareProduct, SoftwareProduct
 from customers.models import Location
 
 EXPECTED_MAX_DURATION = timedelta(days = 1, minutes = -45)
@@ -21,7 +21,7 @@ class Heartbeat(models.Model):
     message       = models.CharField(max_length = 2047)
     detail        = models.CharField(max_length = 2047)
     used_product  = models.ForeignKey(
-        to                  = 'licences.UsedSoftwareProduct',
+        to                  = 'licenses.UsedSoftwareProduct',
         on_delete           = models.CASCADE,
         related_name        = 'heartbeats',
         related_query_name  = 'heartbeat',

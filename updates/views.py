@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from heartbeat.models import Heartbeat
-from licences.models import UsedSoftwareProduct
+from licenses.models import UsedSoftwareProduct
 
 def index(request: WSGIRequest) -> HttpResponse:
     return redirect('updates_list')

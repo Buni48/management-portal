@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('licences', '0001_initial'),
+        ('licenses', '0001_initial'),
     ]
 
     operations = [
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('last_received', models.DateTimeField(auto_now_add=True)),
                 ('message', models.CharField(max_length=2047)),
                 ('detail', models.CharField(max_length=2047)),
-                ('used_product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='heartbeats', related_query_name='heartbeat', to='licences.usedsoftwareproduct')),
+                ('used_product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='heartbeats', related_query_name='heartbeat', to='licenses.usedsoftwareproduct')),
             ],
         ),
     ]

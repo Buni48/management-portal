@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('licences', '0001_initial'),
+        ('licenses', '0001_initial'),
     ]
 
     operations = [
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('version', models.CharField(max_length=16)),
                 ('release_date', models.DateTimeField(auto_now_add=True)),
                 ('content', models.BinaryField()),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='updates', related_query_name='update', to='licences.softwareproduct')),
+                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='updates', related_query_name='update', to='licenses.softwareproduct')),
             ],
         ),
     ]

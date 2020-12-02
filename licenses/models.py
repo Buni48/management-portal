@@ -7,17 +7,17 @@ EXPECTED_MAX_DURATION = timedelta(weeks = 6)
 LIMIT                 = 1000
 DATE_TYPE             = '%Y/%m/%d'
 
-class Licence(models.Model):
+class License(models.Model):
     """
-    The model 'Licence' is the permission to use a software module of a software product.
-    It is abstract: There are customer and location licences.
+    The model 'License' is the permission to use a software module of a software product.
+    It is abstract: There are customer and location licenses.
 
     Attributes:
-    key              (str)      : The licence key
-    detail           (str)      : The detailed information about the licence
-    start_date       (datetime) : The start date of the licence
-    end_date         (datetime) : The end date of the licence
-    module           (int)      : Foreign key for the software module the licence is for
+    key              (str)      : The license key
+    detail           (str)      : The detailed information about the license
+    start_date       (datetime) : The start date of the license
+    end_date         (datetime) : The end date of the license
+    module           (int)      : Foreign key for the software module the license is for
     """
     key              = models.CharField(max_length = 255)
     detail           = models.CharField(max_length = 2047)
@@ -26,69 +26,69 @@ class Licence(models.Model):
     module           = models.ForeignKey(
         to                  = 'SoftwareModule',
         on_delete           = models.CASCADE,
-        related_name        = 'licences',
-        related_query_name  = 'licence',
+        related_name        = 'licenses',
+        related_query_name  = 'license',
         null                = False,
     )
 
-    def getLicences(limit: int = LIMIT) -> list:
+    def getLicenses(limit: int = LIMIT) -> list:
         """
-        Returns licences including information about product, location and if a licence is expiring soon.
+        Returns licenses including information about product, location and if a license is expiring soon.
 
         Parameters:
         limit (int): Maximum number of objects to load (default: 1000)
 
         Returns:
-        list: licences
+        list: licenses
         """
-        licences = Licence.objects.all().order_by('end_date')[:limit]
+        licenses = License.objects.all().order_by('end_date')[:limit]
 
-        for licence in licences:
-            duration = licence.end_date - datetime.now(timezone.utc)
-            licence.start_date = licence.start_date.strftime(DATE_TYPE)
-            licence.end_date   = licence.end_date.strftime(DATE_TYPE)
+        for license in licenses:
+            duration = license.end_date - datetime.now(timezone.utc)
+            license.start_date = license.start_date.strftime(DATE_TYPE)
+            license.end_date   = license.end_date.strftime(DATE_TYPE)
             if (duration > EXPECTED_MAX_DURATION):
-                licence.valid = 1
+                license.valid = 1
             elif (duration > timedelta(seconds = 0)):
-                licence.valid = 0
+                license.valid = 0
             else:
-                licence.valid = -1
+                license.valid = -1
 
-            usedProduct      = UsedSoftwareProduct.objects.get(licence__id = licence.id)
-            licence.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
-            licence.location = Location.objects.get(used_product__id = usedProduct.id)
+            usedProduct      = UsedSoftwareProduct.objects.get(license__id = license.id)
+            license.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            license.location = Location.objects.get(used_product__id = usedProduct.id)
 
-        return licences
+        return licenses
 
-class CustomerLicence(Licence):
+class CustomerLicense(License):
     """
-    The customer licence is a licence valid for the whole customer.
+    The customer license is a license valid for the whole customer.
 
     Attributes:
-    licence_ptr (int): Primary key identifier for all licences
-    customer    (int): Foreign key for the customer which uses the licence
+    license_ptr (int): Primary key identifier for all licenses
+    customer    (int): Foreign key for the customer which uses the license
     """
     customer = models.ForeignKey(
         to                  = 'customers.Customer',
         on_delete           = models.CASCADE,
-        related_name        = 'customer_licences',
-        related_query_name  = 'customer_licence',
+        related_name        = 'customer_licenses',
+        related_query_name  = 'customer_license',
         null                = False,
     )
 
-class LocationLicence(Licence):
+class LocationLicense(License):
     """
-    The location licence is a licence valid for a single customer's location.
+    The location license is a license valid for a single customer's location.
 
     Attributes:
-    licence_ptr (int): Primary key identifier for all licences
-    location    (int): Foreign key for the customer's location which uses the licence
+    license_ptr (int): Primary key identifier for all licenses
+    location    (int): Foreign key for the customer's location which uses the license
     """
     location = models.ForeignKey(
         to                  = 'customers.Location',
         on_delete           = models.CASCADE,
-        related_name        = 'location_licences',
-        related_query_name  = 'location_licence',
+        related_name        = 'location_licenses',
+        related_query_name  = 'location_license',
         null                = False,
     )
 
@@ -170,7 +170,7 @@ class UsedSoftwareProduct(models.Model):
 class SoftwareModule(models.Model):
     """
     The model 'SoftwareModule' is a part of a software product.
-    It has multiple licences.
+    It has multiple licenses.
 
     Attributes:
     name    (str): The name of the software module

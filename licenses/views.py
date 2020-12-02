@@ -2,16 +2,16 @@ from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from heartbeat.models import Heartbeat
-from .models import Licence
+from .models import License
 
 def index(request: WSGIRequest) -> HttpResponse:
-    return redirect('licences_list')
+    return redirect('licenses_list')
 
-def licencesList(request: WSGIRequest) -> HttpResponse:
+def licensesList(request: WSGIRequest) -> HttpResponse:
     heartbeats = Heartbeat.getHeartbeatsMissing()
-    licences   = Licence.getLicences()
+    licenses   = License.getLicenses()
     context = {
         'heartbeats': heartbeats,
-        'licences'  : licences,
+        'licenses'  : licenses,
     }
-    return render(request, 'licences/list.html', context)
+    return render(request, 'licenses/list.html', context)

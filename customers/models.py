@@ -120,7 +120,7 @@ class ContactPerson(Person):
     location   (int): The foreign key for the customer's location the contact person is from
     """
     product    = models.ManyToManyField(
-        to                  = 'licences.SoftwareProduct',
+        to                  = 'licenses.SoftwareProduct',
         related_name        = 'contact_persons',
         related_query_name  = 'contact_person',
     )
