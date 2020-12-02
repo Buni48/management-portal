@@ -10,6 +10,7 @@ DATE_TYPE             = '%Y/%m/%d'
 class Licence(models.Model):
     """
     The model 'Licence' is the permission to use a software module of a software product.
+    It is abstract: There are customer and location licences.
 
     Attributes:
     key              (str)      : The licence key
@@ -17,7 +18,6 @@ class Licence(models.Model):
     start_date       (datetime) : The start date of the licence
     end_date         (datetime) : The end date of the licence
     module           (int)      : Foreign key for the software module the licence is for
-    location         (int)      : Foreign key for the customer's location which uses the licence
     """
     key              = models.CharField(max_length = 255)
     detail           = models.CharField(max_length = 2047)
@@ -25,13 +25,6 @@ class Licence(models.Model):
     end_date         = models.DateTimeField()
     module           = models.ForeignKey(
         to                  = 'SoftwareModule',
-        on_delete           = models.CASCADE,
-        related_name        = 'licences',
-        related_query_name  = 'licence',
-        null                = False,
-    )
-    used_product     = models.ForeignKey(
-        to                  = 'UsedSoftwareProduct',
         on_delete           = models.CASCADE,
         related_name        = 'licences',
         related_query_name  = 'licence',
@@ -67,6 +60,38 @@ class Licence(models.Model):
 
         return licences
 
+class CustomerLicence(Licence):
+    """
+    The customer licence is a licence valid for the whole customer.
+
+    Attributes:
+    licence_ptr (int): Primary key identifier for all licences
+    customer    (int): Foreign key for the customer which uses the licence
+    """
+    customer = models.ForeignKey(
+        to                  = 'customers.Customer',
+        on_delete           = models.CASCADE,
+        related_name        = 'customer_licences',
+        related_query_name  = 'customer_licence',
+        null                = False,
+    )
+
+class LocationLicence(Licence):
+    """
+    The location licence is a licence valid for a single customer's location.
+
+    Attributes:
+    licence_ptr (int): Primary key identifier for all licences
+    location    (int): Foreign key for the customer's location which uses the licence
+    """
+    location = models.ForeignKey(
+        to                  = 'customers.Location',
+        on_delete           = models.CASCADE,
+        related_name        = 'location_licences',
+        related_query_name  = 'location_licence',
+        null                = False,
+    )
+
 class SoftwareProduct(models.Model):
     """
     The model 'SoftwareProduct' is a software product which can be used by many customers.
@@ -76,10 +101,12 @@ class SoftwareProduct(models.Model):
     name     (str): The name of the software product
     category (str): The category the software product belongs to
     version  (str): The current version of the software product
+    adviser  (str): The adviser of the software product
     """
     name     = models.CharField(max_length = 64)
     category = models.CharField(max_length = 64)
     version  = models.CharField(max_length = 16)
+    adviser  = models.CharField(max_length = 64, null = True)
 
     def __str__(self):
         return self.name

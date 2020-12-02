@@ -49,7 +49,6 @@ class Location(models.Model):
     postcode        (str): The postal code of the city where it's located
     city            (str): The city where it's located
     customer        (int): Foreign key for the customer the location belongs to
-    adviser         (int): Foreign key for the customer adviser of aubex who is responsible for the location
     """
     name            = models.CharField(max_length = 64)
     email_address   = models.CharField(max_length = 64)
@@ -64,13 +63,6 @@ class Location(models.Model):
         related_name        = 'locations',
         related_query_name  = 'location',
         null                = False,
-    )
-    adviser         = models.ForeignKey(
-        to                  = 'CustomerAdviser',
-        on_delete           = models.SET_NULL,
-        related_name        = 'locations',
-        related_query_name  = 'location',
-        null                = True,
     )
 
     def __str__(self):
@@ -117,34 +109,25 @@ class Person(models.Model):
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
-    class Meta:
-        abstract = True
-
 class ContactPerson(Person):
     """
     The model 'ContactPerson' inherits from abstract 'Person'.
     He is part of a customer's location and the contact person for aubex.
 
     Attributes:
-    product  (int): The foreign keys for the products the contact person is responsible for
-    location (int): The foreign key for the customer's location the contact person is from
+    person_ptr (int): The primary key identifier for all persons
+    product    (int): The foreign keys for the products the contact person is responsible for
+    location   (int): The foreign key for the customer's location the contact person is from
     """
-    product  = models.ManyToManyField(
+    product    = models.ManyToManyField(
         to                  = 'licences.SoftwareProduct',
         related_name        = 'contact_persons',
         related_query_name  = 'contact_person',
     )
-    location = models.ForeignKey(
+    location   = models.ForeignKey(
         to                  = 'Location',
         on_delete           = models.CASCADE,
         related_name        = 'contact_persons',
         related_query_name  = 'contact_person',
-        null                = True,
+        null                = False,
     )
-
-class CustomerAdviser(Person):
-    """
-    The model 'CustomerAdviser' inherits from abstract 'Person'.
-    He is part of aubex and advises a customer's location.
-    """
-    pass
