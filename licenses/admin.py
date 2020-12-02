@@ -1,3 +1,12 @@
 from django.contrib import admin
+from . import models
 
-# Register your models here.
+license_models = [
+    models.CustomerLicense,
+    models.LocationLicense,
+    models.SoftwareProduct,
+    models.UsedSoftwareProduct,
+    models.SoftwareModule,
+]
+
+admin.site.register(license_models)
