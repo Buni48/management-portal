@@ -8,9 +8,9 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('heartbeat_list')
 
 def heartbeatList(request: WSGIRequest) -> HttpResponse:
-    heartbeats = Heartbeat.getHeartbeats()
+    usedProducts = Heartbeat.getHeartbeats()
     context = {
-        'heartbeats'    : heartbeats,
-        'count_missing' : Heartbeat.getCountMissing(heartbeats),
+        'used_products' : usedProducts,
+        'count_missing' : Heartbeat.getCountMissing(usedProducts),
     }
     return render(request, 'heartbeat/list.html', context)

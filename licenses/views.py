@@ -8,7 +8,7 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('licenses_list')
 
 def licensesList(request: WSGIRequest) -> HttpResponse:
-    heartbeats = Heartbeat.getHeartbeatsMissing()
+    heartbeats = Heartbeat.getHeartbeats()
     licenses   = License.getLicenses()
     context = {
         'heartbeats': heartbeats,

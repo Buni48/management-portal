@@ -8,7 +8,7 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('updates_list')
 
 def updatesList(request: WSGIRequest) -> HttpResponse:
-    heartbeats   = Heartbeat.getHeartbeatsMissing()
+    heartbeats   = Heartbeat.getHeartbeats()
     usedProducts = UsedSoftwareProduct.getUsedProducts()
     context      = {
         'heartbeats'    : heartbeats,

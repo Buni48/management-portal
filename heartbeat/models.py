@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from datetime import datetime, timezone, timedelta
 from licenses.models import UsedSoftwareProduct, SoftwareProduct
 from customers.models import Location
@@ -38,50 +39,41 @@ class Heartbeat(models.Model):
         Returns:
         list: Heartbeats
         """
-        heartbeats = Heartbeat.objects.all().order_by('last_received')[:limit]
+        usedProducts = UsedSoftwareProduct.objects.all()[:limit]
 
-        for heartbeat in heartbeats:
-            duration = datetime.now(timezone.utc) - heartbeat.last_received
-            heartbeat.last_received = heartbeat.last_received.strftime(DATE_TYPE)
-            if (duration <= EXPECTED_MAX_DURATION):
-                heartbeat.received = True
-            else:
-                heartbeat.received = False
+        for usedProduct in usedProducts:
+            heartbeats            = Heartbeat.objects.filter(used_product_id = usedProduct.id)
+            last_received_max     = heartbeats.aggregate(Max('last_received'))
 
-            usedProduct         = UsedSoftwareProduct.objects.get(heartbeat__id = heartbeat.id)
-            heartbeat.product   = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
-            heartbeat.location  = Location.objects.get(used_product__id = usedProduct.id)
+            try:
+                usedProduct.heartbeat     = Heartbeat.objects.get(used_product_id = usedProduct.id, last_received = last_received_max['last_received__max'])
+                duration                  = datetime.now(timezone.utc) - usedProduct.heartbeat.last_received
+                usedProduct.last_received = usedProduct.heartbeat.last_received.strftime(DATE_TYPE)
+                if (duration <= EXPECTED_MAX_DURATION):
+                    usedProduct.received = True
+                else:
+                    usedProduct.received = False
+            except:
+                usedProduct.last_received = 'Noch nie'
+                usedProduct.received = False
 
-        return heartbeats
+            usedProduct.product   = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
+            usedProduct.location  = Location.objects.get(used_product__id = usedProduct.id)
 
-    def getCountMissing(heartbeats: list) -> int:
+        return usedProducts
+
+    def getCountMissing(usedProducts: list) -> int:
         """
         Returns the amount of heartbeats not received in expected time.
 
         Parameters:
-        heartbeats (list): List of heartbeat objects
+        usedProducts (list): List of used products
 
         Returns:
         int: Amount of missing heartbeats
         """
         count = 0
-        for heartbeat in heartbeats:
-            if (heartbeat.received == False):
+        for usedProduct in usedProducts:
+            if (usedProduct.received == False):
                 count += 1
         return count
-
-    def getHeartbeatsMissing() -> list:
-        """
-        Returns the missing heartbeats including the location.
-
-        Returns:
-        list: Heartbeats
-        """
-        missingTime = datetime.now(timezone.utc) - EXPECTED_MAX_DURATION
-        heartbeats = Heartbeat.objects.filter(last_received__lte = missingTime).order_by('last_received')
-
-        for heartbeat in heartbeats:
-            usedProduct         = UsedSoftwareProduct.objects.get(heartbeat__id = heartbeat.id)
-            heartbeat.location  = Location.objects.get(used_product__id = usedProduct.id)
-
-        return heartbeats

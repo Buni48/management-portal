@@ -27,18 +27,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for heartbeat in heartbeats %}
+            {% for used_product in used_products %}
                 <tr>
                     <td></td>
                     <td>
-                        {{heartbeat.location}}
+                        {{used_product.location}}
                     </td>
                     <td>
-                        {{heartbeat.product}}
+                        {{used_product.product}}
                     </td>
                     <td>
-                        {{heartbeat.last_received}}&nbsp;
-                        {% if heartbeat.received %}
+                        {{used_product.last_received}}&nbsp;
+                        {% if used_product.received %}
                             <i class="fas fa-check-circle"></i>
                         {% else %}
                             <i class="fas fa-times-circle"></i>

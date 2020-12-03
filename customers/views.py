@@ -8,7 +8,7 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('customers_list')
 
 def customerList(request: WSGIRequest) -> HttpResponse:
-    heartbeats    = Heartbeat.getHeartbeatsMissing()
+    heartbeats    = Heartbeat.getHeartbeats()
     customerList  = []
     for i in range(65, 91):
         char            = chr(i)
@@ -29,7 +29,7 @@ def customer(request: WSGIRequest, id:int=0) -> HttpResponse:
     if id==0:
         return redirect('customers_list')
 
-    heartbeats = Heartbeat.getHeartbeatsMissing()
+    heartbeats = Heartbeat.getHeartbeats()
     customer = Customer.objects.get(id = id)
     locations  = Location.objects.filter(customer_id = id)
     context = {

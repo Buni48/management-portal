@@ -12,14 +12,14 @@ def index(request: WSGIRequest) -> HttpResponse:
         return redirect('login')
 
 def home(request: WSGIRequest) -> HttpResponse:
-    heartbeats = Heartbeat.getHeartbeatsMissing()
+    heartbeats = Heartbeat.getHeartbeats()
     context = {
         'heartbeats': heartbeats,
     }
     return render(request, 'home.html', context)
 
 def search(request: WSGIRequest) -> HttpResponse:
-    heartbeats = Heartbeat.getHeartbeatsMissing()
+    heartbeats = Heartbeat.getHeartbeats()
     context = {
         'heartbeats': heartbeats,
     }
