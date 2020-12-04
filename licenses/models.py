@@ -1,11 +1,4 @@
 from django.db import models
-from datetime import datetime, timezone, timedelta
-from customers.models import Customer, Location
-from updates.models import Update
-
-EXPECTED_MAX_DURATION = timedelta(weeks = 6)
-LIMIT                 = 1000
-DATE_TYPE             = '%Y/%m/%d'
 
 class License(models.Model):
     """
@@ -30,48 +23,6 @@ class License(models.Model):
         related_query_name  = 'license',
         null                = False,
     )
-
-    def getLicenses(limit: int = LIMIT) -> list:
-        """
-        Returns licenses including information about product, location and if a license is expiring soon.
-
-        Parameters:
-        limit (int): Maximum number of objects to load (default: 1000)
-
-        Returns:
-        list: licenses
-        """
-        licenses = License.objects.all().order_by('end_date')[:limit]
-
-        for license in licenses:
-            duration = license.end_date - datetime.now(timezone.utc)
-            license.start_date = license.start_date.strftime(DATE_TYPE)
-            license.end_date   = license.end_date.strftime(DATE_TYPE)
-            if (duration > EXPECTED_MAX_DURATION):
-                license.valid = 1
-            elif (duration > timedelta(seconds = 0)):
-                license.valid = 0
-            else:
-                license.valid = -1
-
-            license.product  = SoftwareProduct.objects.get(id = license.module.product_id)
-            try:
-                # if license is a location license
-                locationLicense  = LocationLicense.objects.get(license_ptr_id = license.id)
-                license.location = Location.objects.get(id = locationLicense.location_id)
-                license.customer = Customer.objects.get(id = license.location.customer_id)
-            except:
-                try:
-                    # if license is a customer license
-                    customerLicense  = CustomerLicense.objects.get(license_ptr_id = license.id)
-                    license.location = 'Für alle gültig'
-                    license.customer = Customer.objects.get(id = customerLicense.customer_id)
-                except:
-                    # if license has no child (this shouldn't happen: license is abstract!)
-                    license.location = 'Nicht zugewiesen'
-                    license.customer = 'Nicht zugewiesen'
-
-        return licenses
 
 class CustomerLicense(License):
     """
@@ -148,37 +99,6 @@ class UsedSoftwareProduct(models.Model):
         related_query_name  = 'used_product',
         null                = False,
     )
-
-    def getUsedProducts(limit: int = LIMIT) -> list:
-        """
-        Returns used products including information about product, location and if the used product uses the current software version.
-
-        Parameters:
-        limit (int): Maximum number of objects to load (default: 1000)
-
-        Returns:
-        list: used products
-        """
-        usedProducts = UsedSoftwareProduct.objects.all()[:limit]
-
-        for usedProduct in usedProducts:
-            usedProduct.location     = Location.objects.get(used_product__id = usedProduct.id)
-            usedProduct.product      = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
-            usedProduct.last_updated = usedProduct.last_updated.strftime(DATE_TYPE)
-
-            if usedProduct.version == usedProduct.product.version:
-                usedProduct.current = True
-            else:
-                usedProduct.current = False
-
-            try:
-                updates = Update.objects.filter(product_id = usedProduct.product.id).order_by('-release_date')
-                usedProduct.last_released = updates[0].release_date.strftime(DATE_TYPE)
-            except:
-                usedProduct.last_released = 'Noch nie'
-                usedProduct.last_updated  = 'Noch nie'
-
-        return usedProducts
 
 class SoftwareModule(models.Model):
     """

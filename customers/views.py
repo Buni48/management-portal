@@ -2,13 +2,13 @@ from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from .models import Customer, Location
-from heartbeat.models import Heartbeat
+from heartbeat.controllers import HeartbeatController
 
 def index(request: WSGIRequest) -> HttpResponse:
     return redirect('customers_list')
 
 def customerList(request: WSGIRequest) -> HttpResponse:
-    heartbeats    = Heartbeat.getHeartbeats()
+    heartbeats    = HeartbeatController.read()
     customerList  = []
     for i in range(65, 91):
         char            = chr(i)
