@@ -14,6 +14,9 @@
                 <thead>
                     <tr>
                         <th class="th-sm">
+                            Kunde
+                        </th>
+                        <th class="th-sm">
                             Standort
                         </th>
                         <th class="th-sm">
@@ -34,7 +37,16 @@
                     {% for license in licenses %}
                         <tr>
                             <td>
+                                {{license.customer}}
+                                {% if license.customer == 'Nicht zugewiesen' %}
+                                    <i class="fas fa-exclamation-circle" title="Lizenz ist weder Standort noch Kunde zugewiesen"></i>
+                                {% endif %}
+                            </td>
+                            <td>
                                 {{license.location}}
+                                {% if license.customer == 'Nicht zugewiesen' %}
+                                    <i class="fas fa-exclamation-circle" title="Lizenz ist weder Standort noch Kunde zugewiesen"></i>
+                                {% endif %}
                             </td>
                             <td>
                                 {{license.product}}
@@ -48,11 +60,11 @@
                             <td>
                                 {{license.end_date}}&nbsp;
                                 {% if license.valid == 1 %}
-                                    <i class="fas fa-check-circle"></i>
+                                    <i class="fas fa-check-circle" title="Lizenz noch mind. 6 Wochen gültig"></i>
                                 {% elif license.valid == 0 %}
-                                    <i class="fas fa-exclamation-circle"></i>
+                                    <i class="fas fa-exclamation-circle" title="Lizenz läuft bald ab"></i>
                                 {% elif license.valid == -1 %}
-                                    <i class="fas fa-times-circle"></i>
+                                    <i class="fas fa-times-circle" title="Lizenz ist abgelaufen"></i>
                                 {% endif %}
                             </td>
                         </tr>

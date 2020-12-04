@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime, timezone, timedelta
-from customers.models import Location
+from customers.models import Customer, Location
 from updates.models import Update
 
 EXPECTED_MAX_DURATION = timedelta(weeks = 6)
@@ -54,9 +54,22 @@ class License(models.Model):
             else:
                 license.valid = -1
 
-            usedProduct      = UsedSoftwareProduct.objects.get(license__id = license.id)
-            license.product  = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
-            license.location = Location.objects.get(used_product__id = usedProduct.id)
+            license.product  = SoftwareProduct.objects.get(id = license.module.product_id)
+            try:
+                # if license is a location license
+                locationLicense  = LocationLicense.objects.get(license_ptr_id = license.id)
+                license.location = Location.objects.get(id = locationLicense.location_id)
+                license.customer = Customer.objects.get(id = license.location.customer_id)
+            except:
+                try:
+                    # if license is a customer license
+                    customerLicense  = CustomerLicense.objects.get(license_ptr_id = license.id)
+                    license.location = 'Für alle gültig'
+                    license.customer = Customer.objects.get(id = customerLicense.customer_id)
+                except:
+                    # if license has no child (this shouldn't happen: license is abstract!)
+                    license.location = 'Nicht zugewiesen'
+                    license.customer = 'Nicht zugewiesen'
 
         return licenses
 
