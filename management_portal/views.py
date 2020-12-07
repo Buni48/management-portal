@@ -3,6 +3,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, JsonResponse
 from heartbeat.controllers import HeartbeatController
 from customers.controllers import CustomerController, LocationController, ContactPersonController
+from licenses.controllers  import SoftwareProductController, SoftwareModuleController
 import json
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -34,10 +35,14 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
             customers = CustomerController.getFilteredCustomers(word = searchWord, contains = contains)
             locations = LocationController.getLocationsByName(word = searchWord, contains = contains)
             contacts  = ContactPersonController.getContactPersonsByName(word = searchWord, contains = contains)
+            products  = SoftwareProductController.getProductsByName(word = searchWord, contains = contains)
+            modules   = SoftwareModuleController.getModulesByName(word = searchWord, contains = contains)
             response = {
-                'customers'      : json.dumps(customers),
-                'locations'      : json.dumps(locations),
-                'contact_persons': json.dumps(contacts),
+                'customers'         : json.dumps(customers),
+                'locations'         : json.dumps(locations),
+                'contact_persons'   : json.dumps(contacts),
+                'software_products' : json.dumps(products),
+                'software_modules'  : json.dumps(modules),
             }
     return JsonResponse(response)
 

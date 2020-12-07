@@ -1,4 +1,4 @@
-from .models import License, CustomerLicense, LocationLicense, SoftwareProduct
+from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, SoftwareModule
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, LICENSE_EXPIRE_WARNING
@@ -47,3 +47,49 @@ class LicenseController:
                     license.customer = 'Nicht zugewiesen'
 
         return licenses
+
+
+class SoftwareProductController:
+
+    @staticmethod
+    def getProductsByName(word: str, contains: bool = False) -> list:
+        """
+        Returns the filtered software products, filtering by name.
+        Pass a word to filter. You can choose to filter "contains" or "is".
+
+        Parameters:
+        word     (str) : word to filter by
+        contains (bool): if contains or is
+
+        Returns:
+        list: filtered software products
+        """
+        if contains:
+            products = SoftwareProduct.objects.filter(name__icontains = word).values('id', 'name', 'category')
+        else:
+            products = SoftwareProduct.objects.filter(name__iexact = word).values('id', 'name', 'category')
+        
+        return list(products)
+
+
+class SoftwareModuleController:
+
+    @staticmethod
+    def getModulesByName(word: str, contains: bool = False) -> list:
+        """
+        Returns the filtered software modules, filtering by name.
+        Pass a word to filter. You can choose to filter "contains" or "is".
+
+        Parameters:
+        word     (str) : word to filter by
+        contains (bool): if contains or is
+
+        Returns:
+        list: filtered software modules
+        """
+        if contains:
+            modules = SoftwareModule.objects.filter(name__icontains = word).values('id', 'name', 'product__name')
+        else:
+            modules = SoftwareModule.objects.filter(name__iexact = word).values('id', 'name', 'product__name')
+        
+        return list(modules)
