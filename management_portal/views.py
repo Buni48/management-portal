@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, JsonResponse
 from heartbeat.controllers import HeartbeatController
-from customers.controllers import CustomerController, LocationController
+from customers.controllers import CustomerController, LocationController, ContactPersonController
 import json
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -33,9 +33,11 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
         if len(searchWord) > 2:
             customers = CustomerController.getFilteredCustomers(word = searchWord, contains = contains)
             locations = LocationController.getLocationsByName(word = searchWord, contains = contains)
+            contacts  = ContactPersonController.getContactPersonsByName(word = searchWord, contains = contains)
             response = {
-                'customers': json.dumps(customers),
-                'locations': json.dumps(locations),
+                'customers'      : json.dumps(customers),
+                'locations'      : json.dumps(locations),
+                'contact_persons': json.dumps(contacts),
             }
     return JsonResponse(response)
 
