@@ -21,8 +21,13 @@
                 <button id="button" class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light disabled" type="submit">
                     Suche
                 </button>
-                <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
             </form>
+
+            <div class="custom-control custom-checkbox left-button">
+                <input type="checkbox" class="custom-control-input" id="contains" value="True" checked>
+                <label class="custom-control-label" for="contains">Beinhaltende einschließen</label>
+            </div>
+            <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
 
             <div id="customers">
                 <h2 id="customers-title" class="hidden">Kunden</h2>
@@ -58,6 +63,9 @@
                 $('#search_word').on('keyup', (event) => {
                     checkValidity();
                 });
+                $('#contains').on('click', (event) => {
+                    checkContains();
+                });
                 $('#form').on('submit', (event) => {
                     event.preventDefault();
             
@@ -66,18 +74,28 @@
                         url  : "{% url 'search_result' %}",
                         data : {
                             search_word         : $('#search_word').val(),
+                            contains            : $('#contains').val(),
                             csrfmiddlewaretoken : '{{ csrf_token }}',
                             dataType            : "json",
                         },
                         success: (result) => {
-                            console.log(result);
                             generateTables(result);
                         },
                         failure: () => {
-                            console.log('error');
+                            console.error('Request failed!');
                         }
                     });
                 });
+
+                checkContains = () => {
+                    let checkbox = document.getElementById('contains');
+                    let value    = checkbox.value;
+                    if (value == 'True') {
+                        checkbox.setAttribute('value', 'False');
+                    } else {
+                        checkbox.setAttribute('value', 'True');
+                    }
+                };
 
                 generateTables = (data) => {
                     if (!Object.entries(data).length) {

@@ -20,8 +20,8 @@ class CustomerController:
             customersByNumber = Customer.objects.filter(customer_number__icontains = word).values('id', 'customer_number', 'name')
             customersByName   = Customer.objects.filter(name__icontains = word).values('id', 'customer_number', 'name')
         else:
-            customersByNumber = Customer.objects.filter(customer_number_iexact = word).values('id', 'customer_number', 'name')
-            customersByName   = Customer.objects.filter(name_iexact = word).values('id', 'customer_number', 'name')
+            customersByNumber = Customer.objects.filter(customer_number__iexact = word).values('id', 'customer_number', 'name')
+            customersByName   = Customer.objects.filter(name__iexact = word).values('id', 'customer_number', 'name')
 
         return list(chain(customersByName, customersByNumber))
 
@@ -44,7 +44,7 @@ class LocationController:
         if contains:
             locations = Location.objects.filter(name__icontains = word).values('id', 'name', 'postcode', 'city')
         else:
-            locations = Location.objects.filter(name_iexact = word).values('id', 'name', 'postcode', 'city')
+            locations = Location.objects.filter(name__iexact = word).values('id', 'name', 'postcode', 'city')
         
         for location in locations:
             customer = Customer.objects.get(id = location['id'])

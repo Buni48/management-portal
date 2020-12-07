@@ -30,7 +30,9 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
     response = {}
     if request.is_ajax():
         searchWord = request.POST.get('search_word', '')
-        contains   = request.POST.get('if_contains', True)
+        contains   = request.POST.get('contains', True)
+        if contains == 'False':
+            contains = False
         if len(searchWord) > 2:
             customers = CustomerController.getFilteredCustomers(word = searchWord, contains = contains)
             locations = LocationController.getLocationsByName(word = searchWord, contains = contains)
