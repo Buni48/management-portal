@@ -80,8 +80,8 @@ class ContactPersonController:
                 contactsTwo = ContactPerson.objects.filter(first_name__icontains = words[1] + words[2], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
                 contacts    = list(chain(contactsOne, contactsTwo))
             else:
-                contactsByFirstName = ContactPerson.objects.filter(first_name__icontains = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsByLastName  = ContactPerson.objects.filter(last_name__icontains  = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contactsByFirstName = ContactPerson.objects.filter(first_name__icontains = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
+                contactsByLastName  = ContactPerson.objects.filter(last_name__icontains  = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
                 contacts            = list(chain(contactsByFirstName, contactsByLastName))
         else:
             if len(words) == 2:

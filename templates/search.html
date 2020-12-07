@@ -150,9 +150,25 @@
                     }
                     key = key.charAt(0).toUpperCase() + key.slice(1);
                     key = key.replace('__name', '');
+                    key = key.replace('Location__customer', 'Customer');
                     key = key.replace('_', ' ');
+                    key = translateKey(key);
+
                     return key;
                 };
+
+                translateKey = (key) => {
+                    key = key.replace('Customer number', 'Kundennummer');
+                    key = key.replace('Postcode', 'PLZ');
+                    key = key.replace('City', 'Ort');
+                    key = key.replace('Customer', 'Kunde');
+                    key = key.replace('First ', 'Vor');
+                    key = key.replace('Last ', 'Nach');
+                    key = key.replace('Location', 'Standort');
+                    key = key.replace('Product', 'Produkt');
+
+                    return key;
+                }
 
                 checkValidity = () => {
                     let value     = document.getElementById('search_word').value;
