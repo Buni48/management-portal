@@ -14,8 +14,25 @@ def index(request: WSGIRequest) -> HttpResponse:
 
 def home(request: WSGIRequest) -> HttpResponse:
     heartbeats = HeartbeatController.read()
+    countMissing = HeartbeatController.getCountMissing(heartbeats)
+    countTotal = len(HeartbeatController.read(1000))
+    licenses = LicenseController.read()
+    licenseCount = LicenseController.getCounts(licenses)
+    licensesExpired = licenseCount['missing']
+    licensesOkay = licenseCount['valid']
+    countOkay = countTotal - countMissing
+    updateList = UpdateController.getStatus()
+    updateCurrent = updateList[0]
+    updateExpired = updateList[1]
+
     context = {
-        'heartbeats': heartbeats,
+        'heartbeats'      : heartbeats,
+        'count_missing'   : countMissing,
+        'count_okay'      : countOkay,
+        'licenses_okay'   : licensesOkay,
+        'licenses_expired': licensesExpired,
+        'update_current'  : updateCurrent,
+        'update_expired'  : updateExpired,
     }
     return render(request, 'home.html', context)
 
