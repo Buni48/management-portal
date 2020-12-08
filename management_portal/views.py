@@ -33,7 +33,7 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
         contains   = request.POST.get('contains', True)
         if contains == 'False':
             contains = False
-        if len(searchWord) > 2:
+        if len(searchWord) > 2 and len(searchWord) < 101:
             customers = CustomerController.getFilteredCustomers(word = searchWord, contains = contains)
             locations = LocationController.getLocationsByName(word = searchWord, contains = contains)
             contacts  = ContactPersonController.getContactPersonsByName(word = searchWord, contains = contains)

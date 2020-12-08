@@ -5,6 +5,7 @@
     Suche
 {% endblock title %}
 
+<!-- Content -->
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
@@ -16,6 +17,7 @@
                     type="text"
                     placeholder="Suchbegriff eingeben"
                     aria-label="Search"
+                    maxlength="100"
                     required
                 >
                 <button id="button" class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light disabled" type="submit">
@@ -27,7 +29,7 @@
                 <input type="checkbox" class="custom-control-input" id="contains" value="True" checked>
                 <label class="custom-control-label" for="contains">Beinhaltende einschließen</label>
             </div>
-            <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
+            <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3 und 100 Zeichen lang sein.</p>
 
             <div id="customers">
                 <h2 id="customers-title" class="hidden">Kunden</h2>
@@ -205,7 +207,7 @@
                     let value     = document.getElementById('search_word').value;
                     let button    = document.getElementById('button');
                     let paragraph = document.getElementById('invalid');
-                    if (value.length < 3 || value.length > 64) {
+                    if (value.length < 3 || value.length > 100) {
                         button.classList.add('disabled');
                         paragraph.classList.remove('hidden');
                     } else {
