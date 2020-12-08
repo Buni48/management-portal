@@ -21,18 +21,50 @@
                 <button id="button" class="btn btn-indigo btn-rounded btn-sm my-0 waves-effect waves-light disabled" type="submit">
                     Suche
                 </button>
-                <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
             </form>
 
+            <div class="custom-control custom-checkbox left-button">
+                <input type="checkbox" class="custom-control-input" id="contains" value="True" checked>
+                <label class="custom-control-label" for="contains">Beinhaltende einschließen</label>
+            </div>
+            <p id="invalid" class="red-text hidden">Der Suchbegriff muss zwischen 3-64 Zeichen lang sein.</p>
+
             <div id="customers">
-                <h2 id="customer-title" class="hidden">Kunden</h2>
-               <table id="customer-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                <h2 id="customers-title" class="hidden">Kunden</h2>
+               <table id="customers-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                </table>
+            </div>
+
+            <div id="locations">
+                <h2 id="locations-title" class="hidden">Standorte</h2>
+               <table id="locations-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                </table>
+            </div>
+
+            <div id="contact_persons">
+                <h2 id="contact_persons-title" class="hidden">Ansprechpartner</h2>
+               <table id="contact_persons-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                </table>
+            </div>
+
+            <div id="software_products">
+                <h2 id="software_products-title" class="hidden">Software-Produkte</h2>
+               <table id="software_products-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                </table>
+            </div>
+
+            <div id="software_modules">
+                <h2 id="software_modules-title" class="hidden">Software-Module</h2>
+               <table id="software_modules-table selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                 </table>
             </div>
 
             <script>
                 $('#search_word').on('keyup', (event) => {
                     checkValidity();
+                });
+                $('#contains').on('click', (event) => {
+                    checkContains();
                 });
                 $('#form').on('submit', (event) => {
                     event.preventDefault();
@@ -42,49 +74,71 @@
                         url  : "{% url 'search_result' %}",
                         data : {
                             search_word         : $('#search_word').val(),
+                            contains            : $('#contains').val(),
                             csrfmiddlewaretoken : '{{ csrf_token }}',
                             dataType            : "json",
                         },
                         success: (result) => {
-                            console.log(result);
-                            if (!Object.entries(result).length) {
-                                return;
-                            }
-                            if (result.customers == '[]') {
-                                customers = null;
-                            } else {
-                                customers = JSON.parse(result.customers);
-                            }
-                            
-                            let customerThead = document.getElementById('customer-thead');
-                            if (customers) {
-                                document.getElementById('customer-title').classList.remove('hidden');
-                                let customerTable = document.getElementById('customer-table selectedColumn');
-                                let data          = Object.keys(customers[0]);
-                                if (!customerThead) {
-                                    generateTableHead(customerTable, data, 'customer');
-                                } else {
-                                    deleteTable('customer');
-                                }
-                                generateTableBody(customerTable, customers, 'customer');
-                            } else {
-                                document.getElementById('customer-title').classList.add('hidden');
-                                if (customerThead) {
-                                    deleteTable('customer', customerThead);
-                                }
-                            }
+                            generateTables(result);
                         },
                         failure: () => {
-                            console.log('error');
+                            console.error('Request failed!');
                         }
                     });
                 });
 
-                generateTableHead = (table, data, name) => {
+                checkContains = () => {
+                    let checkbox = document.getElementById('contains');
+                    let value    = checkbox.value;
+                    if (value == 'True') {
+                        checkbox.setAttribute('value', 'False');
+                    } else {
+                        checkbox.setAttribute('value', 'True');
+                    }
+                };
+
+                generateTables = (data) => {
+                    if (!Object.entries(data).length) {
+                        return;
+                    }
+                    for (let [key, value] of Object.entries(data)) {
+                        tableData = parseJson(value);
+                        generateTable(tableData, key);
+                    }
+                };
+
+                parseJson = (dataString) => {
+                    if (!dataString || dataString == '[]') {
+                        return null;
+                    }
+                    return JSON.parse(dataString);
+                };
+
+                generateTable = (data, name) => {
+                    let thead = document.getElementById(name + '-thead');
+                    if (data) {
+                        document.getElementById(name + '-title').classList.remove('hidden');
+                        let table = document.getElementById(name + '-table selectedColumn');
+                        let keys  = Object.keys(data[0]);
+                        if (!thead) {
+                            generateTableHead(table, keys, name);
+                        } else {
+                            deleteTable(name);
+                        }
+                        generateTableBody(table, data, name);
+                    } else {
+                        document.getElementById(name + '-title').classList.add('hidden');
+                        if (thead) {
+                            deleteTable(name, thead);
+                        }
+                    }
+                };
+
+                generateTableHead = (table, keys, name) => {
                     let thead = table.createTHead();
                     thead.setAttribute('id', name + '-thead');
                     let row = thead.insertRow();
-                    for (let key of data) {
+                    for (let key of keys) {
                         if (key == 'id') {
                             continue;
                         }
@@ -125,9 +179,27 @@
                         return '';
                     }
                     key = key.charAt(0).toUpperCase() + key.slice(1);
+                    key = key.replace('__name', '');
+                    key = key.replace('Location__customer', 'Customer');
                     key = key.replace('_', ' ');
+                    key = translateKey(key);
+
                     return key;
                 };
+
+                translateKey = (key) => {
+                    key = key.replace('Customer number', 'Kundennummer');
+                    key = key.replace('Postcode', 'PLZ');
+                    key = key.replace('City', 'Ort');
+                    key = key.replace('Customer', 'Kunde');
+                    key = key.replace('First ', 'Vor');
+                    key = key.replace('Last ', 'Nach');
+                    key = key.replace('Location', 'Standort');
+                    key = key.replace('Product', 'Produkt');
+                    key = key.replace('Category', 'Kategorie');
+
+                    return key;
+                }
 
                 checkValidity = () => {
                     let value     = document.getElementById('search_word').value;

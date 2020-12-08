@@ -25,6 +25,9 @@
 .hidden {
     visibility: hidden;
 }
+.left-button {
+    text-align: left;
+}
 
 /* sidebar */
 #menu-toggle {
