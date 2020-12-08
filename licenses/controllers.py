@@ -49,6 +49,20 @@ class LicenseController:
         return licenses
 
 
+    @staticmethod
+    def getCounts(licenses: list) -> list:
+        count = {
+            'missing': 0,
+            'valid': 0,
+        }
+        for license in licenses:
+            if license.valid == -1:
+                count['missing'] += 1
+        else:
+            count['valid'] += 1
+
+        return count
+
 class SoftwareProductController:
 
     @staticmethod
@@ -68,7 +82,7 @@ class SoftwareProductController:
             products = SoftwareProduct.objects.filter(name__icontains = word).values('id', 'name', 'category')
         else:
             products = SoftwareProduct.objects.filter(name__iexact = word).values('id', 'name', 'category')
-        
+
         return list(products)
 
 
@@ -104,5 +118,5 @@ class SoftwareModuleController:
             modules = SoftwareModule.objects.filter(name__icontains = word).values('id', 'name', 'product__name')
         else:
             modules = SoftwareModule.objects.filter(name__iexact = word).values('id', 'name', 'product__name')
-        
+
         return list(modules)
