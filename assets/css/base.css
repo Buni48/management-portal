@@ -224,3 +224,7 @@ table.dataTable thead .sorting_desc_disabled:before {
     margin-left: 5%;
     margin-bottom: 7.5%;
 }
+
+.h4style{
+    margin-left: -1%;
+}
