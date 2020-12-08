@@ -12,11 +12,6 @@
         {% if request.user.is_authenticated %}
             <h1 class="Lage">Derzeitige Lage des Portals</h1>
 
-
-            <p> Heartbeats die nicht angekommen sind: {{count_missing}}</p>
-            <p> Heartbeats die   angekommen sind: {{count_okay}}</p>
-
-
              <div id = "charts" class="row">
                  <div class="col-4">
                      <h4 class ="chartTitle"> Aktuelle Updates</h4>
@@ -32,14 +27,6 @@
                  </div>
              </div>
 
-
-
-
-
-
-
-
-
         <script>
            //bar
            var ctxB = document.getElementById("barChart1").getContext('2d');
@@ -50,24 +37,21 @@
             labels: ["{{update_current}}","{{update_expired}}"],
             datasets: [
                 {
-                         label: ['Updates nicht installiert'],
-                         data: [{{update_current}},{{update_expired}} ],
-                         backgroundColor: [
-                                            'rgba(207, 0, 15, 1)',
-                                             'rgba(31, 58, 147, 1)',
-                                           ],
-                         borderColor: [
-                                        'rgba(207, 0, 15, 1)',
-                                        'rgba(31, 58, 147, 1)',
-                                        ],
-
+                    label: ['Updates nicht installiert'],
+                    data: [{{update_current}},{{update_expired}} ],
+                    backgroundColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
+                    borderColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
                 },
                 {
-
-
-                label: 'Updates installiert',
-                backgroundColor: 'rgba(31, 58, 147, 1)',
-                borderColor:      'rgba(31, 58, 147, 1)',
+                    label: 'Updates installiert',
+                    backgroundColor: 'rgba(31, 58, 147, 1)',
+                    borderColor:      'rgba(31, 58, 147, 1)',
                 }
             ],
         },
@@ -96,11 +80,6 @@
              display: true,
 
             }]
-
-
-
-
-
 
             }
 
@@ -163,12 +142,6 @@
              display: true,
 
             }]
-
-
-
-
-
-
             }
 
         }
@@ -231,11 +204,6 @@
              display: true,
 
             }]
-
-
-
-
-
 
             }
 

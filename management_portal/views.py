@@ -3,7 +3,8 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, JsonResponse
 from heartbeat.controllers import HeartbeatController
 from customers.controllers import CustomerController, LocationController, ContactPersonController
-from licenses.controllers  import SoftwareProductController, SoftwareModuleController
+from licenses.controllers  import LicenseController, SoftwareProductController, SoftwareModuleController
+from updates.controllers   import UpdateController
 import json
 
 def index(request: WSGIRequest) -> HttpResponse:
