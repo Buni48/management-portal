@@ -75,6 +75,19 @@ class SoftwareProductController:
 class SoftwareModuleController:
 
     @staticmethod
+    def getModuleNames(limit: int = LIMIT) -> list:
+        """
+        Returns all module names as list.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: module names
+        """
+        return list(SoftwareModule.objects.all()[:limit].values('name'))
+
+    @staticmethod
     def getModulesByName(word: str, contains: bool = False) -> list:
         """
         Returns the filtered software modules, filtering by name.

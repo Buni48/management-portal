@@ -1,7 +1,21 @@
 from .models import Customer, Location, ContactPerson
 from itertools import chain
+from management_portal.constants import LIMIT
 
 class CustomerController:
+
+    @staticmethod
+    def getCustomerNames(limit: int = LIMIT) -> list:
+        """
+        Returns all customer names as list.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: customer names
+        """
+        return list(Customer.objects.all()[:limit].values('name'))
 
     @staticmethod
     def getFilteredCustomers(word: str, contains: bool = False) -> list:
@@ -27,6 +41,19 @@ class CustomerController:
 
 
 class LocationController:
+
+    @staticmethod
+    def getLocationNames(limit: int = LIMIT) -> list:
+        """
+        Returns all location names as list.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: location names
+        """
+        return list(Location.objects.all()[:limit].values('name'))
 
     @staticmethod
     def getLocationsByName(word: str, contains: bool = False) -> list:
