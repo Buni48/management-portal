@@ -44,8 +44,6 @@ INSTALLED_APPS = [
     'management_portal',
     'updates',
     'user_management',
-    'django_filters',
-
 ]
 
 MIDDLEWARE = [
