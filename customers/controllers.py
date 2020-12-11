@@ -47,11 +47,7 @@ class LocationController:
         locations = Location.objects.filter(customer_id = customer_id)
 
         for location in locations:
-            contact_persons = ContactPerson.objects.filter(location_id = location.id)
-            location.persons = contact_persons
-            
-            for contact_person in location.persons:
-                Person.objects.get(id = contact_person.person_ptr_id)
+            location.persons = ContactPerson.objects.filter(location_id = location.id)
 
         return locations
 
