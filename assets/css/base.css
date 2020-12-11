@@ -8,6 +8,9 @@
     margin: 10pt;
 
 }
+h4 {
+    font-weight: bold;
+}
 
 .fa-times-circle {
     color: #f00;
@@ -24,6 +27,9 @@
 
 .hidden {
     visibility: hidden;
+}
+.left-button {
+    text-align: left;
 }
 
 /* sidebar */
@@ -219,12 +225,8 @@ table.dataTable thead .sorting_desc_disabled:before {
     margin-bottom: 7.5%;
 }
 
-h1 {
-    margin-left: 2.5%;
-}
-
-h4 {
-    font-weight: bold;
+.h4style{
+    margin-left: -1%;
 }
 
 .collapse show{

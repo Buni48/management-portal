@@ -12,9 +12,6 @@
         {% if request.user.is_authenticated %}
             <h1 class="Lage">Derzeitige Lage des Portals</h1>
 
-
-
-
              <div id = "charts" class="row">
                  <div class="col-4">
                      <h4 class ="chartTitle"> Aktuelle Updates</h4>
@@ -30,14 +27,6 @@
                  </div>
              </div>
 
-
-
-
-
-
-
-
-
         <script>
            //bar
            var ctxB = document.getElementById("barChart1").getContext('2d');
@@ -45,27 +34,24 @@
             type: 'bar',
 
         data: {
-            labels: ["28%","72%"],
+            labels: ["{{update_current}}","{{update_expired}}"],
             datasets: [
                 {
-                         label: ['Updates nicht installiert'],
-                         data: [28, 72],
-                         backgroundColor: [
-                                            'rgba(207, 0, 15, 1)',
-                                             'rgba(31, 58, 147, 1)',
-                                           ],
-                         borderColor: [
-                                        'rgba(207, 0, 15, 1)',
-                                        'rgba(31, 58, 147, 1)',
-                                        ],
-
+                    label: ['Updates nicht installiert'],
+                    data: [{{update_current}},{{update_expired}} ],
+                    backgroundColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
+                    borderColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
                 },
                 {
-
-
-                label: 'Updates installiert',
-                backgroundColor: 'rgba(31, 58, 147, 1)',
-                borderColor:      'rgba(31, 58, 147, 1)',
+                    label: 'Updates installiert',
+                    backgroundColor: 'rgba(31, 58, 147, 1)',
+                    borderColor:      'rgba(31, 58, 147, 1)',
                 }
             ],
         },
@@ -95,11 +81,6 @@
 
             }]
 
-
-
-
-
-
             }
 
         }
@@ -112,11 +93,11 @@
             type: 'bar',
 
         data: {
-            labels: ["30%","70%"],
+            labels: ["{{licenses_expired}}","{{licenses_okay}}"],
             datasets: [
                 {
                          label: ['Lizenzen abgelaufen'],
-                         data: [30, 70],
+                         data: [{{licenses_expired}}, {{licenses_okay}}],
                          backgroundColor: [
                                             'rgba(207, 0, 15, 1)',
                                              'rgba(31, 58, 147, 1)',
@@ -161,12 +142,6 @@
              display: true,
 
             }]
-
-
-
-
-
-
             }
 
         }
@@ -180,11 +155,11 @@
             type: 'bar',
 
         data: {
-            labels: ["13%","87%"],
+            labels: ["{{count_missing}}","{{count_okay}}"],
             datasets: [
                 {
                          label: ['Heartbeats nicht angekommen'],
-                         data: [13, 87],
+                         data: [{{count_missing}}, {{count_okay}}],
                          backgroundColor: [
                                             'rgba(207, 0, 15, 1)',
                                              'rgba(31, 58, 147, 1)',
@@ -229,11 +204,6 @@
              display: true,
 
             }]
-
-
-
-
-
 
             }
 

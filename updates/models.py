@@ -14,7 +14,7 @@ class Update(models.Model):
     release_date = models.DateTimeField(auto_now_add = True)
     content      = models.BinaryField()
     product      = models.ForeignKey(
-        to                  = 'licences.SoftwareProduct',
+        to                  = 'licenses.SoftwareProduct',
         on_delete           = models.CASCADE,
         related_name        = 'updates',
         related_query_name  = 'update',

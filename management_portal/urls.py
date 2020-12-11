@@ -13,6 +13,6 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('customers/', include('customers.urls'), name='customers'),
     path('heartbeat/', include('heartbeat.urls'), name='heartbeat'),
-    path('licences/', include('licences.urls'), name='licences'),
+    path('licenses/', include('licenses.urls'), name='licenses'),
     path('updates/', include('updates.urls'), name='updates'),
 ]

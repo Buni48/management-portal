@@ -5,7 +5,7 @@
     Lizenzen
 {% endblock title %}
 
-<!-- Content-->
+<!-- Content--> 
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
@@ -13,6 +13,9 @@
             <table id="selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                 <thead>
                     <tr>
+                        <th class="th-sm">
+                            Kunde
+                        </th>
                         <th class="th-sm">
                             Standort
                         </th>
@@ -31,28 +34,37 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for licence in licences %}
+                    {% for license in licenses %}
                         <tr>
                             <td>
-                                {{licence.location}}
+                                {{license.customer}}
+                                {% if license.customer == 'Nicht zugewiesen' %}
+                                    <i class="fas fa-exclamation-circle" title="Lizenz ist weder Standort noch Kunde zugewiesen"></i>
+                                {% endif %}
                             </td>
                             <td>
-                                {{licence.product}}
+                                {{license.location}}
+                                {% if license.customer == 'Nicht zugewiesen' %}
+                                    <i class="fas fa-exclamation-circle" title="Lizenz ist weder Standort noch Kunde zugewiesen"></i>
+                                {% endif %}
                             </td>
                             <td>
-                                {{licence.module}}
+                                {{license.product}}
                             </td>
                             <td>
-                                {{licence.start_date}}
+                                {{license.module}}
                             </td>
                             <td>
-                                {{licence.end_date}}&nbsp;
-                                {% if licence.valid == 1 %}
-                                    <i class="fas fa-check-circle"></i>
-                                {% elif licence.valid == 0 %}
-                                    <i class="fas fa-exclamation-circle"></i>
-                                {% elif licence.valid == -1 %}
-                                    <i class="fas fa-times-circle"></i>
+                                {{license.start_date}}
+                            </td>
+                            <td>
+                                {{license.end_date}}&nbsp;
+                                {% if license.valid == 1 %}
+                                    <i class="fas fa-check-circle" title="Lizenz noch mind. 6 Wochen gültig"></i>
+                                {% elif license.valid == 0 %}
+                                    <i class="fas fa-exclamation-circle" title="Lizenz läuft bald ab"></i>
+                                {% elif license.valid == -1 %}
+                                    <i class="fas fa-times-circle" title="Lizenz ist abgelaufen"></i>
                                 {% endif %}
                             </td>
                         </tr>

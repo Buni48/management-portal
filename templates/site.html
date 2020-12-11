@@ -12,10 +12,12 @@
                     </a>
                 </li>
                 {% for heartbeat in heartbeats %}
-                <li>
-                    <i class="fas fa-sm fa-times-circle"></i>
-                    {{heartbeat.location}}
-                </li>
+                    {% if heartbeat.received == False %}
+                        <li>
+                            <i class="fas fa-sm fa-times-circle"></i>
+                            {{heartbeat.location}}
+                        </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </div>

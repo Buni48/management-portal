@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'customers',
     'heartbeat',
-    'licences',
+    'licenses',
     'management_portal',
     'updates',
     'user_management',
