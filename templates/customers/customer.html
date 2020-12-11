@@ -31,7 +31,9 @@
                                         </tr>
                                         <tr>
                                             <th scope="row"><b>Ansprechpartner</b></th>
-                                          <td>{{customer.contactperson.first_name}} {{customer.contactperson.last_name}}</td>
+                                            {% for person in location.persons %}
+                                              <td>{{person.first_name}} {{person.last_name}}</td>
+                                            {% endfor %}
                                         </tr>
                                             <tr>
                                                 <th scope="row"><b>Anschrift</b></th>
