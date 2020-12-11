@@ -13,7 +13,7 @@ def customerList(request: WSGIRequest) -> HttpResponse:
     customerList  = []
     for i in range(65, 91):
         char            = chr(i)
-        customers       = list(Customer.objects.filter(name__startswith = char).values('id', 'name'))
+        customers       = list(Customer.objects.filter(name__istartswith = char).values('id', 'name'))
         obj             = {
             'letter'   : char,
             'customers': customers,
