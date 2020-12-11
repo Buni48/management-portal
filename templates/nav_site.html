@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block navbar %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="nav">
         <a class="navbar-brand" href="{% url 'home' %}">
             <img src="{% static 'img/logo.png' %}" class="nav-logo" alt="logo">
         </a>
@@ -67,7 +67,26 @@
 {% endblock navbar %}
 
 {% block footer %}
-    <footer>
+    <footer id="footer">
         © 2020 <a href="https://www.aubex.de/"> aubex GmbH </a> - Gemeinsam für eine bessere Mobilität
     </footer>
+    <script>
+        let navbar = document.getElementById("nav");
+        let footer = document.getElementById("footer");
+        console.log(footer);
+        let stickyNavbar = navbar.offsetTop;
+        let stickyFooter = navbar.offsetTop;
+        window.onscroll = () => {
+            if (window.pageYOffset >= stickyNavbar) {
+                navbar.classList.add("sticky");
+            } else {
+                navbar.classList.remove("sticky");
+            }
+            if (window.pageYOffset >= stickyFooter) {
+                footer.classList.add("sticky-footer");
+            } else {
+                footer.classList.remove("sticky-footer");
+            }
+        };
+    </script>
 {% endblock footer %}
