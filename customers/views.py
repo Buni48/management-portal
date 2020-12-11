@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
-from .models import Customer, Location
+from .models import Customer, Location, ContactPerson
 from heartbeat.models import Heartbeat
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -32,9 +32,11 @@ def customer(request: WSGIRequest, id:int=0) -> HttpResponse:
     heartbeats = Heartbeat.getHeartbeatsMissing()
     customer = Customer.objects.get(id = id)
     locations  = Location.objects.filter(customer_id = id)
+    contactperson = ContactPerson.objects.filter(id = id)
     context = {
         'heartbeats': heartbeats,
         'locations' : locations,
         'customer' : customer,
+        'contactperson' : contactperson,
     }
     return render(request, 'customers/customer.html', context=context)

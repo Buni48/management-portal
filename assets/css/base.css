@@ -226,3 +226,7 @@ h1 {
 h4 {
     font-weight: bold;
 }
+
+.collapse show{
+    background: blue;
+}
