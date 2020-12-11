@@ -64,6 +64,8 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
                 'software_products' : json.dumps(products),
                 'software_modules'  : json.dumps(modules),
             }
+    else:
+        return redirect('search')
     return JsonResponse(response)
 
 def login(request: WSGIRequest) -> HttpResponse:

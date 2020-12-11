@@ -1,4 +1,4 @@
-from .models import Customer, Location, ContactPerson
+from .models import Customer, Location, ContactPerson, Person
 from itertools import chain
 from management_portal.constants import LIMIT
 
@@ -41,6 +41,15 @@ class CustomerController:
 
 
 class LocationController:
+
+    @staticmethod
+    def getLocationsByCustomer(customer_id: int, limit: int = LIMIT) -> list:
+        locations = Location.objects.filter(customer_id = customer_id)
+
+        for location in locations:
+            location.persons = ContactPerson.objects.filter(location_id = location.id)
+
+        return locations
 
     @staticmethod
     def getLocationNames(limit: int = LIMIT) -> list:

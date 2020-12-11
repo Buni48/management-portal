@@ -11,6 +11,9 @@
 h4 {
     font-weight: bold;
 }
+nav {
+    z-index: 2;
+}
 
 .fa-times-circle {
     color: #f00;
@@ -30,6 +33,11 @@ h4 {
 }
 .left-button {
     text-align: left;
+}
+.sticky {
+    width: 100%;
+    position: sticky;
+    top: 0px;
 }
 
 /* sidebar */
@@ -59,7 +67,9 @@ h4 {
     position: fixed;
     left: 250px;
     width: 250px;
-    height: 86.5%;
+    top: 61pt;
+    bottom: 80pt;
+    height: auto;
     margin-left: -250px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -187,14 +197,16 @@ footer {
     background-color: #006ccd;
     color: #fff;
     text-align: center;
-    padding: 50px;
-
+    padding: 31pt;
 }
 footer a {
     color: #fff;
 }
 footer a:hover {
     color: #ccc;
+}
+.sticky-footer {
+    position: sticky;
 }
 
 /* tables */
@@ -225,6 +237,10 @@ table.dataTable thead .sorting_desc_disabled:before {
     margin-bottom: 7.5%;
 }
 
-.h4style{
+.h4style {
     margin-left: -1%;
+}
+
+.collapse show {
+    background: blue;
 }

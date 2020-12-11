@@ -9,7 +9,7 @@
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
-            <h1>Kunde</h1>
+            <h1>Kunde "{{customer.name}}"</h1><hr>
             <div class="container">
                     <div class="accordion col" id="accordionExample">
                       <div class="card row-md-2">
@@ -26,22 +26,24 @@
                               <table class="table">
                                   <tbody>
                                         <tr>
-                                          <th scope="row">Kundennummer</th>
+                                            <th scope="row"><b>Kundennummer</b></th>
                                           <td>{{customer.customer_number}}</td>
                                         </tr>
                                         <tr>
-                                          <th scope="row">Ansprechpartner</th>
-                                          <td>{{person.contactperson}}</td>
+                                            <th scope="row"><b>Ansprechpartner</b></th>
+                                            {% for person in location.persons %}
+                                              <td>{{person.first_name}} {{person.last_name}}</td>
+                                            {% endfor %}
                                         </tr>
                                             <tr>
-                                              <th scope="row">Anschrift</th>
+                                                <th scope="row"><b>Anschrift</b></th>
                                               <td>{{location.name}}</td>
                                               <td>{{location.street}}</td>
                                               <td>{{location.house_number}}</td>
                                               <td>{{location.postcode}}</td>
                                               <td>{{location.city}}</td>
                                               <td>{{location.phone_number}}</td>
-                                              <td>{{location.email_adress}}</td>
+                                              <td>{{location.email_address}}</td>
                                             </tr>
                                   </tbody>
                               </table>
@@ -60,3 +62,4 @@
             {% endif %}
         </div>
 {% endblock content %}
+
