@@ -228,3 +228,7 @@ table.dataTable thead .sorting_desc_disabled:before {
 .h4style{
     margin-left: -1%;
 }
+
+.collapse show{
+    background: blue;
+}
