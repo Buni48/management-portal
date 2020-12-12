@@ -8,6 +8,8 @@
 <!-- Content -->
 {% block content %}
     <div class="content">
+        <div id="alert" class="alert alert-danger hidden-alert" role="alert">
+        </div>
         <h1>Lizenz erstellen</h1>
         <form id="form" method="post">
             <div class="form-group">
@@ -54,10 +56,11 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Erstellen</button>
-            <button type="button"
-                class="btn btn-danger"
-                onclick="location.href=`{% url 'licenses_list' %}`;"
-            >Abbrechen</button>
+            <a href="{% url 'licenses_list' %}">
+                <button type="button" class="btn btn-danger">
+                    Abbrechen
+                </button>
+            </a>
         </form>
     </div>
     <script>
@@ -79,6 +82,17 @@
                     customer            : $('#customer').val(),
                     csrfmiddlewaretoken : '{{ csrf_token }}',
                     dataType            : "json",
+                },
+                success: (result) => {
+                    if (result.status) {
+                        document.location.href = "{% url 'licenses_list' %}";
+                    } else {
+                        $('#alert').removeClass('hidden-alert');
+                        $('#alert').html(result.message);
+                    }
+                },
+                failure: () => {
+                    console.log('Request failed!');
                 },
             });
         });

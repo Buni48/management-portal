@@ -9,7 +9,18 @@
 {% block content %}
     <div class="content">
         {% if request.user.is_authenticated %}
+            {% if message %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+            {% endif %}
             <h1>Lizenzen</h1>
+            <a href="{% url 'licenses_create' %}">
+                <button type="button" class="btn btn-primary">
+                    + Lizenz hinzufügen
+                </button>
+            </a>
+            <br><br>
             <table id="selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
                 <thead>
                     <tr>

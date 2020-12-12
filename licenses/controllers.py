@@ -167,6 +167,8 @@ class LicenseController:
             status['message'] = 'Bitte Anfangsdatum angeben.'
         elif not len(end_date):
             status['message'] = 'Bitte Enddatum angeben.'
+        elif start_date >= end_date:
+            status['message'] = 'Enddatum muss später als Anfangsdatum sein.'
         elif not module:
             status['message'] = 'Bitte Modul angeben.'
         elif customer and location:
