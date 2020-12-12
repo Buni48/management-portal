@@ -14,7 +14,7 @@ class License(models.Model):
     """
     key              = models.CharField(max_length = 255)
     detail           = models.CharField(max_length = 2047)
-    start_date       = models.DateTimeField(auto_now_add = True)
+    start_date       = models.DateTimeField()
     end_date         = models.DateTimeField()
     module           = models.ForeignKey(
         to                  = 'SoftwareModule',
