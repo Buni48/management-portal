@@ -31,4 +31,22 @@ def create(request: WSGIRequest) -> HttpResponse:
     return render(request, 'licenses/create.html', context)
 
 def save(request: WSGIRequest) -> HttpResponse:
+    if request.is_ajax():
+        key         = request.POST.get('key', '')
+        detail      = request.POST.get('detail', '')
+        start_date  = request.POST.get('start_date', '')
+        end_date    = request.POST.get('end_date', '')
+        module      = request.POST.get('module', '')
+        location    = request.POST.get('location', '')
+        customer    = request.POST.get('customer', '')
+
+        status      = LicenseController.save(
+            key         = key,
+            detail      = detail,
+            start_date  = start_date,
+            end_date    = end_date,
+            module      = module,
+            location    = location,
+            customer    = customer,
+        )
     return redirect('licenses_list')

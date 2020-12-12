@@ -15,7 +15,7 @@ class CustomerController:
         Returns:
         list: customer names
         """
-        return list(Customer.objects.all()[:limit].values('name'))
+        return list(Customer.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
     def getFilteredCustomers(word: str, contains: bool = False) -> list:
@@ -62,7 +62,7 @@ class LocationController:
         Returns:
         list: location names
         """
-        return list(Location.objects.all()[:limit].values('name'))
+        return list(Location.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
     def getLocationsByName(word: str, contains: bool = False) -> list:

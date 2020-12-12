@@ -9,7 +9,7 @@
 {% block content %}
     <div class="content">
         <h1>Lizenz erstellen</h1>
-        <form action="{% url 'licenses_save' %}" method="post">
+        <form id="form" method="post">
             <div class="form-group">
                 <label for="key">Lizenzschlüssel</label>
                 <input type="text" class="form-control" id="key" placeholder="Lizenzschlüssel eingeben" maxlength="255" required>
@@ -28,28 +28,28 @@
             </div>
             <div class="form-group">
                 <label for="module">Software-Modul</label>
-                <select class="mdb-select md-form" searchable="Modul wählen..." required>
+                <select id="module" class="mdb-select md-form" searchable="Modul wählen..." required>
                     <option value="" disabled selected>Bitte Modul auswählen</option>
                     {% for module in modules %}
-                        <option value="{{module.name}}">{{module.name}}</option>
+                        <option value="{{module.id}}">{{module.name}}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-group">
                 <label for="location">Standorte</label>
-                <select class="mdb-select md-form" searchable="Standort wählen...">
+                <select id="location" class="mdb-select md-form" searchable="Standort wählen...">
                     <option value="" disabled selected>Bitte Standort auswählen</option>
                     {% for location in locations %}
-                        <option value="{{location.name}}">{{location.name}}</option>
+                        <option value="{{location.id}}">{{location.name}}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-group">
                 <label for="customer">Kunde</label>
-                <select class="mdb-select md-form" searchable="Kunden wählen...">
+                <select id="customer" class="mdb-select md-form" searchable="Kunden wählen...">
                     <option value="" disabled selected>Bitte Kunden auswählen</option>
                     {% for customer in customers %}
-                        <option value="{{customer.name}}">{{customer.name}}</option>
+                        <option value="{{customer.id}}">{{customer.name}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -66,7 +66,6 @@
         }); */
         $('#form').on('submit', (event) => {
             event.preventDefault();
-
             $.ajax({
                 type : "POST", 
                 url  : "{% url 'licenses_save' %}",
@@ -75,6 +74,9 @@
                     detail              : $('#detail').val(),
                     start_date          : $('#start_date').val(),
                     end_date            : $('#end_date').val(),
+                    module              : $('#module').val(),
+                    location            : $('#location').val(),
+                    customer            : $('#customer').val(),
                     csrfmiddlewaretoken : '{{ csrf_token }}',
                     dataType            : "json",
                 },

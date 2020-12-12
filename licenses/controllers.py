@@ -48,6 +48,95 @@ class LicenseController:
 
         return licenses
 
+    @staticmethod
+    def save(key: str, detail: str, start_date: str, end_date: str,
+        module: int, location: int = 0, customer: int = 0, id: int = 0) -> dict:
+        status = {
+            'status' : False,
+            'message': '',
+        }
+        status = LicenseController.__checkCompleteness(
+            key         = key,
+            detail      = detail,
+            start_date  = start_date,
+            end_date    = end_date,
+            module      = module,
+            location    = location,
+            customer    = customer,
+            id          = id,
+        )
+        if status['status']:
+            result = LicenseController.__checkForeignKeys(
+                module   = module,
+                location = location,
+                customer = customer,
+            )
+            if result['status']:
+                if id:
+                    status          = LicenseController.edit(
+                        id          = id,
+                        key         = key,
+                        detail      = detail,
+                        start_date  = start_date,
+                        end_date    = end_date,
+                        module      = result['moduleInstance'],
+                        location    = result['locationInstance'],
+                        customer    = result['customerInstance'],
+                    )
+                else:
+                    status          = LicenseController.create(
+                        key         = key,
+                        detail      = detail,
+                        start_date  = start_date,
+                        end_date    = end_date,
+                        module      = result['moduleInstance'],
+                        location    = result['locationInstance'],
+                        customer    = result['customerInstance'],
+                    )
+            else:
+                status['status']  = result['status']
+                status['message'] = result['message']
+
+        return status
+
+    @staticmethod
+    def create(key: str, detail: str,
+        start_date: str, end_date: str, module, location, customer) -> dict:
+        status = {
+            'status' : True,
+            'message': 'Die Lizenz wurde erfolgreich angelegt.',
+        }
+        try:
+            if location:
+                license = LocationLicense(
+                    key         = key,
+                    detail      = detail,
+                    start_date  = start_date,
+                    end_date    = end_date,
+                    module      = module,
+                    location    = location,
+                )
+                license.save()
+            else:
+                license = CustomerLicense(
+                    key         = key,
+                    detail      = detail,
+                    start_date  = start_date,
+                    end_date    = end_date,
+                    module      = module,
+                    customer    = customer,
+                )
+                license.save()
+        except:
+            status['status']  = False
+            status['message'] = 'Es ist ein unerwarteter Fehler aufgetreten'
+
+        return status
+
+    @staticmethod
+    def edit(id: int, key: str, detail: str,
+        start_date: str, end_date: str, module, location, customer) -> dict:
+        pass
 
     @staticmethod
     def getCounts(licenses: list) -> list:
@@ -62,6 +151,62 @@ class LicenseController:
             count['valid'] += 1
 
         return count
+    
+    @staticmethod
+    def __checkCompleteness(key: str, detail: str, start_date: str, end_date: str,
+        module: int, location: int, customer: int, id: int) -> dict:
+        status = {
+            'status' : False,
+            'message': '',
+        }
+        if not len(key):
+            status['message'] = 'Bitte Lizenzschlüssel angeben.'
+        elif not len(detail):
+            status['message'] = 'Bitte Details angeben.'
+        elif not len(start_date):
+            status['message'] = 'Bitte Anfangsdatum angeben.'
+        elif not len(end_date):
+            status['message'] = 'Bitte Enddatum angeben.'
+        elif not module:
+            status['message'] = 'Bitte Modul angeben.'
+        elif customer and location:
+            status['message'] = 'Bitte nur Kunde ODER Standort zuweisen.'
+        elif not customer and not location:
+            status['message'] = 'Bitte Kunde oder Standort zuweisen.'
+        else:
+            status['status'] = True
+        
+        return status
+
+    @staticmethod
+    def __checkForeignKeys(module: int, location: int, customer: int):
+        result = {
+            'status'          : False,
+            'message'         : '',
+            'moduleInstance'  : None,
+            'locationInstance': None,
+            'customerInstance': None,
+        }
+        try:
+            result['moduleInstance'] = SoftwareModule.objects.get(id = module)
+        except:
+            result['message'] = 'Zugewiesenes Modul nicht gefunden.'
+    
+        if not len(result['message']):
+            if location:
+                try:
+                    result['locationInstance'] = Location.objects.get(id = location)
+                    result['status']           = True
+                except:
+                    result['message'] = 'Zugewiesenen Standort nicht gefunden.'
+            else:
+                try:
+                    result['customerInstance'] = Customer.objects.get(id = customer)
+                    result['status']           = True
+                except:
+                    result['message'] = 'Zugewiesenen Kunden nicht gefunden.'
+
+        return result
 
 class SoftwareProductController:
 
@@ -99,7 +244,7 @@ class SoftwareModuleController:
         Returns:
         list: module names
         """
-        return list(SoftwareModule.objects.all()[:limit].values('name'))
+        return list(SoftwareModule.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
     def getModulesByName(word: str, contains: bool = False) -> list:

@@ -3,7 +3,7 @@ from django.db.models import Max
 from datetime import datetime, timezone
 from licenses.models import UsedSoftwareProduct, SoftwareProduct
 from customers.models import Location
-from management_portal.constants import LIMIT, DATE_TYPE, HEARTBEAT_DURATION
+from management_portal.constants import LIMIT, DATETIME_TYPE, HEARTBEAT_DURATION
 
 class HeartbeatController:
 
@@ -27,7 +27,7 @@ class HeartbeatController:
             try:
                 usedProduct.heartbeat     = Heartbeat.objects.get(used_product_id = usedProduct.id, last_received = last_received_max['last_received__max'])
                 duration                  = datetime.now(timezone.utc) - usedProduct.heartbeat.last_received
-                usedProduct.last_received = usedProduct.heartbeat.last_received.strftime(DATE_TYPE)
+                usedProduct.last_received = usedProduct.heartbeat.last_received.strftime(DATETIME_TYPE)
                 if (duration <= HEARTBEAT_DURATION):
                     usedProduct.received = True
                 else:
