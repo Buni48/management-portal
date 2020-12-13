@@ -54,8 +54,8 @@ def save(request: WSGIRequest) -> JsonResponse:
             location    = location,
             customer    = customer,
         )
+        response = JsonResponse(status)
         if status['status']:
-            response = JsonResponse(status)
             response.set_cookie('license_status_message', status['message'], 7)
 
     return response
