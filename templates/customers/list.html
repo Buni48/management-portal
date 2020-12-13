@@ -8,6 +8,12 @@
 <!-- Content-->
 {% block content %}
     <div class="content">
+        <div class="addCustomer">
+            <button type="button" class="btn btn-primary">
+              <a href="{% url 'createCustomer' %}">Neuen Kunden anlegen</a>
+            </button>
+        </div>
+
         {% if request.user.is_authenticated %}
             <h1>Kunden</h1>
             <div class="listname_box">
@@ -31,5 +37,11 @@
             </button>
 
         {% endif %}
+
+
     </div>
+
+
+
 {% endblock content %}
+

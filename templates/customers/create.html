@@ -1,0 +1,36 @@
+{% extends "site.html" %}
+
+
+{% block content %}
+    <div class = "content">
+
+    <!--
+    <form method="post">
+         {% csrf_token %}
+        <label>Kundennamen: </label>
+        <input type="text" name="customername">
+
+        <label>Kundennumer:</label>
+         <input id="customer_number" type="text" name="customernumber">
+         <input type="submit" value="OK">
+    </form>
+     -->
+
+        <form action= "{% url 'saveCustomer' %}" method="post">
+            {% csrf_token %}
+            <div class ="form-group">
+                <label for="kundenname"> Kundenname </label>
+                <input type="text" class="form-control" id="kundenname" name="kundenname">
+            </div>
+            <div class ="form-group">
+                <label for="kundennummer"> Kundennumer </label>
+                <input type="text" class="form-control" id="kundennummer" name="kundennummer">
+            </div>
+
+
+            <input type="submit" value="Submit">
+        </form>
+
+
+    </div>
+{% endblock content %}
