@@ -31,6 +31,12 @@ nav {
 .hidden {
     visibility: hidden;
 }
+.hidden-alert {
+    visibility: hidden;
+    padding: 0;
+    margin: 0;
+    height: 0;
+}
 .left-button {
     text-align: left;
 }
