@@ -8,10 +8,23 @@
 <!-- Content-->
 {% block content %}
     <div class="content">
+        {% if message %}
+                {% if status == 'False' %}
+                    <div class="alert alert-danger" role="alert">
+                        {{message}}
+                    </div>
+                {% else %}
+                    <div class="alert alert-success" role="alert">
+                        {{message}}
+                    </div>
+                {% endif %}
+            {% endif %}
         <div class="addCustomer">
-            <button type="button" class="btn btn-primary">
-              <a href="{% url 'createCustomer' %}">Neuen Kunden anlegen</a>
-            </button>
+            <a href="{% url 'customers_create' %}">
+                <button type="button" class="btn btn-primary">
+                    + Kunden hinzufügen
+                </button>
+            </a>
         </div>
 
         {% if request.user.is_authenticated %}
