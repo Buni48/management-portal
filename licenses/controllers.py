@@ -146,7 +146,7 @@ class LicenseController:
                 license.save()
         except:
             status['status']  = False
-            status['message'] = 'Es ist ein unerwarteter Fehler aufgetreten'
+            status['message'] = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
         return status
 
@@ -182,8 +182,27 @@ class LicenseController:
                 )
             except:
                 status['status']  = False
-                status['message'] = 'Die zu bearbeitende Lizenz wurde nicht gefunden'
+                status['message'] = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
 
+        return status
+    
+    @staticmethod
+    def delete(id: int) -> dict:
+        status = {
+            'status' : True,
+            'message': 'Die Lizenz wurde erfolgreich gelöscht.',
+        }
+        try:
+            license = LocationLicense.objects.get(license_ptr_id = id)
+            license.delete()
+        except:
+            try:
+                license = CustomerLicense.objects.get(license_ptr_id = id)
+                license.delete()
+            except:
+                status['status']  = False
+                status['message'] = ' Die zu löschende Lizenz nicht gefunden.'
+        
         return status
 
     @staticmethod

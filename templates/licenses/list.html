@@ -10,9 +10,15 @@
     <div class="content">
         {% if request.user.is_authenticated %}
             {% if message %}
-                <div class="alert alert-success" role="alert">
-                    {{message}}
-                </div>
+                {% if status == 'False' %}
+                    <div class="alert alert-danger" role="alert">
+                        {{message}}
+                    </div>
+                {% else %}
+                    <div class="alert alert-success" role="alert">
+                        {{message}}
+                    </div>
+                {% endif %}
             {% endif %}
             <h1>Lizenzen</h1>
             <a href="{% url 'licenses_create' %}">
@@ -53,6 +59,9 @@
                             <td>
                                 <a href="{% url 'licenses_edit' id=license.id %}">
                                     <i class="fas fa-edit" title="Lizenz bearbeiten"></i>
+                                </a>&nbsp;
+                                <a href="{% url 'licenses_delete' id=license.id %}" class="text-danger">
+                                    <i class="fas fa-trash" title="Lizenz löschen"></i>
                                 </a>
                             </td>
                             <td>

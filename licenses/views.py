@@ -9,16 +9,21 @@ def index(request: WSGIRequest) -> HttpResponse:
     return redirect('licenses_list')
 
 def licensesList(request: WSGIRequest) -> HttpResponse:
+    status     = request.COOKIES.get('license_status_status')
     message    = request.COOKIES.get('license_status_message')
     heartbeats = HeartbeatController.read()
     licenses   = LicenseController.read()
     context    = {
         'heartbeats': heartbeats,
         'licenses'  : licenses,
+        'status'    : status,
         'message'   : message,
     }
+
     response = render(request, 'licenses/list.html', context)
+    response.delete_cookie('license_status_status')
     response.delete_cookie('license_status_message')
+
     return response
 
 def create(request: WSGIRequest) -> HttpResponse:
@@ -36,8 +41,9 @@ def create(request: WSGIRequest) -> HttpResponse:
     return render(request, 'licenses/edit.html', context)
 
 def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
-    if id == 0:
+    if id < 1:
         return redirect('licenses_list')
+
     license    = LicenseController.getLicenseById(id = id)
     heartbeats = HeartbeatController.read()
     modules    = SoftwareModuleController.getModuleNames()
@@ -77,6 +83,16 @@ def save(request: WSGIRequest) -> JsonResponse:
         )
         response = JsonResponse(status)
         if status['status']:
+            response.set_cookie('license_status_status' , status['status'] , 7)
             response.set_cookie('license_status_message', status['message'], 7)
+
+    return response
+
+def delete(request: WSGIRequest, id: int = 0) -> HttpResponse:
+    response = redirect('licenses_list')
+    if id > 0:
+        status = LicenseController.delete(id = id)
+        response.set_cookie('license_status_status' , status['status'] , 7)
+        response.set_cookie('license_status_message', status['message'], 7)
 
     return response
