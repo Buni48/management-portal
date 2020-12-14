@@ -1,8 +1,22 @@
 from .models import Customer, Location, ContactPerson, Person
 from itertools import chain
 from management_portal.constants import LIMIT
+from management_portal.general import Status
 
 class CustomerController:
+
+    @staticmethod
+    def getCustomerById(id: int):
+        """
+        Returns a customer for a given id.
+
+        Attributes:
+        id (int): id of the customer
+
+        Returns:
+        Customer: customer
+        """
+        return Customer.objects.get(id = id)
 
     @staticmethod
     def getCustomerNames(limit: int = LIMIT) -> list:
@@ -38,6 +52,130 @@ class CustomerController:
             customersByName   = Customer.objects.filter(name__iexact = word).values('id', 'customer_number', 'name')
 
         return list(chain(customersByName, customersByNumber))
+
+    @staticmethod
+    def getCustomersForEachLetter() -> list:
+        """
+        Get customers for each letter as list of dictionaries.
+
+        Returns:
+        list: customers for each letter
+        """
+        customerList = []
+        for i in range(65, 91):
+            char = chr(i)
+            customers = list(Customer.objects.filter(name__istartswith = char).values('id', 'name'))
+            obj = {
+                'letter'    : char,
+                'customers' : customers,
+            }
+            customerList.append(obj)
+        
+        return customerList
+
+    @staticmethod
+    def save(customer_number: str, name: str, id: int = 0) -> Status:
+        """
+        Saves a customer.
+        By giving an id it edits this customer otherwise it creates a new one.
+
+        Attributes:
+        customer_number (str): customer number
+        name            (str): customer name
+        id              (int): customer id if customer should been edited
+
+        Returns:
+        Status: save status
+        """
+        status = Status()
+        if not len(customer_number):
+            status.message = 'Bitte Kundennummer angeben.'
+        elif not len(name):
+            status.message = 'Bitte Name angeben.'
+        else:
+            if id:
+                status = CustomerController.edit(
+                    id              = id,
+                    customer_number = customer_number,
+                    name            = name,
+                )
+            else:
+                status = CustomerController.create(
+                    customer_number = customer_number,
+                    name            = name,
+                )
+
+        return status
+
+    @staticmethod
+    def create(customer_number: str, name: str) -> Status:
+        """
+        Creates a customer.
+
+        Attributes:
+        customer_number (str): customer number
+        name            (str): customer name
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True, 'Der Kunde "' + name + '" wurde erfolgreich angelegt.')
+        try:
+            customer = Customer(
+                customer_number = customer_number,
+                name            = name,
+            )
+            customer.save()
+        except:
+            status.status = False
+            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+        
+        return status
+    
+    @staticmethod
+    def edit(id: int, customer_number: str, name: str) -> Status:
+        """
+        Edits a customer.
+
+        Attributes:
+        id              (int): customer id
+        customer_number (str): customer number
+        name            (str): customer name
+
+        Returns:
+        Status: edit status
+        """
+        status = Status(True, 'Der Kunde "' + name + '"wurde erfolgreich aktualisiert')
+        try:
+            customer                 = Customer.objects.get(id = id)
+            customer.customer_number = customer_number
+            customer.name            = name
+            customer.save()
+        except:
+            status.status = False
+            status.message = 'Der zu bearbeitende Kunde wurde nicht gefunden.'
+    
+    @staticmethod
+    def delete(id: int) -> Status:
+        """
+        Deletes a customer with the given id.
+
+        Attributes:
+        id (int): customer id of the customer to delete
+
+        Returns:
+        Status: delete status
+        """
+        status = Status(False, 'Der zu löschende Kunde wurde nicht gefunden.')
+        try:
+            customer        = Customer.objects.get(id = id)
+            customer.delete()
+            status.status   = True
+            status.message  = 'Der Kunde "' + customer.name + '"wurde erfolgreich gelöscht.'
+        except:
+            pass
+        
+        return status
 
 
 class LocationController:
