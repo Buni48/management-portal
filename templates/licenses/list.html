@@ -25,6 +25,9 @@
                 <thead>
                     <tr>
                         <th class="th-sm">
+                            Aktionen
+                        </th>
+                        <th class="th-sm">
                             Kunde
                         </th>
                         <th class="th-sm">
@@ -47,6 +50,11 @@
                 <tbody>
                     {% for license in licenses %}
                         <tr>
+                            <td>
+                                <a href="{% url 'licenses_edit' id=license.id %}">
+                                    <i class="fas fa-edit" title="Lizenz bearbeiten"></i>
+                                </a>
+                            </td>
                             <td>
                                 {{license.customer}}
                                 {% if license.customer == 'Nicht zugewiesen' %}

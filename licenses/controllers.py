@@ -1,7 +1,7 @@
 from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, SoftwareModule
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
-from management_portal.constants import LIMIT, DATE_TYPE, LICENSE_EXPIRE_WARNING
+from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
 
 class LicenseController:
 
@@ -47,6 +47,23 @@ class LicenseController:
                     license.customer = 'Nicht zugewiesen'
 
         return licenses
+
+    @staticmethod
+    def getLicenseById(id: int):
+        try:
+            license = LocationLicense.objects.get(license_ptr_id = id)
+            license.start_date = license.start_date.strftime(DATE_TYPE_JS)
+            license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
+        except:
+            try:
+                license = CustomerLicense.objects.get(license_ptr_id = id)
+                license.start_date = license.start_date.strftime(DATE_TYPE_JS)
+                license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
+            except:
+                license = None
+        
+        return license
+
 
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str,
@@ -136,7 +153,38 @@ class LicenseController:
     @staticmethod
     def edit(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> dict:
-        pass
+        status = {
+            'status' : True,
+            'message': 'Die Lizenz wurde erfolgreich aktualisiert.',
+        }
+        try:
+            LicenseController.__updateLocationLicense(
+                id          = id,
+                key         = key,
+                detail      = detail,
+                start_date  = start_date,
+                end_date    = end_date,
+                module      = module,
+                location    = location,
+                customer    = customer,
+            )
+        except:
+            try:
+                LicenseController.__updateCustomerLicense(
+                    id          = id,
+                    key         = key,
+                    detail      = detail,
+                    start_date  = start_date,
+                    end_date    = end_date,
+                    module      = module,
+                    location    = location,
+                    customer    = customer,
+                )
+            except:
+                status['status']  = False
+                status['message'] = 'Die zu bearbeitende Lizenz wurde nicht gefunden'
+
+        return status
 
     @staticmethod
     def getCounts(licenses: list) -> list:
@@ -209,6 +257,56 @@ class LicenseController:
                     result['message'] = 'Zugewiesenen Kunden nicht gefunden.'
 
         return result
+
+    @staticmethod
+    def __updateLocationLicense(id: int, key: str, detail: str,
+        start_date: str, end_date: str, module, location, customer):
+        locationLicense = LocationLicense.objects.get(license_ptr_id = id)
+        if location:
+            locationLicense.key         = key
+            locationLicense.detail      = detail
+            locationLicense.start_date  = start_date
+            locationLicense.end_date    = end_date
+            locationLicense.module      = module
+            locationLicense.location    = location
+            locationLicense.save()
+        else:
+            locationLicense.delete()
+            customerLicense = CustomerLicense(
+                id          = id,
+                key         = key,
+                detail      = detail,
+                start_date  = start_date,
+                end_date    = end_date,
+                module      = module,
+                customer    = customer,
+            )
+            customerLicense.save()
+
+    def __updateCustomerLicense(id: int, key: str, detail: str,
+        start_date: str, end_date: str, module, location, customer):
+        customerLicense = CustomerLicense.objects.get(license_ptr_id = id)
+        if customer:
+            customerLicense.key         = key
+            customerLicense.detail      = detail
+            customerLicense.start_date  = start_date
+            customerLicense.end_date    = end_date
+            customerLicense.module      = module
+            customerLicense.customer    = customer
+            customerLicense.save()
+        else:
+            customerLicense.delete()
+            locationLicense = LocationLicense(
+                id          = id,
+                key         = key,
+                detail      = detail,
+                start_date  = start_date,
+                end_date    = end_date,
+                module      = module,
+                location    = location,
+            )
+            locationLicense.save()
+
 
 class SoftwareProductController:
 
