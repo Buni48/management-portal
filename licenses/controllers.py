@@ -2,6 +2,7 @@ from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, 
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
+from management_portal.general import Status
 
 class LicenseController:
 
@@ -67,11 +68,8 @@ class LicenseController:
 
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str,
-        module: int, location: int = 0, customer: int = 0, id: int = 0) -> dict:
-        status = {
-            'status' : False,
-            'message': '',
-        }
+        module: int, location: int = 0, customer: int = 0, id: int = 0) -> Status:
+        status = Status()
         status = LicenseController.__checkCompleteness(
             key         = key,
             detail      = detail,
@@ -82,7 +80,7 @@ class LicenseController:
             customer    = customer,
             id          = id,
         )
-        if status['status']:
+        if status.status:
             result = LicenseController.__checkForeignKeys(
                 module   = module,
                 location = location,
@@ -111,18 +109,15 @@ class LicenseController:
                         customer    = result['customerInstance'],
                     )
             else:
-                status['status']  = result['status']
-                status['message'] = result['message']
+                status.status  = result['status']
+                status.message = result['message']
 
         return status
 
     @staticmethod
     def create(key: str, detail: str,
-        start_date: str, end_date: str, module, location, customer) -> dict:
-        status = {
-            'status' : True,
-            'message': 'Die Lizenz wurde erfolgreich angelegt.',
-        }
+        start_date: str, end_date: str, module, location, customer) -> Status:
+        status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
         try:
             if location:
                 license = LocationLicense(
@@ -145,18 +140,15 @@ class LicenseController:
                 )
                 license.save()
         except:
-            status['status']  = False
-            status['message'] = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.status  = False
+            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
         return status
 
     @staticmethod
     def edit(id: int, key: str, detail: str,
-        start_date: str, end_date: str, module, location, customer) -> dict:
-        status = {
-            'status' : True,
-            'message': 'Die Lizenz wurde erfolgreich aktualisiert.',
-        }
+        start_date: str, end_date: str, module, location, customer) -> Status:
+        status = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
         try:
             LicenseController.__updateLocationLicense(
                 id          = id,
@@ -181,17 +173,14 @@ class LicenseController:
                     customer    = customer,
                 )
             except:
-                status['status']  = False
-                status['message'] = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
+                status.status  = False
+                status.message = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
 
         return status
     
     @staticmethod
-    def delete(id: int) -> dict:
-        status = {
-            'status' : True,
-            'message': 'Die Lizenz wurde erfolgreich gelöscht.',
-        }
+    def delete(id: int) -> Status:
+        status = Status(True, 'Die Lizenz wurde erfolgreich gelöscht.')
         try:
             license = LocationLicense.objects.get(license_ptr_id = id)
             license.delete()
@@ -200,8 +189,8 @@ class LicenseController:
                 license = CustomerLicense.objects.get(license_ptr_id = id)
                 license.delete()
             except:
-                status['status']  = False
-                status['message'] = ' Die zu löschende Lizenz nicht gefunden.'
+                status.status  = False
+                status.message = ' Die zu löschende Lizenz nicht gefunden.'
         
         return status
 
@@ -221,34 +210,31 @@ class LicenseController:
     
     @staticmethod
     def __checkCompleteness(key: str, detail: str, start_date: str, end_date: str,
-        module: int, location: int, customer: int, id: int) -> dict:
-        status = {
-            'status' : False,
-            'message': '',
-        }
+        module: int, location: int, customer: int, id: int) -> Status:
+        status = Status()
         if not len(key):
-            status['message'] = 'Bitte Lizenzschlüssel angeben.'
+            status.message = 'Bitte Lizenzschlüssel angeben.'
         elif not len(detail):
-            status['message'] = 'Bitte Details angeben.'
+            status.message = 'Bitte Details angeben.'
         elif not len(start_date):
-            status['message'] = 'Bitte Anfangsdatum angeben.'
+            status.message = 'Bitte Anfangsdatum angeben.'
         elif not len(end_date):
-            status['message'] = 'Bitte Enddatum angeben.'
+            status.message = 'Bitte Enddatum angeben.'
         elif start_date >= end_date:
-            status['message'] = 'Enddatum muss später als Anfangsdatum sein.'
+            status.message = 'Enddatum muss später als Anfangsdatum sein.'
         elif not module:
-            status['message'] = 'Bitte Modul angeben.'
+            status.message = 'Bitte Modul angeben.'
         elif customer and location:
-            status['message'] = 'Bitte nur Kunde ODER Standort zuweisen.'
+            status.message = 'Bitte nur Kunde ODER Standort zuweisen.'
         elif not customer and not location:
-            status['message'] = 'Bitte Kunde oder Standort zuweisen.'
+            status.message = 'Bitte Kunde oder Standort zuweisen.'
         else:
-            status['status'] = True
+            status.status = True
         
         return status
 
     @staticmethod
-    def __checkForeignKeys(module: int, location: int, customer: int):
+    def __checkForeignKeys(module: int, location: int, customer: int) -> dict:
         result = {
             'status'          : False,
             'message'         : '',

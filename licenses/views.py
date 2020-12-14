@@ -81,10 +81,10 @@ def save(request: WSGIRequest) -> JsonResponse:
             location    = location,
             customer    = customer,
         )
-        response = JsonResponse(status)
-        if status['status']:
-            response.set_cookie('license_status_status' , status['status'] , 7)
-            response.set_cookie('license_status_message', status['message'], 7)
+        response = JsonResponse(status.__dict__)
+        if status.status:
+            response.set_cookie('license_status_status' , status.status , 7)
+            response.set_cookie('license_status_message', status.message, 7)
 
     return response
 
@@ -92,7 +92,7 @@ def delete(request: WSGIRequest, id: int = 0) -> HttpResponse:
     response = redirect('licenses_list')
     if id > 0:
         status = LicenseController.delete(id = id)
-        response.set_cookie('license_status_status' , status['status'] , 7)
-        response.set_cookie('license_status_message', status['message'], 7)
+        response.set_cookie('license_status_status' , status.status , 7)
+        response.set_cookie('license_status_message', status.message, 7)
 
     return response
