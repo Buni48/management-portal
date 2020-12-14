@@ -51,6 +51,16 @@ class LicenseController:
 
     @staticmethod
     def getLicenseById(id: int):
+        """
+        Returns the location or customer license to a given id.
+        Returns 'None', if no license exists.
+
+        Attributes:
+        id (int): license id
+
+        Returns:
+        License: location or customer license
+        """
         try:
             license = LocationLicense.objects.get(license_ptr_id = id)
             license.start_date = license.start_date.strftime(DATE_TYPE_JS)
@@ -69,6 +79,24 @@ class LicenseController:
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str,
         module: int, location: int = 0, customer: int = 0, id: int = 0) -> Status:
+        """
+        Saves a license.
+        By giving an id it edits this license otherwise it creates a new one.
+        Give a location id to save a location license and a customer id to save a customer.
+
+        Attributes:
+        key         (str): license key
+        detail      (str): license details
+        start_date  (str): start date of the license
+        end_date    (str): end date of the license
+        module      (int): id of the belonging software module
+        location    (int): id of the belonging customer's location
+        customer    (int): id of the belonging customer
+        id          (int): license id if license should been edited
+
+        Returns:
+        Status: save status
+        """
         status = Status()
         status = LicenseController.__checkCompleteness(
             key         = key,
@@ -78,7 +106,6 @@ class LicenseController:
             module      = module,
             location    = location,
             customer    = customer,
-            id          = id,
         )
         if status.status:
             result = LicenseController.__checkForeignKeys(
@@ -117,6 +144,22 @@ class LicenseController:
     @staticmethod
     def create(key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
+        """
+        Creates a license.
+        Give a location object to create a location license and a customer object to create a customer.
+
+        Attributes:
+        key         (str)           : license key
+        detail      (str)           : license details
+        start_date  (str)           : start date of the license
+        end_date    (str)           : end date of the license
+        module      (SoftwareModule): belonging software module
+        location    (Location)      : belonging customer's location
+        customer    (Customer)      : belonging customer
+
+        Returns:
+        Status: create status
+        """
         status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
         try:
             if location:
@@ -148,6 +191,23 @@ class LicenseController:
     @staticmethod
     def edit(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
+        """
+        Edits a license.
+        Give a location id to edit a location license and a customer id to edit a customer.
+
+        Attributes:
+        id          (int)           : license id
+        key         (str)           : license key
+        detail      (str)           : license details
+        start_date  (str)           : start date of the license
+        end_date    (str)           : end date of the license
+        module      (SoftwareModule): belonging software module
+        location    (Location)      : belonging customer's location
+        customer    (Customer)      : belonging customer
+
+        Returns:
+        Status: edit status
+        """
         status = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
         try:
             LicenseController.__updateLocationLicense(
@@ -180,6 +240,15 @@ class LicenseController:
     
     @staticmethod
     def delete(id: int) -> Status:
+        """
+        Deletes the license with the given id.
+
+        Attributes:
+        id (int): id of the license to delete
+
+        Returns:
+        Status: delete status
+        """
         status = Status(True, 'Die Lizenz wurde erfolgreich gelöscht.')
         try:
             license = LocationLicense.objects.get(license_ptr_id = id)
@@ -195,7 +264,16 @@ class LicenseController:
         return status
 
     @staticmethod
-    def getCounts(licenses: list) -> list:
+    def getCounts(licenses: list) -> dict:
+        """
+        Returns the amount of missing and valid licenses in a given license list.
+
+        Attributes:
+        licenses (list): list of licenses
+
+        Returns:
+        dict: amount of missing and valid licenses
+        """
         count = {
             'missing': 0,
             'valid': 0,
@@ -209,8 +287,23 @@ class LicenseController:
         return count
     
     @staticmethod
-    def __checkCompleteness(key: str, detail: str, start_date: str, end_date: str,
-        module: int, location: int, customer: int, id: int) -> Status:
+    def __checkCompleteness(key: str, detail: str, start_date: str,
+        end_date: str, module: int, location: int, customer: int) -> Status:
+        """
+        Checks if all necessary attributes to save a license are set and valid.
+
+        Attributes:
+        key         (str): license key
+        detail      (str): license details
+        start_date  (str): start date of the license
+        end_date    (str): end date of the license
+        module      (int): id of the belonging software module
+        location    (int): id of the belonging customer's location
+        customer    (int): id of the belonging customer
+
+        Returns:
+        Status: save status
+        """
         status = Status()
         if not len(key):
             status.message = 'Bitte Lizenzschlüssel angeben.'
@@ -235,6 +328,17 @@ class LicenseController:
 
     @staticmethod
     def __checkForeignKeys(module: int, location: int, customer: int) -> dict:
+        """
+        Checks if foreign keys are valid and returns status and belonging objects.
+
+        Attributes:
+        module      (int): id of the belonging software module
+        location    (int): id of the belonging customer's location
+        customer    (int): id of the belonging customer
+
+        Returns:
+        dict: status and instances
+        """
         result = {
             'status'          : False,
             'message'         : '',
@@ -266,6 +370,19 @@ class LicenseController:
     @staticmethod
     def __updateLocationLicense(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer):
+        """
+        Updates a location license.
+
+        Attributes:
+        id          (int)           : license id
+        key         (str)           : license key
+        detail      (str)           : license details
+        start_date  (str)           : start date of the license
+        end_date    (str)           : end date of the license
+        module      (SoftwareModule): belonging software module
+        location    (Location)      : belonging customer's location
+        customer    (Customer)      : belonging customer
+        """
         locationLicense = LocationLicense.objects.get(license_ptr_id = id)
         if location:
             locationLicense.key         = key
@@ -290,6 +407,19 @@ class LicenseController:
 
     def __updateCustomerLicense(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer):
+        """
+        Updates a customer license.
+
+        Attributes:
+        id          (int)           : license id
+        key         (str)           : license key
+        detail      (str)           : license details
+        start_date  (str)           : start date of the license
+        end_date    (str)           : end date of the license
+        module      (SoftwareModule): belonging software module
+        location    (Location)      : belonging customer's location
+        customer    (Customer)      : belonging customer
+        """
         customerLicense = CustomerLicense.objects.get(license_ptr_id = id)
         if customer:
             customerLicense.key         = key
