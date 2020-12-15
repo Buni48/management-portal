@@ -20,14 +20,26 @@
                     </div>
                 {% endif %}
             {% endif %}
-            <div class="addCustomer">
-                <a href="{% url 'customers_create' %}">
-                    <button type="button" class="btn btn-primary">
-                        + Kunden hinzufügen
-                    </button>
-                </a>
-            </div>
+            <input id="search"
+                class="form-control mr-sm-2"
+                type="text"
+                list="customers"
+                maxlength="100"
+                placeholder="Kunden suchen"
+            >
+            <datalist id="customers">
+                {% for customer in customers %}
+                    <option value="{{customer.customer_number}}">
+                        {{customer.name}}
+                    </option>
+                {% endfor %}
+            </datalist><br>
             <h1>Kunden</h1>
+            <a href="{% url 'customers_create' %}">
+                <button type="button" class="btn btn-primary">
+                    + Kunden hinzufügen
+                </button>
+            </a><br><br>
             <div class="listname_box">
                 {% for customer_letter in customer_list %}
                 <h4 class="h4style">{{customer_letter.letter}}</h4>
@@ -42,6 +54,28 @@
                 </ul>
                 {% endfor %}
             </div>
+            <script>
+                $('#search').on('change', (event) => {
+                    $.ajax({
+                        type : "POST", 
+                        url  : "{% url 'customer' id=0 %}",
+                        data : {
+                            customer_number     : $('#search').val(),
+                            csrfmiddlewaretoken : '{{ csrf_token }}',
+                            dataType            : "json",
+                        },
+                        success: (result) => {
+                            let url = "{% url 'customer' id=0 %}"
+                            url = url.replace('0', result.id);
+                            document.location.href = url;
+                        },
+                        failure: () => {
+                            console.error('Request failed!');
+                        }
+                    });
+                    
+                });
+            </script>
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
             <button type="button">

@@ -17,6 +17,19 @@ class CustomerController:
         Customer: customer
         """
         return Customer.objects.get(id = id)
+    
+    @staticmethod
+    def getCustomerByCustomerNumber(customer_number: str):
+        """
+        Returns a customer for a given customer number.
+
+        Attributes:
+        customer_number (str): customer number of the customer
+
+        Returns:
+        Customer: customer
+        """
+        return Customer.objects.get(customer_number = customer_number)
 
     @staticmethod
     def getCustomerNames(limit: int = LIMIT) -> list:
@@ -85,6 +98,19 @@ class CustomerController:
             customerList.append(obj)
         
         return customerList
+    
+    @staticmethod
+    def read(limit: int = LIMIT) -> list:
+        """
+        Returns all customers.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: customers
+        """
+        return Customer.objects.all()[:limit]
 
     @staticmethod
     def save(customer_number: str, name: str, id: int = 0) -> Status:
