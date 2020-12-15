@@ -253,7 +253,3 @@ table.dataTable thead .sorting_desc_disabled:before {
 .collapse show {
     background: blue;
 }
-
-.addCustomer {
-   text-align: right;
-}

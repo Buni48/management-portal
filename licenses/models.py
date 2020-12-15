@@ -12,7 +12,7 @@ class License(models.Model):
     end_date         (datetime) : The end date of the license
     module           (int)      : Foreign key for the software module the license is for
     """
-    key              = models.CharField(max_length = 255)
+    key              = models.CharField(max_length = 255, unique = True)
     detail           = models.CharField(max_length = 2047)
     start_date       = models.DateTimeField()
     end_date         = models.DateTimeField()

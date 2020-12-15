@@ -17,6 +17,19 @@ class CustomerController:
         Customer: customer
         """
         return Customer.objects.get(id = id)
+    
+    @staticmethod
+    def getCustomerByCustomerNumber(customer_number: str):
+        """
+        Returns a customer for a given customer number.
+
+        Attributes:
+        customer_number (str): customer number of the customer
+
+        Returns:
+        Customer: customer
+        """
+        return Customer.objects.get(customer_number = customer_number)
 
     @staticmethod
     def getCustomerNames(limit: int = LIMIT) -> list:
@@ -30,6 +43,19 @@ class CustomerController:
         list: customer names
         """
         return list(Customer.objects.all()[:limit].values('id', 'name'))
+
+    @staticmethod
+    def getCustomerNumbers(limit: int = LIMIT) -> list:
+        """
+        Returns all customer numbers as list.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: customer numbers
+        """
+        return list(Customer.objects.all()[:limit].values('customer_number'))
 
     @staticmethod
     def getFilteredCustomers(word: str, contains: bool = False) -> list:
@@ -72,6 +98,19 @@ class CustomerController:
             customerList.append(obj)
         
         return customerList
+    
+    @staticmethod
+    def read(limit: int = LIMIT) -> list:
+        """
+        Returns all customers.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: customers
+        """
+        return Customer.objects.all()[:limit]
 
     @staticmethod
     def save(customer_number: str, name: str, id: int = 0) -> Status:
@@ -93,17 +132,24 @@ class CustomerController:
         elif not len(name):
             status.message = 'Bitte Name angeben.'
         else:
-            if id:
-                status = CustomerController.edit(
-                    id              = id,
-                    customer_number = customer_number,
-                    name            = name,
-                )
-            else:
-                status = CustomerController.create(
-                    customer_number = customer_number,
-                    name            = name,
-                )
+            customerNumbers = CustomerController.getCustomerNumbers()
+            for customerNumber in customerNumbers:
+                if customer_number == customerNumber['customer_number']:
+                    status.message = 'Diese Kundennummer wird bereits verwendet.'
+                    break
+
+            if not len(status.message):
+                if id:
+                    status = CustomerController.edit(
+                        id              = id,
+                        customer_number = customer_number,
+                        name            = name,
+                    )
+                else:
+                    status = CustomerController.create(
+                        customer_number = customer_number,
+                        name            = name,
+                    )
 
         return status
 

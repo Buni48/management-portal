@@ -14,9 +14,11 @@ def customerList(request: WSGIRequest) -> HttpResponse:
     message      = request.COOKIES.get('customer_status_message')
     heartbeats   = HeartbeatController.read()
     customerList = CustomerController.getCustomersForEachLetter()
+    customers    = CustomerController.read()
     context      = {
         'heartbeats'    : heartbeats,
         'customer_list' : customerList,
+        'customers'     : customers,
         'status'        : status,
         'message'       : message,
     }
@@ -27,13 +29,21 @@ def customerList(request: WSGIRequest) -> HttpResponse:
 
     return response
 
-def customer(request: WSGIRequest, id: int = 0) -> HttpResponse:
-    if id < 1:
+def customer(request: WSGIRequest, id: int = 0):
+    response = None
+    if request.is_ajax and id == 0:
+        customer_number = request.POST.get('customer_number', '')
+        customer = CustomerController.getCustomerByCustomerNumber(customer_number = customer_number)
+        id = customer.id
+        response = JsonResponse({'id': id})
+    elif id < 1:
         return redirect('customers_list')
+
 
     status      = request.COOKIES.get('customer_status_status')
     message     = request.COOKIES.get('customer_status_message')
     heartbeats  = HeartbeatController.read()
+
     customer    = CustomerController.getCustomerById(id = id)
     locations   = LocationController.getLocationsByCustomer(customer_id = id)
     context     = {
@@ -43,7 +53,9 @@ def customer(request: WSGIRequest, id: int = 0) -> HttpResponse:
         'status'    : status,
         'message'   : message,
     }
-    return render(request, 'customers/customer.html', context = context)
+    if not response:
+        response = render(request, 'customers/customer.html', context = context)
+    return response
 
 def create(request: WSGIRequest) -> HttpResponse:
     heartbeats = HeartbeatController.read()

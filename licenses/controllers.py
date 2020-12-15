@@ -98,7 +98,7 @@ class LicenseController:
         Status: save status
         """
         status = Status()
-        status = LicenseController.__checkCompleteness(
+        status = LicenseController.__checkValidity(
             key         = key,
             detail      = detail,
             start_date  = start_date,
@@ -281,13 +281,13 @@ class LicenseController:
         for license in licenses:
             if license.valid == -1:
                 count['missing'] += 1
-        else:
-            count['valid'] += 1
+            else:
+                count['valid'] += 1
 
         return count
     
     @staticmethod
-    def __checkCompleteness(key: str, detail: str, start_date: str,
+    def __checkValidity(key: str, detail: str, start_date: str,
         end_date: str, module: int, location: int, customer: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
@@ -322,7 +322,13 @@ class LicenseController:
         elif not customer and not location:
             status.message = 'Bitte Kunde oder Standort zuweisen.'
         else:
-            status.status = True
+            licenses = LicenseController.read()
+            for license in licenses:
+                if key == license.key:
+                    status.message = 'Diese Lizenzschlüssel wird bereits verwendet.'
+                    break
+            if not len(status.message):
+                status.status = True
         
         return status
 
