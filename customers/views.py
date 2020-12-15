@@ -9,7 +9,6 @@ from .controllers import LocationController
 def index(request: WSGIRequest) -> HttpResponse:
     return redirect('customers_list')
 
-
 def customerList(request: WSGIRequest) -> HttpResponse:
     status       = request.COOKIES.get('customer_status_status')
     message      = request.COOKIES.get('customer_status_message')
@@ -28,11 +27,12 @@ def customerList(request: WSGIRequest) -> HttpResponse:
 
     return response
 
-
 def customer(request: WSGIRequest, id: int = 0) -> HttpResponse:
-    if id == 0:
+    if id < 1:
         return redirect('customers_list')
 
+    status      = request.COOKIES.get('customer_status_status')
+    message     = request.COOKIES.get('customer_status_message')
     heartbeats  = HeartbeatController.read()
     customer    = CustomerController.getCustomerById(id = id)
     locations   = LocationController.getLocationsByCustomer(customer_id = id)
@@ -40,15 +40,31 @@ def customer(request: WSGIRequest, id: int = 0) -> HttpResponse:
         'heartbeats': heartbeats,
         'locations' : locations,
         'customer'  : customer,
+        'status'    : status,
+        'message'   : message,
     }
     return render(request, 'customers/customer.html', context = context)
 
-
 def create(request: WSGIRequest) -> HttpResponse:
+    heartbeats = HeartbeatController.read()
     context = {
-        'title': 'Kunden erstellen',
+        'title'     : 'Kunden erstellen',
+        'heartbeats': heartbeats
     }
-    return render(request, 'customers/create.html', context)
+    return render(request, 'customers/edit.html', context)
+
+def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
+    if id < 1:
+        return redirect('customers_list')
+
+    customer   = CustomerController.getCustomerById(id = id)
+    heartbeats = HeartbeatController.read()
+    context    = {
+        'title'     : 'Kunden bearbeiten',
+        'customer'  : customer,
+        'heartbeats': heartbeats,
+    }
+    return render(request, 'customers/edit.html', context)
 
 def save(request: WSGIRequest) -> JsonResponse:
     response = JsonResponse({})
@@ -65,5 +81,14 @@ def save(request: WSGIRequest) -> JsonResponse:
         if status.status:
             response.set_cookie('customer_status_status' , status.status , 7)
             response.set_cookie('customer_status_message', status.message, 7)
+
+    return response
+
+def delete(request: WSGIRequest, id: int = 0) -> HttpResponse:
+    response = redirect('customers_list')
+    if id > 0:
+        status = CustomerController.delete(id = id)
+        response.set_cookie('customer_status_status' , status.status , 7)
+        response.set_cookie('customer_status_message', status.message, 7)
 
     return response

@@ -154,6 +154,8 @@ class CustomerController:
         except:
             status.status = False
             status.message = 'Der zu bearbeitende Kunde wurde nicht gefunden.'
+        
+        return status
     
     @staticmethod
     def delete(id: int) -> Status:
@@ -171,7 +173,7 @@ class CustomerController:
             customer        = Customer.objects.get(id = id)
             customer.delete()
             status.status   = True
-            status.message  = 'Der Kunde "' + customer.name + '"wurde erfolgreich gelöscht.'
+            status.message  = 'Der Kunde "' + customer.name + '" wurde erfolgreich gelöscht.'
         except:
             pass
         

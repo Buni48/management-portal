@@ -9,16 +9,16 @@
 {% block content %}
     <div class="content">
         {% if message %}
-                {% if status == 'False' %}
-                    <div class="alert alert-danger" role="alert">
-                        {{message}}
-                    </div>
-                {% else %}
-                    <div class="alert alert-success" role="alert">
-                        {{message}}
-                    </div>
-                {% endif %}
+            {% if status == 'False' %}
+                <div class="alert alert-danger" role="alert">
+                    {{message}}
+                </div>
+            {% else %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
             {% endif %}
+        {% endif %}
         <div class="addCustomer">
             <a href="{% url 'customers_create' %}">
                 <button type="button" class="btn btn-primary">
