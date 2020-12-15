@@ -8,26 +8,25 @@
 <!-- Content-->
 {% block content %}
     <div class="content">
-        {% if message %}
-            {% if status == 'False' %}
-                <div class="alert alert-danger" role="alert">
-                    {{message}}
-                </div>
-            {% else %}
-                <div class="alert alert-success" role="alert">
-                    {{message}}
-                </div>
-            {% endif %}
-        {% endif %}
-        <div class="addCustomer">
-            <a href="{% url 'customers_create' %}">
-                <button type="button" class="btn btn-primary">
-                    + Kunden hinzufügen
-                </button>
-            </a>
-        </div>
-
         {% if request.user.is_authenticated %}
+            {% if message %}
+                {% if status == 'False' %}
+                    <div class="alert alert-danger" role="alert">
+                        {{message}}
+                    </div>
+                {% else %}
+                    <div class="alert alert-success" role="alert">
+                        {{message}}
+                    </div>
+                {% endif %}
+            {% endif %}
+            <div class="addCustomer">
+                <a href="{% url 'customers_create' %}">
+                    <button type="button" class="btn btn-primary">
+                        + Kunden hinzufügen
+                    </button>
+                </a>
+            </div>
             <h1>Kunden</h1>
             <div class="listname_box">
                 {% for customer_letter in customer_list %}
@@ -48,13 +47,6 @@
             <button type="button">
                 <a href="{% url 'login' %}">Anmelden</a>
             </button>
-
         {% endif %}
-
-
     </div>
-
-
-
 {% endblock content %}
-
