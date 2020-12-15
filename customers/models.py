@@ -8,7 +8,7 @@ class Customer(models.Model):
     customer_number (str): The unique identification number 
     name            (str): The name of the customer
     """
-    customer_number = models.CharField(max_length = 32)
+    customer_number = models.CharField(max_length = 32, unique = True)
     name            = models.CharField(max_length = 64)
 
     def __str__(self):
