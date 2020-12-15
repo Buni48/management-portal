@@ -32,6 +32,19 @@ class CustomerController:
         return list(Customer.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
+    def getCustomerNumbers(limit: int = LIMIT) -> list:
+        """
+        Returns all customer numbers as list.
+
+        Parameters:
+        limit (int): Maximum number of objects to load (default: 1000)
+
+        Returns:
+        list: customer numbers
+        """
+        return list(Customer.objects.all()[:limit].values('customer_number'))
+
+    @staticmethod
     def getFilteredCustomers(word: str, contains: bool = False) -> list:
         """
         Returns the filtered customers, filtering by customer number and name.
@@ -93,17 +106,24 @@ class CustomerController:
         elif not len(name):
             status.message = 'Bitte Name angeben.'
         else:
-            if id:
-                status = CustomerController.edit(
-                    id              = id,
-                    customer_number = customer_number,
-                    name            = name,
-                )
-            else:
-                status = CustomerController.create(
-                    customer_number = customer_number,
-                    name            = name,
-                )
+            customerNumbers = CustomerController.getCustomerNumbers()
+            for customerNumber in customerNumbers:
+                if customer_number == customerNumber['customer_number']:
+                    status.message = 'Diese Kundennummer wird bereits verwendet.'
+                    break
+
+            if not len(status.message):
+                if id:
+                    status = CustomerController.edit(
+                        id              = id,
+                        customer_number = customer_number,
+                        name            = name,
+                    )
+                else:
+                    status = CustomerController.create(
+                        customer_number = customer_number,
+                        name            = name,
+                    )
 
         return status
 
