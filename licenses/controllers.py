@@ -281,8 +281,8 @@ class LicenseController:
         for license in licenses:
             if license.valid == -1:
                 count['missing'] += 1
-        else:
-            count['valid'] += 1
+            else:
+                count['valid'] += 1
 
         return count
     
