@@ -129,8 +129,12 @@ class CustomerController:
         status = Status()
         if not len(customer_number):
             status.message = 'Bitte Kundennummer angeben.'
+        elif len(customer_number) > 32:
+            status.message = 'Kundennummer darf nur maximal 32 Zeichen lang sein.'
         elif not len(name):
             status.message = 'Bitte Name angeben.'
+        elif len(name) > 64:
+            status.message = 'Name darf nur maximal 64 Zeichen lang sein.'
         else:
             customerNumbers = CustomerController.getCustomerNumbers()
             for customerNumber in customerNumbers:

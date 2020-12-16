@@ -307,8 +307,12 @@ class LicenseController:
         status = Status()
         if not len(key):
             status.message = 'Bitte Lizenzschlüssel angeben.'
+        elif len(key) > 255:
+            status.message = 'Lizenzschlüssel darf maximal 255 Zeichen lang sein.'
         elif not len(detail):
             status.message = 'Bitte Details angeben.'
+        elif len(detail) > 2047:
+            status.message = 'Details dürfen maximal 2047 Zeichen lang sein.'
         elif not len(start_date):
             status.message = 'Bitte Anfangsdatum angeben.'
         elif not len(end_date):
