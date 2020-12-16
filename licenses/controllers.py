@@ -106,6 +106,7 @@ class LicenseController:
             module      = module,
             location    = location,
             customer    = customer,
+            id          = id,
         )
         if status.status:
             saveStatus   = LicenseController.__checkForeignKeys(
@@ -288,7 +289,7 @@ class LicenseController:
     
     @staticmethod
     def __checkValidity(key: str, detail: str, start_date: str,
-        end_date: str, module: int, location: int, customer: int) -> Status:
+        end_date: str, module: int, location: int, customer: int, id: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
 
@@ -300,6 +301,7 @@ class LicenseController:
         module      (int): id of the belonging software module
         location    (int): id of the belonging customer's location
         customer    (int): id of the belonging customer
+        id          (int): license id if license should been edited
 
         Returns:
         Status: save status
@@ -328,7 +330,7 @@ class LicenseController:
         else:
             licenses = LicenseController.read()
             for license in licenses:
-                if key == license.key:
+                if key == license.key and not id == str(license.id):
                     status.message = 'Diese Lizenzschlüssel wird bereits verwendet.'
                     break
             if not len(status.message):
