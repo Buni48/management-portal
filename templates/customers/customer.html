@@ -22,7 +22,7 @@
             {% endif %}
             <h1>Kunde "{{customer.name}}" - K.Nr.: {{customer.customer_number}}</h1><hr>
             <div class="center">
-                <a href="">
+                <a href="{% url 'locations_create' customer_id=customer.id %}">
                     <button type="button" class="btn btn-primary">
                         + Standort hinzufügen
                     </button>
@@ -44,12 +44,18 @@
                         {% for location in locations %}
                             <div class="card-header" id="headingOne">
                                 <h2 class="mb-0">
-                                    <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <button class="btn btn-link btn-block text-left"
+                                        type="button"
+                                        data-toggle="collapse"
+                                        data-target="#collapse-{{location.id}}"
+                                        aria-expanded="true"
+                                        aria-controls="collapse-{{location.id}}"
+                                    >
                                         {{location.name}}
                                     </button>
                                 </h2>
                             </div>
-                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+                            <div id="collapse-{{location.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
                                 <div class="card-body">
                                     <table class="table">
                                         <tbody>
@@ -69,6 +75,18 @@
                                                 <td>{{location.phone_number}}</td>
                                                 <td>{{location.email_address}}</td>
                                             </tr>
+                                            <tr>
+                                                <td class="location-button">
+                                                    <a href="{% url 'locations_edit' customer_id=customer.id id=location.id %}">
+                                                        <button type="button" class="btn btn-sm btn-default">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteLocation({{ location.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -77,6 +95,30 @@
                     </div>
                 </div>
             </div>
+            <script>
+                deleteLocation = (id) => {
+                    $.ajax({
+                        type : "POST", 
+                        url  : "{% url 'locations_delete' %}",
+                        data : {
+                            id                  : id,
+                            csrfmiddlewaretoken : '{{ csrf_token }}',
+                            dataType            : "json",
+                        },
+                        success: (result) => {
+                            if (result.status) {
+                                document.location.href = "{% if customer.id %}{% url 'customer' id=customer.id %}{% else %}{% url 'customers_list' %}{% endif %}";
+                            } else {
+                                $('#alert').removeClass('hidden-alert');
+                                $('#alert').html(result.message);
+                            }
+                        },
+                        failure: () => {
+                            console.log('Request failed!');
+                        },
+                    });
+                };
+            </script>
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
             <button type="button">
