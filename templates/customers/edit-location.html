@@ -1,0 +1,152 @@
+{% extends "site.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <div id="alert" class="alert alert-danger hidden-alert" role="alert">
+            </div>
+            <h1 id="title">{{title}}</h1>
+
+            <form id="form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text"
+                        class="form-control"
+                        value="{{location.name}}"
+                        id="name"
+                        name="name"
+                        placeholder="Namen eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="name">E-Mail-Adresse</label>
+                    <input type="email"
+                        class="form-control"
+                        value="{{location.email_address}}"
+                        id="email_address"
+                        name="email_address"
+                        placeholder="E-Mail-Addresse eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="name">Telefonnummer</label>
+                    <input type="text"
+                        class="form-control"
+                        value="{{location.phone_number}}"
+                        id="phone_number"
+                        name="phone_number"
+                        placeholder="Telefonnummer eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-10">
+                        <label for="name">Straße</label>
+                        <input type="text"
+                            class="form-control"
+                            value="{{location.street}}"
+                            id="street"
+                            name="street"
+                            placeholder="Straße eingeben"
+                            maxlength="64"
+                            required
+                        >
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="name">Hausnummer</label>
+                        <input type="text"
+                            class="form-control"
+                            value="{{location.house_number}}"
+                            id="house_number"
+                            name="house_number"
+                            placeholder="Hausnummer eingeben"
+                            maxlength="8"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label for="name">PLZ</label>
+                        <input type="text"
+                            class="form-control"
+                            value="{{location.postcode}}"
+                            id="postcode"
+                            name="postcode"
+                            placeholder="PLZ eingeben"
+                            maxlength="16"
+                            required
+                        >
+                    </div>
+                    <div class="form-group col-md-9">
+                        <label for="name">Ort</label>
+                        <input type="text"
+                            class="form-control"
+                            value="{{location.city}}"
+                            id="city"
+                            name="city"
+                            placeholder="Ort eingeben"
+                            maxlength="64"
+                            required
+                        >
+                    </div>
+                </div>
+                <p>Dieser Standort gehört zum Kunden "{{customer.name}}" mit der Kundennummer "{{customer.customer_number}}".</p>
+                <button type="submit" class="btn btn-primary">Speichern</button>
+                <a href="{% url 'customer' id=customer.id %}">
+                    <button type="button" class="btn btn-danger">
+                        Abbrechen
+                    </button>
+                </a>
+            </form>
+            <script>
+                $('#form').on('submit', (event) => {
+                    event.preventDefault();
+                    $.ajax({
+                        type : "POST", 
+                        url  : "{% url 'locations_save' %}",
+                        data : {
+                            customer            : '{{ customer.id }}',
+                            id                  : '{{ location.id }}',
+                            name                : $('#name').val(),
+                            email_address       : $('#email_address').val(),
+                            phone_number        : $('#phone_number').val(),
+                            street              : $('#street').val(),
+                            house_number        : $('#house_number').val(),
+                            postcode            : $('#postcode').val(),
+                            city                : $('#city').val(),
+                            csrfmiddlewaretoken : '{{ csrf_token }}',
+                            dataType            : "json",
+                        },
+                        success: (result) => {
+                            if (result.status) {
+                                document.location.href = "{% if customer.id %}{% url 'customer' id=customer.id %}{% else %}{% url 'customers_list' %}{% endif %}";
+                            } else {
+                                $('#alert').removeClass('hidden-alert');
+                                $('#alert').html(result.message);
+                            }
+                        },
+                        failure: () => {
+                            console.log('Request failed!');
+                        },
+                    });
+                });
+            </script>
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+        {% endif %}
+    </div>
+{% endblock content %}
