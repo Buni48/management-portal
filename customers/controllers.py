@@ -87,6 +87,24 @@ class CustomerController:
         return customerList
     
     @staticmethod
+    def getCustomerByLocationId(location_id: int):
+        """
+        Returns the customer belonging to a location for a given location id.
+
+        Attributes:
+        location_id (int): id of the location
+
+        Returns:
+        Customer: customer
+        """
+        customer = None
+        location = Location.objects.get(id = location_id)
+        if location:
+            customer = location.customer 
+
+        return customer
+
+    @staticmethod
     def read(limit: int = LIMIT) -> list:
         """
         Returns all customers.
@@ -264,6 +282,19 @@ class LocationController:
             location['customer'] = customer.name
 
         return list(locations)
+    
+    @staticmethod
+    def getLocationById(id: int) -> list:
+        """
+        Returns the location with the given id.
+
+        Attributes:
+        id (int): id of the location
+
+        Returns:
+        Location: location
+        """
+        return Location.objects.get(id = id)
 
     @staticmethod
     def save(name: str, email_address: str, phone_number: str, street: str,
@@ -298,7 +329,7 @@ class LocationController:
         )
         if saveStatus.status:
             if id:
-                LocationController.edit(
+                status = LocationController.edit(
                     id            = id,
                     name          = name,
                     email_address = email_address,
@@ -310,7 +341,7 @@ class LocationController:
                     customer      = saveStatus.instances['customer'],
                 )
             else:
-                LocationController.create(
+                status = LocationController.create(
                     name          = name,
                     email_address = email_address,
                     phone_number  = phone_number,
