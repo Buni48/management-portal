@@ -253,3 +253,7 @@ table.dataTable thead .sorting_desc_disabled:before {
 .collapse show {
     background: blue;
 }
+
+.location-button {
+    padding-bottom: 0;
+}
