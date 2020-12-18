@@ -276,12 +276,12 @@ class LicenseController:
         dict: amount of missing and valid licenses
         """
         count = {
-            'missing': 0,
-            'valid': 0,
+            'expired': 0,
+            'valid'  : 0,
         }
         for license in licenses:
             if license.valid == -1:
-                count['missing'] += 1
+                count['expired'] += 1
             else:
                 count['valid'] += 1
 
