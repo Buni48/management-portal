@@ -96,6 +96,12 @@
                 </div>
             </div>
             <script>
+                /**
+                 * Deletes the location with the given id by sending an ajax request.
+                 * After that you get a success or error message.
+                 * 
+                 * @param {int} id  location id
+                 */
                 deleteLocation = (id) => {
                     $.ajax({
                         type : "POST", 

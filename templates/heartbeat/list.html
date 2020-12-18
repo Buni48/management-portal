@@ -60,6 +60,9 @@
 
 {% block custom_js %}
     <script>
+        /**
+         * Executed after the page was load to show data table.
+         */
         $(document).ready(function () {
             $('#selectedColumn').DataTable({
                 "aaSorting": [],
