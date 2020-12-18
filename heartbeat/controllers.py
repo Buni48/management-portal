@@ -57,3 +57,26 @@ class HeartbeatController:
             if (usedProduct.received == False):
                 count += 1
         return count
+
+    @staticmethod
+    def getCounts(usedProducts: list) -> dict:
+        """
+        Returns the amount of heartbeats recieved and not received in expected time.
+
+        Parameters:
+        usedProducts (list): List of used products
+
+        Returns:
+        dict: Amount of valid and missing heartbeats
+        """
+        count = {
+            'missing': 0,
+            'valid'  : 0,
+        }
+        for usedProduct in usedProducts:
+            if usedProduct.received:
+                count['valid'] += 1
+            else:
+                count['missing'] += 1
+
+        return count

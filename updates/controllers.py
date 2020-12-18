@@ -39,27 +39,24 @@ class UpdateController:
         return usedProducts
 
     @staticmethod
-    def getStatus():
+    def getCounts(usedProducts: list) -> dict:
         """
-        Returns used products including information about product, location and if the used product uses the current software version.
+        Returns the amount of used products recieved which are current or old.
 
         Parameters:
-        limit (int): Maximum number of objects to load (default: 1000)
+        usedProducts (list): List of used products
 
         Returns:
-        list: used products
+        dict: Amount of current and old used products
         """
-        usedProducts = UsedSoftwareProduct.objects.all()
-        current = 0
-        expired = 0
-        productStatus = []
+        count = {
+            'current': 0,
+            'old'    : 0,
+        }
         for usedProduct in usedProducts:
             if usedProduct.version == usedProduct.product.version:
-                current += 1
-            elif usedProduct.version != usedProduct.product.version:
-                expired += 1
+                count['current'] += 1
+            else:
+                count['old'] += 1
 
-        productStatus.append(current)
-        productStatus.append(expired)
-
-        return productStatus
+        return count

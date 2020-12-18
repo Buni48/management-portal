@@ -2,7 +2,7 @@ from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, 
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
-from management_portal.general import Status
+from management_portal.general import Status, SaveStatus
 
 class LicenseController:
 
@@ -106,14 +106,15 @@ class LicenseController:
             module      = module,
             location    = location,
             customer    = customer,
+            id          = id,
         )
         if status.status:
-            result = LicenseController.__checkForeignKeys(
+            saveStatus   = LicenseController.__checkForeignKeys(
                 module   = module,
                 location = location,
                 customer = customer,
             )
-            if result['status']:
+            if saveStatus.status:
                 if id:
                     status          = LicenseController.edit(
                         id          = id,
@@ -121,9 +122,9 @@ class LicenseController:
                         detail      = detail,
                         start_date  = start_date,
                         end_date    = end_date,
-                        module      = result['moduleInstance'],
-                        location    = result['locationInstance'],
-                        customer    = result['customerInstance'],
+                        module      = saveStatus.instances['module'],
+                        location    = saveStatus.instances['location'],
+                        customer    = saveStatus.instances['customer'],
                     )
                 else:
                     status          = LicenseController.create(
@@ -131,13 +132,13 @@ class LicenseController:
                         detail      = detail,
                         start_date  = start_date,
                         end_date    = end_date,
-                        module      = result['moduleInstance'],
-                        location    = result['locationInstance'],
-                        customer    = result['customerInstance'],
+                        module      = saveStatus.instances['module'],
+                        location    = saveStatus.instances['location'],
+                        customer    = saveStatus.instances['customer'],
                     )
             else:
-                status.status  = result['status']
-                status.message = result['message']
+                status.status  = saveStatus.status
+                status.message = saveStatus.message
 
         return status
 
@@ -275,12 +276,12 @@ class LicenseController:
         dict: amount of missing and valid licenses
         """
         count = {
-            'missing': 0,
-            'valid': 0,
+            'expired': 0,
+            'valid'  : 0,
         }
         for license in licenses:
             if license.valid == -1:
-                count['missing'] += 1
+                count['expired'] += 1
             else:
                 count['valid'] += 1
 
@@ -288,7 +289,7 @@ class LicenseController:
     
     @staticmethod
     def __checkValidity(key: str, detail: str, start_date: str,
-        end_date: str, module: int, location: int, customer: int) -> Status:
+        end_date: str, module: int, location: int, customer: int, id: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
 
@@ -300,6 +301,7 @@ class LicenseController:
         module      (int): id of the belonging software module
         location    (int): id of the belonging customer's location
         customer    (int): id of the belonging customer
+        id          (int): license id if license should been edited
 
         Returns:
         Status: save status
@@ -328,7 +330,7 @@ class LicenseController:
         else:
             licenses = LicenseController.read()
             for license in licenses:
-                if key == license.key:
+                if key == license.key and not id == str(license.id):
                     status.message = 'Diese Lizenzschlüssel wird bereits verwendet.'
                     break
             if not len(status.message):
@@ -337,9 +339,9 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __checkForeignKeys(module: int, location: int, customer: int) -> dict:
+    def __checkForeignKeys(module: int, location: int, customer: int) -> SaveStatus:
         """
-        Checks if foreign keys are valid and returns status and belonging objects.
+        Checks if foreign keys are valid and returns status including belonging objects.
 
         Attributes:
         module      (int): id of the belonging software module
@@ -347,35 +349,34 @@ class LicenseController:
         customer    (int): id of the belonging customer
 
         Returns:
-        dict: status and instances
+        SaveStatus: save status including instances
         """
-        result = {
-            'status'          : False,
-            'message'         : '',
-            'moduleInstance'  : None,
-            'locationInstance': None,
-            'customerInstance': None,
+        instances = {
+            'module'  : None,
+            'location': None,
+            'customer': None,
         }
+        status = SaveStatus(instances = instances)
         try:
-            result['moduleInstance'] = SoftwareModule.objects.get(id = module)
+            status.instances['module'] = SoftwareModule.objects.get(id = module)
         except:
-            result['message'] = 'Zugewiesenes Modul nicht gefunden.'
+            status.message = 'Zugewiesenes Modul nicht gefunden.'
     
-        if not len(result['message']):
+        if not len(status.message):
             if location:
                 try:
-                    result['locationInstance'] = Location.objects.get(id = location)
-                    result['status']           = True
+                    status.instances['location'] = Location.objects.get(id = location)
+                    status.status = True
                 except:
-                    result['message'] = 'Zugewiesenen Standort nicht gefunden.'
+                    status.message = 'Zugewiesenen Standort nicht gefunden.'
             else:
                 try:
-                    result['customerInstance'] = Customer.objects.get(id = customer)
-                    result['status']           = True
+                    status.instances['customer'] = Customer.objects.get(id = customer)
+                    status.status = True
                 except:
-                    result['message'] = 'Zugewiesenen Kunden nicht gefunden.'
+                    status.message = 'Zugewiesenen Kunden nicht gefunden.'
 
-        return result
+        return status
 
     @staticmethod
     def __updateLocationLicense(id: int, key: str, detail: str,
