@@ -161,7 +161,8 @@ class LicenseController:
         Returns:
         Status: create status
         """
-        status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
+        status        = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
+        create_status = None
         try:
             if location:
                 create_status = LicenseController.__createLocationLicense(
@@ -211,7 +212,8 @@ class LicenseController:
         Returns:
         Status: edit status
         """
-        status = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
+        status        = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
+        update_status = None
         try:
             update_status = LicenseController.__updateLocationLicense(
                 id          = id,
