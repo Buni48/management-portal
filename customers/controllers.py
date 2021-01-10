@@ -1,4 +1,5 @@
 from .models import Customer, Location, ContactPerson, Person
+from licenses.models import CustomerLicense, UsedSoftwareProduct
 from itertools import chain
 from management_portal.constants import LIMIT
 from management_portal.general import Status, SaveStatus
@@ -361,7 +362,7 @@ class LocationController:
     def create(name: str, email_address: str, phone_number: str, street: str,
         house_number: str, postcode: str, city: str, customer) -> Status:
         """
-        Creates a customer's location.
+        Creates a customer's location and used products if customer licenses existing.
 
         Parameter:
         name          (str)     : location name
@@ -376,7 +377,8 @@ class LocationController:
         Returns:
         Status: create status
         """
-        status = Status(True, 'Der Standort "' + name + '" wurde erfolgreich angelegt.')
+        status    = Status(True, 'Der Standort "' + name + '" wurde erfolgreich angelegt.')
+        up_status = None
         try:
             location = Location(
                 name          = name,
@@ -389,10 +391,45 @@ class LocationController:
                 customer      = customer,
             )
             location.save()
+            up_status = LocationController.__createUsedProducts(
+                customer = customer,
+                location = location,
+            )
         except:
             status.status = False
             status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
+        if up_status and not up_status.status:
+            status.status = False
+            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+
+        return status
+    
+    @staticmethod
+    def __createUsedProducts(customer, location) -> Status:
+        """
+        Creates used products for given location if the given customer has customer licenses.
+
+        Parameter:
+        customer (Customer): customer to check licenses for
+        location (Location): location to create used products for
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True)
+        try:
+            licenses = CustomerLicense.objects.filter(customer = customer)
+            for license in licenses:
+                used_product = UsedSoftwareProduct(
+                    location = location,
+                    product  = license.module.product,
+                    version  = license.module.product.version,
+                )
+                used_product.save()
+        except:
+            status.status = False
+        
         return status
 
     @staticmethod
