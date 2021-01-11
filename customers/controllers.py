@@ -2,16 +2,20 @@ from .models import Customer, Location, ContactPerson, Person
 from licenses.models import CustomerLicense, UsedSoftwareProduct
 from itertools import chain
 from management_portal.constants import LIMIT
-from management_portal.general import Status, SaveStatus
+from management_portal.general import Status, save_status
 
 class CustomerController:
+    """
+    The 'CustomerController' manages the customer model.
+    This includes things like read, save and delete functions which can be called from the view.
+    """
 
     @staticmethod
-    def getCustomerById(id: int):
+    def get_customer_by_id(id: int):
         """
         Returns a customer for a given id.
 
-        Attributes:
+        Parameters:
         id (int): id of the customer
 
         Returns:
@@ -20,11 +24,11 @@ class CustomerController:
         return Customer.objects.get(id = id)
     
     @staticmethod
-    def getCustomerByCustomerNumber(customer_number: str):
+    def get_customer_by_customer_number(customer_number: str):
         """
         Returns a customer for a given customer number.
 
-        Attributes:
+        Parameters:
         customer_number (str): customer number of the customer
 
         Returns:
@@ -33,7 +37,7 @@ class CustomerController:
         return Customer.objects.get(customer_number = customer_number)
 
     @staticmethod
-    def getCustomerNames(limit: int = LIMIT) -> list:
+    def get_customer_names(limit: int = LIMIT) -> list:
         """
         Returns all customer names as list.
 
@@ -46,7 +50,7 @@ class CustomerController:
         return list(Customer.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
-    def getFilteredCustomers(word: str, contains: bool = False) -> list:
+    def get_filtered_customers(word: str, contains: bool = False) -> list:
         """
         Returns the filtered customers, filtering by customer number and name.
         Pass a word to filter. You can choose to filter "contains" or "is".
@@ -59,23 +63,23 @@ class CustomerController:
         list: filtered customers
         """
         if contains:
-            customersByNumber = Customer.objects.filter(customer_number__icontains = word).values('id', 'customer_number', 'name')
-            customersByName   = Customer.objects.filter(name__icontains = word).values('id', 'customer_number', 'name')
+            customers_by_number = Customer.objects.filter(customer_number__icontains = word).values('id', 'customer_number', 'name')
+            customers_by_name   = Customer.objects.filter(name__icontains = word).values('id', 'customer_number', 'name')
         else:
-            customersByNumber = Customer.objects.filter(customer_number__iexact = word).values('id', 'customer_number', 'name')
-            customersByName   = Customer.objects.filter(name__iexact = word).values('id', 'customer_number', 'name')
+            customers_by_number = Customer.objects.filter(customer_number__iexact = word).values('id', 'customer_number', 'name')
+            customers_by_name   = Customer.objects.filter(name__iexact = word).values('id', 'customer_number', 'name')
 
-        return list(chain(customersByName, customersByNumber))
+        return list(chain(customers_by_name, customers_by_number))
 
     @staticmethod
-    def getCustomersForEachLetter() -> list:
+    def get_customers_for_each_letter() -> list:
         """
         Get customers for each letter as list of dictionaries.
 
         Returns:
         list: customers for each letter
         """
-        customerList = []
+        customer_list = []
         for i in range(65, 91):
             char = chr(i)
             customers = list(Customer.objects.filter(name__istartswith = char).values('id', 'name'))
@@ -83,16 +87,16 @@ class CustomerController:
                 'letter'    : char,
                 'customers' : customers,
             }
-            customerList.append(obj)
+            customer_list.append(obj)
         
-        return customerList
+        return customer_list
     
     @staticmethod
-    def getCustomerByLocationId(location_id: int):
+    def get_customer_by_location_id(location_id: int):
         """
         Returns the customer belonging to a location for a given location id.
 
-        Attributes:
+        Parameters:
         location_id (int): id of the location
 
         Returns:
@@ -124,7 +128,7 @@ class CustomerController:
         Saves a customer.
         By giving an id it edits this customer otherwise it creates a new one.
 
-        Attributes:
+        Parameters:
         customer_number (str): customer number
         name            (str): customer name
         id              (int): customer id if customer should been edited
@@ -168,7 +172,7 @@ class CustomerController:
         """
         Creates a customer.
 
-        Attributes:
+        Parameters:
         customer_number (str): customer number
         name            (str): customer name
 
@@ -193,7 +197,7 @@ class CustomerController:
         """
         Edits a customer.
 
-        Attributes:
+        Parameters:
         id              (int): customer id
         customer_number (str): customer number
         name            (str): customer name
@@ -218,7 +222,7 @@ class CustomerController:
         """
         Deletes a customer with the given id.
 
-        Attributes:
+        Parameters:
         id (int): customer id of the customer to delete
 
         Returns:
@@ -237,9 +241,13 @@ class CustomerController:
 
 
 class LocationController:
+    """
+    The 'LocationController' manages the location model.
+    This includes things like read, save and delete functions which can be called from the view.
+    """
 
     @staticmethod
-    def getLocationsByCustomer(customer_id: int, limit: int = LIMIT) -> list:
+    def get_locations_by_customer(customer_id: int, limit: int = LIMIT) -> list:
         locations = Location.objects.filter(customer_id = customer_id)
 
         for location in locations:
@@ -248,7 +256,7 @@ class LocationController:
         return locations
 
     @staticmethod
-    def getLocationNames(limit: int = LIMIT) -> list:
+    def get_location_names(limit: int = LIMIT) -> list:
         """
         Returns all location names as list.
 
@@ -261,7 +269,7 @@ class LocationController:
         return list(Location.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
-    def getLocationsByName(word: str, contains: bool = False) -> list:
+    def get_locations_by_name(word: str, contains: bool = False) -> list:
         """
         Returns the filtered locations, filtering by name.
         Pass a word to filter. You can choose to filter "contains" or "is".
@@ -279,17 +287,17 @@ class LocationController:
             locations = Location.objects.filter(name__iexact = word).values('id', 'name', 'postcode', 'city')
         
         for location in locations:
-            customer = Customer.objects.get(id = location['id'])
+            customer             = Customer.objects.get(id = location['id'])
             location['customer'] = customer.name
 
         return list(locations)
     
     @staticmethod
-    def getLocationById(id: int) -> list:
+    def get_location_by_id(id: int) -> list:
         """
         Returns the location with the given id.
 
-        Attributes:
+        Parameters:
         id (int): id of the location
 
         Returns:
@@ -318,7 +326,7 @@ class LocationController:
         Status: save status
         """
         status = Status()
-        saveStatus = LocationController.__checkValidity(
+        save_status = LocationController.__check_validity(
             name          = name,
             email_address = email_address,
             phone_number  = phone_number,
@@ -328,7 +336,7 @@ class LocationController:
             city          = city,
             customer      = customer,
         )
-        if saveStatus.status:
+        if save_status.status:
             if id:
                 status = LocationController.edit(
                     id            = id,
@@ -339,7 +347,7 @@ class LocationController:
                     house_number  = house_number,
                     postcode      = postcode,
                     city          = city,
-                    customer      = saveStatus.instances['customer'],
+                    customer      = save_status.instances['customer'],
                 )
             else:
                 status = LocationController.create(
@@ -350,11 +358,11 @@ class LocationController:
                     house_number  = house_number,
                     postcode      = postcode,
                     city          = city,
-                    customer      = saveStatus.instances['customer'],
+                    customer      = save_status.instances['customer'],
                 )
         else:
-            status.status  = saveStatus.status
-            status.message = saveStatus.message
+            status.status  = save_status.status
+            status.message = save_status.message
         
         return status
 
@@ -391,7 +399,7 @@ class LocationController:
                 customer      = customer,
             )
             location.save()
-            up_status = LocationController.__createUsedProducts(
+            up_status = LocationController.__create_used_products(
                 customer = customer,
                 location = location,
             )
@@ -403,33 +411,6 @@ class LocationController:
             status.status = False
             status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
-        return status
-    
-    @staticmethod
-    def __createUsedProducts(customer, location) -> Status:
-        """
-        Creates used products for given location if the given customer has customer licenses.
-
-        Parameter:
-        customer (Customer): customer to check licenses for
-        location (Location): location to create used products for
-
-        Returns:
-        Status: create status
-        """
-        status = Status(True)
-        try:
-            licenses = CustomerLicense.objects.filter(customer = customer)
-            for license in licenses:
-                used_product = UsedSoftwareProduct(
-                    location = location,
-                    product  = license.module.product,
-                    version  = license.module.product.version,
-                )
-                used_product.save()
-        except:
-            status.status = False
-        
         return status
 
     @staticmethod
@@ -476,7 +457,7 @@ class LocationController:
         """
         Deletes a location with the given id.
 
-        Attributes:
+        Parameters:
         id (int): location id of the customer to delete
 
         Returns:
@@ -494,8 +475,8 @@ class LocationController:
         return status
 
     @staticmethod
-    def __checkValidity(name: str, email_address: str, phone_number: str, street: str,
-        house_number: str, postcode: str, city: str, customer: int) -> SaveStatus:
+    def __check_validity(name: str, email_address: str, phone_number: str, street: str,
+        house_number: str, postcode: str, city: str, customer: int) -> save_status:
         """
         Checks the completeness and validity of location data to save.
 
@@ -510,12 +491,12 @@ class LocationController:
         customer      (int): id for the customer the location belongs to
 
         Returns:
-        SaveStatus: save status
+        save_status: save status
         """
         instances = {
             'customer': customer,
         }
-        status = SaveStatus(instances = instances)
+        status = save_status(instances = instances)
 
         if not len(name):
             status.message = 'Bitte Namen angeben.'
@@ -556,11 +537,41 @@ class LocationController:
 
         return status
 
+    @staticmethod
+    def __create_used_products(customer, location) -> Status:
+        """
+        Creates used products for given location if the given customer has customer licenses.
+
+        Parameter:
+        customer (Customer): customer to check licenses for
+        location (Location): location to create used products for
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True)
+        try:
+            licenses = CustomerLicense.objects.filter(customer = customer)
+            for license in licenses:
+                used_product = UsedSoftwareProduct(
+                    location = location,
+                    product  = license.module.product,
+                    version  = license.module.product.version,
+                )
+                used_product.save()
+        except:
+            status.status = False
+        
+        return status
+
 
 class ContactPersonController:
+    """
+    The 'ContactPersonController' manages the contact person model.
+    """
 
     @staticmethod
-    def getContactPersonsByName(word: str, contains: bool = False) -> list:
+    def get_contact_persons_by_name(word: str, contains: bool = False) -> list:
         """
         Returns the filtered contact persons, filtering by first name and last name.
         Pass a word to filter. You can choose to filter "contains" or "is".
@@ -576,30 +587,30 @@ class ContactPersonController:
 
         if contains:
             if len(words) == 2:
-                contactsOne = ContactPerson.objects.filter(first_name__icontains = words[0], last_name__icontains = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsTwo = ContactPerson.objects.filter(first_name__icontains = words[1], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts    = list(chain(contactsOne, contactsTwo))
+                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0], last_name__icontains = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts     = list(chain(contacts_one, contacts_two))
             elif len(words) == 3:
-                contactsOne = ContactPerson.objects.filter(first_name__icontains = words[0] + words[1], last_name__icontains = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsTwo = ContactPerson.objects.filter(first_name__icontains = words[1] + words[2], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts    = list(chain(contactsOne, contactsTwo))
+                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0] + words[1], last_name__icontains = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1] + words[2], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts     = list(chain(contacts_one, contacts_two))
             else:
-                contactsByFirstName = ContactPerson.objects.filter(first_name__icontains = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
-                contactsByLastName  = ContactPerson.objects.filter(last_name__icontains  = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
-                contacts            = list(chain(contactsByFirstName, contactsByLastName))
+                contacts_by_first_name = ContactPerson.objects.filter(first_name__icontains = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
+                contacts_by_last_name  = ContactPerson.objects.filter(last_name__icontains  = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
+                contacts               = list(chain(contacts_by_first_name, contacts_by_last_name))
         else:
             if len(words) == 2:
-                contactsOne = ContactPerson.objects.filter(first_name__iexact = words[0], last_name__iexact = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsTwo = ContactPerson.objects.filter(first_name__iexact = words[1], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts    = list(chain(contactsOne, contactsTwo))
+                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0], last_name__iexact = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts     = list(chain(contacts_one, contacts_two))
             elif len(words) == 3:
-                contactsOne = ContactPerson.objects.filter(first_name__iexact = words[0] + words[1], last_name__iexact = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsTwo = ContactPerson.objects.filter(first_name__iexact = words[1] + words[2], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts    = list(chain(contactsOne, contactsTwo))
+                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0] + words[1], last_name__iexact = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1] + words[2], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts     = list(chain(contacts_one, contacts_two))
             else:
-                contactsByFirstName = ContactPerson.objects.filter(first_name__iexact = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contactsByLastName  = ContactPerson.objects.filter(last_name__iexact  = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts            = list(chain(contactsByFirstName, contactsByLastName))
+                contacts_by_first_name = ContactPerson.objects.filter(first_name__iexact = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_by_last_name  = ContactPerson.objects.filter(last_name__iexact  = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts               = list(chain(contacts_by_first_name, contacts_by_last_name))
 
         for contact in contacts:
             if not contact['product__name']:

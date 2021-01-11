@@ -5,6 +5,10 @@ from management_portal.constants import LIMIT, DATE_TYPE
 
 
 class UpdateController:
+    """
+    The 'UpdateController' manages the update model.
+    This includes things like read and counts.
+    """
 
     @staticmethod
     def read(limit: int = LIMIT) -> list:
@@ -17,34 +21,34 @@ class UpdateController:
         Returns:
         list: used products
         """
-        usedProducts = UsedSoftwareProduct.objects.all()[:limit]
+        used_products = UsedSoftwareProduct.objects.all()[:limit]
 
-        for usedProduct in usedProducts:
-            usedProduct.location = Location.objects.get(used_product__id=usedProduct.id)
-            usedProduct.product = SoftwareProduct.objects.get(used_product__id=usedProduct.id)
-            usedProduct.last_updated = usedProduct.last_updated.strftime(DATE_TYPE)
+        for used_product in used_products:
+            used_product.location     = Location.objects.get(used_product__id = used_product.id)
+            used_product.product      = SoftwareProduct.objects.get(used_product__id = used_product.id)
+            used_product.last_updated = used_product.last_updated.strftime(DATE_TYPE)
 
-            if usedProduct.version == usedProduct.product.version:
-                usedProduct.current = True
+            if used_product.version == used_product.product.version:
+                used_product.current = True
             else:
-                usedProduct.current = False
+                used_product.current = False
 
             try:
-                updates = Update.objects.filter(product_id=usedProduct.product.id).order_by('-release_date')
-                usedProduct.last_released = updates[0].release_date.strftime(DATE_TYPE)
+                updates                    = Update.objects.filter(product_id = used_product.product.id).order_by('-release_date')
+                used_product.last_released = updates[0].release_date.strftime(DATE_TYPE)
             except:
-                usedProduct.last_released = 'Noch nie'
-                usedProduct.last_updated = 'Noch nie'
+                used_product.last_released = 'Noch nie'
+                used_product.last_updated  = 'Noch nie'
 
-        return usedProducts
+        return used_products
 
     @staticmethod
-    def getCounts(usedProducts: list) -> dict:
+    def get_counts(used_products: list) -> dict:
         """
         Returns the amount of used products recieved which are current or old.
 
         Parameters:
-        usedProducts (list): List of used products
+        used_products (list): List of used products
 
         Returns:
         dict: Amount of current and old used products
@@ -53,8 +57,8 @@ class UpdateController:
             'current': 0,
             'old'    : 0,
         }
-        for usedProduct in usedProducts:
-            if usedProduct.version == usedProduct.product.version:
+        for used_product in used_products:
+            if used_product.version == used_product.product.version:
                 count['current'] += 1
             else:
                 count['old'] += 1

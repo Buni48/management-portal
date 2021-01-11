@@ -8,7 +8,7 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     When the app root is called. Redirects to the heartbeat list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -16,20 +16,20 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     return redirect('heartbeat_list')
 
-def heartbeatList(request: WSGIRequest) -> HttpResponse:
+def heartbeat_list(request: WSGIRequest) -> HttpResponse:
     """
     When the heartbeat list is called. Renders the heartbeat list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: heartbeat list
     """
-    usedProducts = HeartbeatController.read()
-    countMissing = HeartbeatController.getCountMissing(usedProducts)
-    context = {
-        'used_products' : usedProducts,
-        'count_missing' : countMissing,
+    used_products = HeartbeatController.read()
+    count_missing = HeartbeatController.get_count_missing(used_products)
+    context       = {
+        'used_products' : used_products,
+        'count_missing' : count_missing,
     }
     return render(request, 'heartbeat/list.html', context)

@@ -10,7 +10,7 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     When the app root is called. Redirects to the customer list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -18,11 +18,11 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     return redirect('customers_list')
 
-def customerList(request: WSGIRequest) -> HttpResponse:
+def customer_list(request: WSGIRequest) -> HttpResponse:
     """
     When the customer list is called. Renders the customer list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -31,11 +31,11 @@ def customerList(request: WSGIRequest) -> HttpResponse:
     status       = request.COOKIES.get('customer_status_status')
     message      = request.COOKIES.get('customer_status_message')
     heartbeats   = HeartbeatController.read()
-    customerList = CustomerController.getCustomersForEachLetter()
+    customer_list = CustomerController.get_customers_for_each_letter()
     customers    = CustomerController.read()
     context      = {
         'heartbeats'    : heartbeats,
-        'customer_list' : customerList,
+        'customer_list' : customer_list,
         'customers'     : customers,
         'status'        : status,
         'message'       : message,
@@ -51,7 +51,7 @@ def customer(request: WSGIRequest, id: int = 0):
     """
     When a customer is called. Renders the customer page with the given id.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
     id      (int)        : id of the customer to load
 
@@ -61,9 +61,9 @@ def customer(request: WSGIRequest, id: int = 0):
     response = None
     if request.is_ajax and id == 0:
         customer_number = request.POST.get('customer_number', '')
-        customer = CustomerController.getCustomerByCustomerNumber(customer_number = customer_number)
-        id = customer.id
-        response = JsonResponse({'id': id})
+        customer        = CustomerController.get_customer_by_customer_number(customer_number = customer_number)
+        id              = customer.id
+        response        = JsonResponse({'id': id})
     elif id < 1:
         return redirect('customers_list')
 
@@ -72,8 +72,8 @@ def customer(request: WSGIRequest, id: int = 0):
     message     = request.COOKIES.get('customer_status_message')
     heartbeats  = HeartbeatController.read()
 
-    customer    = CustomerController.getCustomerById(id = id)
-    locations   = LocationController.getLocationsByCustomer(customer_id = id)
+    customer    = CustomerController.get_customer_by_id(id = id)
+    locations   = LocationController.get_locations_by_customer(customer_id = id)
     context     = {
         'heartbeats': heartbeats,
         'locations' : locations,
@@ -85,20 +85,21 @@ def customer(request: WSGIRequest, id: int = 0):
         response = render(request, 'customers/customer.html', context = context)
         response.delete_cookie('customer_status_status')
         response.delete_cookie('customer_status_message')
+
     return response
 
 def create(request: WSGIRequest) -> HttpResponse:
     """
     When the customer create is called. Renders the form to create a customer.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: form to create customer
     """
     heartbeats = HeartbeatController.read()
-    context = {
+    context    = {
         'title'     : 'Kunden erstellen',
         'heartbeats': heartbeats,
     }
@@ -109,7 +110,7 @@ def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
     When the customer edit is called.
     Renders the form to edit the customer with the given id. 
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
     id      (int)        : id of the customer to edit
 
@@ -119,7 +120,7 @@ def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
     if id < 1:
         return redirect('customers_list')
 
-    customer   = CustomerController.getCustomerById(id = id)
+    customer   = CustomerController.get_customer_by_id(id = id)
     heartbeats = HeartbeatController.read()
     context    = {
         'title'     : 'Kunden bearbeiten',
@@ -134,7 +135,7 @@ def save(request: WSGIRequest) -> JsonResponse:
     Saves the data sent if valid and complete and returns the status.
     If id is also sent this customer will be edited, otherwise a new one will be created.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): ajax save request
 
     Returns:
@@ -162,7 +163,7 @@ def delete(request: WSGIRequest, id: int = 0) -> HttpResponseRedirect:
     When the customer delete is called. Deletes the customer with the given id.
     After that it redirects to the customer list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -176,12 +177,12 @@ def delete(request: WSGIRequest, id: int = 0) -> HttpResponseRedirect:
 
     return response
 
-def createLocation(request: WSGIRequest, customer_id: int = 0) -> HttpResponse:
+def create_location(request: WSGIRequest, customer_id: int = 0) -> HttpResponse:
     """
     When the location create is called. Renders the form to create a location.
     Pass the id of the customer the location should belong to.
 
-    Attributes:
+    Parameters:
     request     (WSGIRequest): url request of the user
     customer_id (int)        : id of the customer
 
@@ -192,7 +193,7 @@ def createLocation(request: WSGIRequest, customer_id: int = 0) -> HttpResponse:
         return redirect('customers_list')
 
     heartbeats  = HeartbeatController.read()
-    customer    = CustomerController.getCustomerById(id = customer_id)
+    customer    = CustomerController.get_customer_by_id(id = customer_id)
     context     = {
         'title'     : 'Standort erstellen',
         'customer'  : customer,
@@ -200,12 +201,12 @@ def createLocation(request: WSGIRequest, customer_id: int = 0) -> HttpResponse:
     }
     return render(request, 'customers/edit-location.html', context)
 
-def editLocation(request: WSGIRequest, id: int = 0, customer_id: int = 0) -> HttpResponse:
+def edit_location(request: WSGIRequest, id: int = 0, customer_id: int = 0) -> HttpResponse:
     """
     When the location edit is called. Renders the form to edit the location with the given id.
     Pass also the id of the customer the location belongs to.
 
-    Attributes:
+    Parameters:
     request     (WSGIRequest): url request of the user
     customer_id (int)        : id of the customer
     id          (int)        : id of the location to edit
@@ -216,9 +217,9 @@ def editLocation(request: WSGIRequest, id: int = 0, customer_id: int = 0) -> Htt
     if id < 1 or customer_id < 1:
         return redirect('customers_list')
 
-    location   = LocationController.getLocationById(id = id)
+    location   = LocationController.get_location_by_id(id = id)
     heartbeats = HeartbeatController.read()
-    customer   = CustomerController.getCustomerById(id = customer_id)
+    customer   = CustomerController.get_customer_by_id(id = customer_id)
     context    = {
         'title'     : 'Standort bearbeiten',
         'location'  : location,
@@ -227,13 +228,13 @@ def editLocation(request: WSGIRequest, id: int = 0, customer_id: int = 0) -> Htt
     }
     return render(request, 'customers/edit-location.html', context)
 
-def saveLocation(request: WSGIRequest) -> JsonResponse:
+def save_location(request: WSGIRequest) -> JsonResponse:
     """
     When the location save is called as an ajax request.
     Saves the data sent if valid and complete and returns the status.
     If id is also sent this location will be edited, otherwise a new one will be created.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): ajax save request
 
     Returns:
@@ -268,12 +269,12 @@ def saveLocation(request: WSGIRequest) -> JsonResponse:
 
     return response
 
-def deleteLocation(request: WSGIRequest) -> JsonResponse:
+def delete_location(request: WSGIRequest) -> JsonResponse:
     """
     When the location delete is called as an ajax request.
     Deletes the location with the given id and returns the status.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): ajax delete request
 
     Returns:

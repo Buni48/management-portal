@@ -13,7 +13,7 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     If the user is logged in it redirects to the homepage.
     If the user is logged out it redirects to the login page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -28,23 +28,23 @@ def home(request: WSGIRequest) -> HttpResponse:
     """
     When home is called. Renders the homepage with the charts.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: homepage
     """
-    heartbeats      = HeartbeatController.read()
-    licenses        = LicenseController.read()
-    heartbeatsCount = HeartbeatController.getCounts(heartbeats)
-    licensesCount   = LicenseController.getCounts(licenses)
-    updatesCount    = UpdateController.getCounts(heartbeats)
+    heartbeats       = HeartbeatController.read()
+    licenses         = LicenseController.read()
+    heartbeats_count = HeartbeatController.get_counts(heartbeats)
+    licenses_count   = LicenseController.get_counts(licenses)
+    updates_count    = UpdateController.get_counts(heartbeats)
 
     context = {
         'heartbeats'      : heartbeats,
-        'heartbeats_count': heartbeatsCount,
-        'licenses_count'  : licensesCount,
-        'updates_count'   : updatesCount,
+        'heartbeats_count': heartbeats_count,
+        'licenses_count'  : licenses_count,
+        'updates_count'   : updates_count,
     }
     return render(request, 'home.html', context)
 
@@ -52,25 +52,25 @@ def search(request: WSGIRequest) -> HttpResponse:
     """
     When the search is called. Renders the global search form.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: global search form
     """
     heartbeats = HeartbeatController.read()
-    context = {
+    context    = {
         'heartbeats': heartbeats,
     }
     return render(request, 'search.html', context)
 
-def searchResult(request: WSGIRequest) -> JsonResponse:
+def search_result(request: WSGIRequest) -> JsonResponse:
     """
     When the search result is called as an ajax request.
     Searches for customers, locations, contact persons, software products and software modules by a given search word.
     It returns all the search results grouped by tables.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): ajax request
 
     Returns:
@@ -78,17 +78,17 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
     """
     response = {}
     if request.is_ajax():
-        searchWord = request.POST.get('search_word', '')
-        contains   = request.POST.get('contains', True)
+        search_word = request.POST.get('search_word', '')
+        contains    = request.POST.get('contains', True)
         if contains == 'False':
             contains = False
-        if len(searchWord) > 2 and len(searchWord) < 101:
-            customers = CustomerController.getFilteredCustomers(word = searchWord, contains = contains)
-            locations = LocationController.getLocationsByName(word = searchWord, contains = contains)
-            contacts  = ContactPersonController.getContactPersonsByName(word = searchWord, contains = contains)
-            products  = SoftwareProductController.getProductsByName(word = searchWord, contains = contains)
-            modules   = SoftwareModuleController.getModulesByName(word = searchWord, contains = contains)
-            response = {
+        if len(search_word) > 2 and len(search_word) < 101:
+            customers = CustomerController.get_filtered_customers(word = search_word, contains = contains)
+            locations = LocationController.get_locations_by_name(word = search_word, contains = contains)
+            contacts  = ContactPersonController.get_contact_persons_by_name(word = search_word, contains = contains)
+            products  = SoftwareProductController.get_products_by_name(word = search_word, contains = contains)
+            modules   = SoftwareModuleController.get_modules_by_name(word = search_word, contains = contains)
+            response  = {
                 'customers'         : json.dumps(customers),
                 'locations'         : json.dumps(locations),
                 'contact_persons'   : json.dumps(contacts),
@@ -97,13 +97,14 @@ def searchResult(request: WSGIRequest) -> JsonResponse:
             }
     else:
         return redirect('search')
+
     return JsonResponse(response)
 
 def login(request: WSGIRequest) -> HttpResponseRedirect:
     """
     Redirects to the login page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -115,7 +116,7 @@ def logout(request: WSGIRequest) -> HttpResponseRedirect:
     """
     Redirects to the logout page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
