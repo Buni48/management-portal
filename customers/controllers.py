@@ -2,7 +2,7 @@ from .models import Customer, Location, ContactPerson, Person
 from licenses.models import CustomerLicense, UsedSoftwareProduct
 from itertools import chain
 from management_portal.constants import LIMIT
-from management_portal.general import Status, save_status
+from management_portal.general import Status, SaveStatus
 
 class CustomerController:
     """
@@ -476,7 +476,7 @@ class LocationController:
 
     @staticmethod
     def __check_validity(name: str, email_address: str, phone_number: str, street: str,
-        house_number: str, postcode: str, city: str, customer: int) -> save_status:
+        house_number: str, postcode: str, city: str, customer: int) -> SaveStatus:
         """
         Checks the completeness and validity of location data to save.
 
@@ -496,7 +496,7 @@ class LocationController:
         instances = {
             'customer': customer,
         }
-        status = save_status(instances = instances)
+        status = SaveStatus(instances = instances)
 
         if not len(name):
             status.message = 'Bitte Namen angeben.'
