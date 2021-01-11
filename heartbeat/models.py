@@ -10,10 +10,11 @@ class Heartbeat(models.Model):
     detail        (str)     : The detailed information of the received heartbeat
     used_product  (int)     : The used product the heartbeat belongs to
     """
-    last_received = models.DateTimeField(auto_now_add = True)
-    message       = models.CharField(max_length = 2047)
-    detail        = models.CharField(max_length = 2047)
-    used_product  = models.ForeignKey(
+    last_received    = models.DateTimeField(auto_now_add = True)
+    message          = models.CharField(max_length = 2047)
+    detail           = models.CharField(max_length = 2047)
+    unknown_location = models.BooleanField(default = False)
+    used_product     = models.ForeignKey(
         to                  = 'licenses.UsedSoftwareProduct',
         on_delete           = models.CASCADE,
         related_name        = 'heartbeats',
