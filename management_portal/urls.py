@@ -12,7 +12,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('customers/', include('customers.urls'), name='customers'),
-    path('heartbeat', include('heartbeat.urls'), name='heartbeat'),
+    path('heartbeat/', include('heartbeat.urls'), name='heartbeat'),
     path('licenses/', include('licenses.urls'), name='licenses'),
     path('updates/', include('updates.urls'), name='updates'),
 ]
