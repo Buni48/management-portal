@@ -16,6 +16,9 @@
                 <thead>
                     <tr>
                         <th class="th-sm">
+                            Aktionen
+                        </th>
+                        <th class="th-sm">
                             Standort
                         </th>
                         <th class="th-sm">
@@ -33,6 +36,11 @@
                     {% for used_product in used_products %}
                         <tr>
                             <td>
+                                <a id="bar" onclick="openModal('{{used.product.id}}');">
+                                    <i class="fas fa-history" title="Vergangene Heartbeats anzeigen"></i>
+                                </a>&nbsp;
+                            </td>
+                            <td>
                                 {{used_product.location}}
                             </td>
                             <td>
@@ -44,9 +52,9 @@
                             <td>
                                 {{used_product.last_received}}&nbsp;
                                 {% if used_product.received %}
-                                    <i class="fas fa-check-circle" id="bar" onclick="temp()"></i>
+                                    <i class="fas fa-check-circle" class="bar"></i>
                                 {% else %}
-                                    <i class="fas fa-times-circle" id="bar" onclick="temp()"></i>
+                                    <i class="fas fa-times-circle" class="bar"></i>
                                 {% endif %}
                             </td>
                         </tr>
@@ -63,7 +71,7 @@
     <!-- Modal -->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
-    <!-- Modal content-->
+        <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -74,43 +82,40 @@
                 <thead>
                     <tr>
                         <th class="th-sm">
-                            ID:
+                            ID
                         </th>
                         <th class="th-sm">
-                            Last received:
+                            Zuletzt erhalten
                         </th>
                          <th class="th-sm">
-                            Message:
+                            Nachricht
                         </th>
                         <th class="th-sm">
-                            Detail:
+                            Detail
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for heartbeat in heartbeats %}
-                         <tr>
-                            <td>
-                                {{heartbeat.used_product }}
-                            </td>
-                            <td>
-                                {{heartbeat.last_received}}
-                            </td>
-                            <td>
-                                {{heartbeat.message}}
-                            </td>
-                            <td>
-                                {{heartbeat.detail}}&nbsp;
-                            </td>
-                        </tr>
-                    {% endfor %}
+                    <tr>
+                        <td id="history-used_product">
+                            {{heartbeat.used_product}}
+                        </td>
+                        <td id="history-last_received">
+                            {{heartbeat.last_received}}
+                        </td>
+                        <td id="history-message">
+                            {{heartbeat.message}}
+                        </td>
+                        <td id="history-detail">
+                            {{heartbeat.detail}}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -119,11 +124,32 @@
 
 {% block custom_js %}
     <script>
-        $(document).ready(function(){
-  $("#bar").click(function(){
-    $("#myModal").modal();
-  });
-});
+        /* $(document).ready(function(){
+            $(".bar").click(function(){
+                $("#myModal").modal();
+            });
+        }); */
+        openModal = (id) => {
+            $.ajax({
+                type : "POST",
+                url  : "{% url 'heartbeat_history' %}",
+                data : {
+                    id                  : id,
+                    csrfmiddlewaretoken : '{{ csrf_token }}',
+                    dataType            : "json",
+                },
+                success: (result) => {
+                    (result.used_product).appendTo('#history-used_product');
+                    (result.last_received).appendTo('#history-last_received');
+                    (result.message).appendTo('#history-message');
+                    (result.detail).appendTo('#history-used_product');
+                    $("#myModal").modal();
+                },
+                failure: () => {
+                    console.log('Request failed!');
+                },
+            });
+        };
 
 
     /**
