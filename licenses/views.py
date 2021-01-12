@@ -9,7 +9,7 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     When the app root is called. Redirects to the license list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -17,11 +17,11 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     return redirect('licenses_list')
 
-def licensesList(request: WSGIRequest) -> HttpResponse:
+def licenses_list(request: WSGIRequest) -> HttpResponse:
     """
     When the license list is called. Renders the license list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -48,16 +48,16 @@ def create(request: WSGIRequest) -> HttpResponse:
     """
     When the license create is called. Renders the form to create a license.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: form to create license
     """
     heartbeats = HeartbeatController.read()
-    modules    = SoftwareModuleController.getModuleNames()
-    locations  = LocationController.getLocationNames()
-    customers  = CustomerController.getCustomerNames()
+    modules    = SoftwareModuleController.get_module_names()
+    locations  = LocationController.get_location_names()
+    customers  = CustomerController.get_customer_names()
     context    = {
         'title'     : 'Lizenz erstellen',
         'heartbeats': heartbeats,
@@ -72,7 +72,7 @@ def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
     When the license edit is called.
     Renders the form to edit the license with the given id. 
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
     id      (int)        : id of the license to edit
 
@@ -82,11 +82,11 @@ def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
     if id < 1:
         return redirect('licenses_list')
 
-    license    = LicenseController.getLicenseById(id = id)
+    license    = LicenseController.get_license_by_id(id = id)
     heartbeats = HeartbeatController.read()
-    modules    = SoftwareModuleController.getModuleNames()
-    locations  = LocationController.getLocationNames()
-    customers  = CustomerController.getCustomerNames()
+    modules    = SoftwareModuleController.get_module_names()
+    locations  = LocationController.get_location_names()
+    customers  = CustomerController.get_customer_names()
     context    = {
         'title'     : 'Lizenz bearbeiten',
         'license'   : license,
@@ -101,9 +101,9 @@ def save(request: WSGIRequest) -> JsonResponse:
     """
     When the license save is called as an ajax request.
     Saves the data sent if valid and complete and returns the status.
-    If id is also sent this license will be edited, otherwise a new one will be created.
+    If an id is also sent this license will be edited, otherwise a new one will be created.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): ajax save request
 
     Returns:
@@ -142,7 +142,7 @@ def delete(request: WSGIRequest, id: int = 0) -> HttpResponseRedirect:
     When the license delete is called. Deletes the license with the given id.
     After that it redirects to the license list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:

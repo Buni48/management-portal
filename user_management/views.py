@@ -11,7 +11,7 @@ def authentication(request: WSGIRequest) -> HttpResponseRedirect:
     If authentification is successful it redirects to the homepage.
     Otherwise it redirects to the login page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -36,7 +36,7 @@ def login(request: WSGIRequest) -> HttpResponse:
     """
     When the login is called. Renders the login page form.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -48,7 +48,7 @@ def logout(request: WSGIRequest) -> HttpResponseRedirect:
     """
     Loggs out the user and redirects to the logged out page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -57,12 +57,12 @@ def logout(request: WSGIRequest) -> HttpResponseRedirect:
     auth_logout(request)
     return redirect('user_management:logged_out')
 
-def loggedOut(request: WSGIRequest) -> HttpResponse:
+def logged_out(request: WSGIRequest) -> HttpResponse:
     """
     When the logged out is called (usually after logout).
     Renders the logged out page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -74,7 +74,7 @@ def settings(request: WSGIRequest) -> HttpResponse:
     """
     When the settings are called. Renders the user settings page.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:

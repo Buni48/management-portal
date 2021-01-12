@@ -1,10 +1,14 @@
-from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, UsedSoftwareProduct,SoftwareModule
+from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, UsedSoftwareProduct, SoftwareModule
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
 from management_portal.general import Status, SaveStatus
 
 class LicenseController:
+    """
+    The 'LicenseController' manages the license model.
+    This includes things like read, save and delete functions which can be called from the view.
+    """
 
     @staticmethod
     def read(limit: int = LIMIT) -> list:
@@ -33,15 +37,15 @@ class LicenseController:
             license.product  = SoftwareProduct.objects.get(id = license.module.product_id)
             try:
                 # if license is a location license
-                locationLicense  = LocationLicense.objects.get(license_ptr_id = license.id)
-                license.location = Location.objects.get(id = locationLicense.location_id)
+                location_license = LocationLicense.objects.get(license_ptr_id = license.id)
+                license.location = Location.objects.get(id = location_license.location_id)
                 license.customer = Customer.objects.get(id = license.location.customer_id)
             except:
                 try:
                     # if license is a customer license
-                    customerLicense  = CustomerLicense.objects.get(license_ptr_id = license.id)
+                    customer_license  = CustomerLicense.objects.get(license_ptr_id = license.id)
                     license.location = 'Für alle gültig'
-                    license.customer = Customer.objects.get(id = customerLicense.customer_id)
+                    license.customer = Customer.objects.get(id = customer_license.customer_id)
                 except:
                     # if license has no child (this shouldn't happen: license is abstract!)
                     license.location = 'Nicht zugewiesen'
@@ -50,24 +54,24 @@ class LicenseController:
         return licenses
 
     @staticmethod
-    def getLicenseById(id: int):
+    def get_license_by_id(id: int):
         """
         Returns the location or customer license to a given id.
         Returns 'None', if no license exists.
 
-        Attributes:
+        Parameters:
         id (int): license id
 
         Returns:
         License: location or customer license
         """
         try:
-            license = LocationLicense.objects.get(license_ptr_id = id)
+            license            = LocationLicense.objects.get(license_ptr_id = id)
             license.start_date = license.start_date.strftime(DATE_TYPE_JS)
             license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
         except:
             try:
-                license = CustomerLicense.objects.get(license_ptr_id = id)
+                license            = CustomerLicense.objects.get(license_ptr_id = id)
                 license.start_date = license.start_date.strftime(DATE_TYPE_JS)
                 license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
             except:
@@ -84,7 +88,7 @@ class LicenseController:
         By giving an id it edits this license otherwise it creates a new one.
         Give a location id to save a location license and a customer id to save a customer.
 
-        Attributes:
+        Parameters:
         key         (str): license key
         detail      (str): license details
         start_date  (str): start date of the license
@@ -98,7 +102,7 @@ class LicenseController:
         Status: save status
         """
         status = Status()
-        status = LicenseController.__checkValidity(
+        status = LicenseController.__check_validity(
             key         = key,
             detail      = detail,
             start_date  = start_date,
@@ -109,12 +113,12 @@ class LicenseController:
             id          = id,
         )
         if status.status:
-            saveStatus   = LicenseController.__checkForeignKeys(
+            save_status  = LicenseController.__check_foreign_keys(
                 module   = module,
                 location = location,
                 customer = customer,
             )
-            if saveStatus.status:
+            if save_status.status:
                 if id:
                     status          = LicenseController.edit(
                         id          = id,
@@ -122,9 +126,9 @@ class LicenseController:
                         detail      = detail,
                         start_date  = start_date,
                         end_date    = end_date,
-                        module      = saveStatus.instances['module'],
-                        location    = saveStatus.instances['location'],
-                        customer    = saveStatus.instances['customer'],
+                        module      = save_status.instances['module'],
+                        location    = save_status.instances['location'],
+                        customer    = save_status.instances['customer'],
                     )
                 else:
                     status          = LicenseController.create(
@@ -132,13 +136,13 @@ class LicenseController:
                         detail      = detail,
                         start_date  = start_date,
                         end_date    = end_date,
-                        module      = saveStatus.instances['module'],
-                        location    = saveStatus.instances['location'],
-                        customer    = saveStatus.instances['customer'],
+                        module      = save_status.instances['module'],
+                        location    = save_status.instances['location'],
+                        customer    = save_status.instances['customer'],
                     )
             else:
-                status.status  = saveStatus.status
-                status.message = saveStatus.message
+                status.status  = save_status.status
+                status.message = save_status.message
 
         return status
 
@@ -149,7 +153,7 @@ class LicenseController:
         Creates a license and belonging used software products.
         Pass a location object to create a location license and a customer object to create a customer.
 
-        Attributes:
+        Parameters:
         key         (str)           : license key
         detail      (str)           : license details
         start_date  (str)           : start date of the license
@@ -165,7 +169,7 @@ class LicenseController:
         create_status = None
         try:
             if location:
-                create_status = LicenseController.__createLocationLicense(
+                create_status = LicenseController.__create_location_license(
                     key         = key,
                     detail      = detail,
                     start_date  = start_date,
@@ -174,7 +178,7 @@ class LicenseController:
                     location    = location,
                 )
             else:
-                create_status = LicenseController.__createCustomerLicense(
+                create_status = LicenseController.__create_customer_license(
                     key         = key,
                     detail      = detail,
                     start_date  = start_date,
@@ -199,7 +203,7 @@ class LicenseController:
         Edits a license and creates or deletes belonging used software products if needed.
         Pass a location id to edit a location license and a customer id to edit a customer.
 
-        Attributes:
+        Parameters:
         id          (int)           : license id
         key         (str)           : license key
         detail      (str)           : license details
@@ -215,7 +219,7 @@ class LicenseController:
         status        = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
         update_status = None
         try:
-            update_status = LicenseController.__updateLocationLicense(
+            update_status = LicenseController.__update_location_license(
                 id          = id,
                 key         = key,
                 detail      = detail,
@@ -227,7 +231,7 @@ class LicenseController:
             )
         except:
             try:
-                update_status = LicenseController.__updateCustomerLicense(
+                update_status = LicenseController.__update_customer_license(
                     id          = id,
                     key         = key,
                     detail      = detail,
@@ -252,7 +256,7 @@ class LicenseController:
         """
         Deletes the license with the given id.
 
-        Attributes:
+        Parameters:
         id (int): id of the license to delete
 
         Returns:
@@ -261,7 +265,7 @@ class LicenseController:
         status = Status(True, 'Die Lizenz wurde erfolgreich gelöscht.')
         try:
             license = LocationLicense.objects.get(license_ptr_id = id)
-            LicenseController.__deleteRedundantUsedProduct(
+            LicenseController.__delete_redundant_used_product(
                 location = license.location,
                 module   = license.module,
             )
@@ -271,7 +275,7 @@ class LicenseController:
                 license = CustomerLicense.objects.get(license_ptr_id = id)
                 locations = Location.objects.filter(customer = license.customer)
                 for location in locations:
-                    LicenseController.__deleteRedundantUsedProduct(
+                    LicenseController.__delete_redundant_used_product(
                         location = location,
                         module   = license.module,
                     )
@@ -283,11 +287,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def getCounts(licenses: list) -> dict:
+    def get_counts(licenses: list) -> dict:
         """
         Returns the amount of missing and valid licenses in a given license list.
 
-        Attributes:
+        Parameters:
         licenses (list): list of licenses
 
         Returns:
@@ -306,12 +310,12 @@ class LicenseController:
         return count
 
     @staticmethod
-    def __checkValidity(key: str, detail: str, start_date: str,
+    def __check_validity(key: str, detail: str, start_date: str,
         end_date: str, module: int, location: int, customer: int, id: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
 
-        Attributes:
+        Parameters:
         key         (str): license key
         detail      (str): license details
         start_date  (str): start date of the license
@@ -357,11 +361,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __checkForeignKeys(module: int, location: int, customer: int) -> SaveStatus:
+    def __check_foreign_keys(module: int, location: int, customer: int) -> SaveStatus:
         """
         Checks if foreign keys are valid and returns status including belonging objects.
 
-        Attributes:
+        Parameters:
         module      (int): id of the belonging software module
         location    (int): id of the belonging customer's location
         customer    (int): id of the belonging customer
@@ -384,25 +388,25 @@ class LicenseController:
             if location:
                 try:
                     status.instances['location'] = Location.objects.get(id = location)
-                    status.status = True
+                    status.status                = True
                 except:
-                    status.message = 'Zugewiesenen Standort nicht gefunden.'
+                    status.message               = 'Zugewiesenen Standort nicht gefunden.'
             else:
                 try:
                     status.instances['customer'] = Customer.objects.get(id = customer)
-                    status.status = True
+                    status.status                = True
                 except:
-                    status.message = 'Zugewiesenen Kunden nicht gefunden.'
+                    status.message               = 'Zugewiesenen Kunden nicht gefunden.'
 
         return status
 
     @staticmethod
-    def __createLocationLicense(key: str, detail: str,
+    def __create_location_license(key: str, detail: str,
         start_date: str, end_date: str, module, location) -> Status:
         """
         Creates a location license and belonging used software products.
 
-        Attributes:
+        Parameters:
         key         (str)           : license key
         detail      (str)           : license details
         start_date  (str)           : start date of the license
@@ -413,7 +417,7 @@ class LicenseController:
         Returns:
         Status: create status
         """
-        status = LicenseController.__checkLicenseDuplicateForLocation(
+        status = LicenseController.__check_license_duplicate_for_location(
             location = location,
             module   = module,
         )
@@ -426,7 +430,7 @@ class LicenseController:
                 module      = module,
                 location    = location,
             )
-            status = LicenseController.__createUsedProduct(
+            status = LicenseController.__create_used_product(
                 location = location,
                 module   = module,
             )
@@ -436,13 +440,13 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __createCustomerLicense(key: str, detail: str,
+    def __create_customer_license(key: str, detail: str,
         start_date: str, end_date: str, module, customer) -> Status:
         """
         Creates a customer license and belonging used software products.
         Redundant location licenses will be removed.
 
-        Attributes:
+        Parameters:
         key         (str)           : license key
         detail      (str)           : license details
         start_date  (str)           : start date of the license
@@ -453,7 +457,7 @@ class LicenseController:
         Returns:
         Status: create status
         """
-        status = LicenseController.__checkLicenseDuplicateForCustomer(
+        status = LicenseController.__check_license_duplicate_for_customer(
             customer = customer,
             module   = module,
         )
@@ -466,7 +470,7 @@ class LicenseController:
                 module      = module,
                 customer    = customer,
             )
-            status = LicenseController.__createUsedProductsForCustomer(
+            status = LicenseController.__create_used_products_for_customer(
                 customer = customer,
                 module   = module,
             )
@@ -476,11 +480,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __checkLicenseDuplicateForLocation(location, module) -> Status:
+    def __check_license_duplicate_for_location(location, module) -> Status:
         """
         Checks if a license already existing for a location-module-combination.
 
-        Attributes:
+        Parameters:
         location (Location)      : customer's location
         module   (SoftwareModule): software module
 
@@ -495,7 +499,7 @@ class LicenseController:
             )
             status.message = 'Es existiert bereits eine Standortlizenz für diese Standort-Modul-Kombination.'
         except:
-            status = LicenseController.__checkCustomerLicenseDuplicate(
+            status = LicenseController.__check_customer_license_duplicate(
                 customer = location.customer,
                 module   = module,
             )
@@ -503,12 +507,12 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __checkLicenseDuplicateForCustomer(customer, module) -> Status:
+    def __check_license_duplicate_for_customer(customer, module) -> Status:
         """
         Checks if a license already existing for a customer-module-combination.
         If location licenses get redundant by the customer license they will be deleted.
 
-        Attributes:
+        Parameters:
         customer (Customer)      : customer
         module   (SoftwareModule): software module
 
@@ -516,7 +520,7 @@ class LicenseController:
         Status: status
         """
         status = Status()
-        status = LicenseController.__checkCustomerLicenseDuplicate(
+        status = LicenseController.__check_customer_license_duplicate(
             customer = customer,
             module   = module,
         )
@@ -536,11 +540,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __checkCustomerLicenseDuplicate(customer, module) -> Status:
+    def __check_customer_license_duplicate(customer, module) -> Status:
         """
         Checks if a customer license already existing for a customer-module-combination.
 
-        Attributes:
+        Parameters:
         customer (Customer)      : customer
         module   (SoftwareModule): software module
 
@@ -560,11 +564,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __createUsedProduct(location, module) -> Status:
+    def __create_used_product(location, module) -> Status:
         """
         Creates a used product for the given location if it doesn't exist already.
 
-        Attributes:
+        Parameters:
         location (Location)     : location of the used product
         module  (SoftwareModule): software module
 
@@ -591,18 +595,18 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __createUsedProductsForCustomer(customer, module) -> Status:
+    def __create_used_products_for_customer(customer, module) -> Status:
         """
         Creates used products for all location of the given customer if them doesn't exist already.
 
-        Attributes:
+        Parameters:
         customer (Customer)       : customer the used products should be created for
         product  (SoftwareProduct): the software product the used software product is
         """
         status    = Status(True)
         locations = Location.objects.filter(customer = customer)
         for location in locations:
-            status = LicenseController.__createUsedProduct(
+            status = LicenseController.__create_used_product(
                 location = location,
                 module   = module,
             )
@@ -610,14 +614,14 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __updateLocationLicense(id: int, key: str, detail: str,
+    def __update_location_license(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
         """
         Updates a location license if a location is passed.
         If a customer is given instead the old location license gonna be deleted and a customer license is gonna be created instead.
         In this case the used products for the other locations will be also created.
 
-        Attributes:
+        Parameters:
         id          (int)           : license id
         key         (str)           : license key
         detail      (str)           : license details
@@ -631,24 +635,24 @@ class LicenseController:
         Status: update status
         """
         status = Status(True)
-        locationLicense = LocationLicense.objects.get(license_ptr_id = id)
+        location_license = LocationLicense.objects.get(license_ptr_id = id)
         if location:
-            if not locationLicense.location == location:
+            if not location_license.location == location:
                 used_product = UsedSoftwareProduct.objects.get(
                     location = location,
                     product  = module.product,
                 )
                 used_product.location = location
                 used_product.save()
-            locationLicense.key         = key
-            locationLicense.detail      = detail
-            locationLicense.start_date  = start_date
-            locationLicense.end_date    = end_date
-            locationLicense.module      = module
-            locationLicense.location    = location
-            locationLicense.save()
+            location_license.key         = key
+            location_license.detail      = detail
+            location_license.start_date  = start_date
+            location_license.end_date    = end_date
+            location_license.module      = module
+            location_license.location    = location
+            location_license.save()
         else:
-            customerLicense = CustomerLicense(
+            customer_license = CustomerLicense(
                 id          = id,
                 key         = key,
                 detail      = detail,
@@ -657,25 +661,25 @@ class LicenseController:
                 module      = module,
                 customer    = customer,
             )
-            up_status = LicenseController.__createUsedProductsForCustomer(
+            up_status = LicenseController.__create_used_products_for_customer(
                 customer = customer,
                 module   = module,
             )
             if up_status:
-                locationLicense.delete()
-                customerLicense.save()
+                location_license.delete()
+                customer_license.save()
 
         return status
 
     @staticmethod
-    def __updateCustomerLicense(id: int, key: str, detail: str,
+    def __update_customer_license(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
         """
         Updates a customer license if a customer is passed.
         If a location is given instead the old customer license gonna be deleted and a location license is gonna be created instead.
         In this case the used products for the old customer's locations will be also deleted and the new one will be created.
 
-        Attributes:
+        Parameters:
         id          (int)           : license id
         key         (str)           : license key
         detail      (str)           : license details
@@ -689,23 +693,23 @@ class LicenseController:
         Status: update status
         """
         status = Status(True)
-        customerLicense = CustomerLicense.objects.get(license_ptr_id = id)
+        customer_license = CustomerLicense.objects.get(license_ptr_id = id)
         if customer:
-            if not customerLicense.customer == customer:
-                status = LicenseController.__deleteUsedProductsForCustomer(
+            if not customer_license.customer == customer:
+                status = LicenseController.__delete_used_products_for_customer(
                     customer = customer,
                     module   = module,
                 )
             if status.status:
-                customerLicense.key         = key
-                customerLicense.detail      = detail
-                customerLicense.start_date  = start_date
-                customerLicense.end_date    = end_date
-                customerLicense.module      = module
-                customerLicense.customer    = customer
-                customerLicense.save()
+                customer_license.key         = key
+                customer_license.detail      = detail
+                customer_license.start_date  = start_date
+                customer_license.end_date    = end_date
+                customer_license.module      = module
+                customer_license.customer    = customer
+                customer_license.save()
         else:
-            locationLicense = LocationLicense(
+            location_license = LocationLicense(
                 id          = id,
                 key         = key,
                 detail      = detail,
@@ -714,24 +718,24 @@ class LicenseController:
                 module      = module,
                 location    = location,
             )
-            status = LicenseController.__deleteUsedProductsForCustomer(
+            status = LicenseController.__delete_used_products_for_customer(
                 customer         = location.customer,
                 module           = module,
                 location_to_keep = location,
             )
             if status.status:
-                customerLicense.delete()
-                locationLicense.save()
+                customer_license.delete()
+                location_license.save()
         
         return status
 
     @staticmethod
-    def __deleteUsedProductsForCustomer(customer, module, location_to_keep = None) -> Status:
+    def __delete_used_products_for_customer(customer, module, location_to_keep = None) -> Status:
         """
         Deletes the used products for the customers.
         You can optionally pass a location to keep.
 
-        Attributes:
+        Parameters:
         customer         (Customer)      : customer the used products should be deleted
         module           (SoftwareModule): software module
         location_to_keep (Location)      : location to keep
@@ -739,9 +743,9 @@ class LicenseController:
         Returns:
         Status: delete status
         """
-        status = Status(True)
+        status        = Status(True)
         location_kept = False
-        locations = Location.objects.filter(customer = customer)
+        locations     = Location.objects.filter(customer = customer)
         for location in locations:
             if location_to_keep and location_to_keep == location:
                 location_kept = True
@@ -756,7 +760,7 @@ class LicenseController:
                 status.status = False
                 break
         if status.status and location_to_keep and not location_kept:
-            status = LicenseController.__createUsedProduct(
+            status = LicenseController.__create_used_product(
                 location = location_to_keep,
                 module   = module,
             )
@@ -764,11 +768,11 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __deleteRedundantUsedProduct(location, module):
+    def __delete_redundant_used_product(location, module):
         """
         Deletes the used product of the given location-module-combination if it's redundant.
 
-        Attributes:
+        Parameters:
         location (Location)      : customer's location
         module   (SoftwareModule): software module
         """
@@ -790,9 +794,12 @@ class LicenseController:
 
 
 class SoftwareProductController:
+    """
+    The 'SoftwareProductController' manages the software product model.
+    """
 
     @staticmethod
-    def getProductsByName(word: str, contains: bool = False) -> list:
+    def get_products_by_name(word: str, contains: bool = False) -> list:
         """
         Returns the filtered software products, filtering by name.
         Pass a word to filter. You can choose to filter "contains" or "is".
@@ -813,9 +820,12 @@ class SoftwareProductController:
 
 
 class SoftwareModuleController:
+    """
+    The 'SoftwareModuleController' manages the software product model.
+    """
 
     @staticmethod
-    def getModuleNames(limit: int = LIMIT) -> list:
+    def get_module_names(limit: int = LIMIT) -> list:
         """
         Returns all module names as list.
 
@@ -828,7 +838,7 @@ class SoftwareModuleController:
         return list(SoftwareModule.objects.all()[:limit].values('id', 'name'))
 
     @staticmethod
-    def getModulesByName(word: str, contains: bool = False) -> list:
+    def get_modules_by_name(word: str, contains: bool = False) -> list:
         """
         Returns the filtered software modules, filtering by name.
         Pass a word to filter. You can choose to filter "contains" or "is".

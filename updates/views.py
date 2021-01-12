@@ -8,7 +8,7 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     When the app root is called. Redirects to the update list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
@@ -16,20 +16,20 @@ def index(request: WSGIRequest) -> HttpResponseRedirect:
     """
     return redirect('updates_list')
 
-def updatesList(request: WSGIRequest) -> HttpResponse:
+def updates_list(request: WSGIRequest) -> HttpResponse:
     """
     When the update list is called. Renders the update list.
 
-    Attributes:
+    Parameters:
     request (WSGIRequest): url request of the user
 
     Returns:
     HttpResponse: update list
     """
-    heartbeats   = HeartbeatController.read()
-    usedProducts = UpdateController.read()
-    context      = {
+    heartbeats    = HeartbeatController.read()
+    used_products = UpdateController.read()
+    context       = {
         'heartbeats'    : heartbeats,
-        'used_products' : usedProducts,
+        'used_products' : used_products,
     }
     return render(request, 'updates/list.html', context)
