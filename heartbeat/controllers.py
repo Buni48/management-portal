@@ -42,10 +42,7 @@ class HeartbeatController:
 
     @staticmethod
     def getHeartbeat( id:int) -> list:
-        usedProducts = UsedSoftwareProduct.objects.all()
-        heartbeats= Heartbeat.objects.all()
-        for usedProduct in usedProducts:
-            heartbeats            = Heartbeat.objects.filter(used_product_id = usedProduct.id)
+        heartbeats=Heartbeat.objects.filter(used_product__id=id)
 
         return heartbeats
 
