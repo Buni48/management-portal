@@ -2,7 +2,7 @@
 
 <!-- Title -->
 {% block title %}
-    Lizenzen
+    Heartbeats
 {% endblock title %}
 
 <!-- Content-->
@@ -36,7 +36,7 @@
                     {% for used_product in used_products %}
                         <tr>
                             <td>
-                                <a id="bar" onclick="openModal('{{used.product.id}}');">
+                                <a id="bar" onclick="openModal('{{used_product.id}}', '{{used_product.location}} - {{used_product.product}}')">
                                     <i class="fas fa-history" title="Vergangene Heartbeats anzeigen"></i>
                                 </a>&nbsp;
                             </td>
@@ -47,7 +47,7 @@
                                 {{used_product.product}}
                             </td>
                             <td>
-                                {{used_product.heartbeat.message}}
+                                {{used_product.heartbeat.detail}}
                             </td>
                             <td>
                                 {{used_product.last_received}}&nbsp;
@@ -68,52 +68,38 @@
             </button>
         {% endif %}
     </div>
-    <!-- Modal -->
+    <!-- Heartbeat Modal -->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
         <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
+                    <h1 id="modal-title" class="modal-title"></h1>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h1 class="modal-title">{{customer.name}}</h1>
                 </div>
                 <div class="modal-body">
-                    <table id="selectedColumn" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
-                <thead>
-                    <tr>
-                        <th class="th-sm">
-                            ID
-                        </th>
-                        <th class="th-sm">
-                            Zuletzt erhalten
-                        </th>
-                         <th class="th-sm">
-                            Nachricht
-                        </th>
-                        <th class="th-sm">
-                            Detail
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="history-used_product">
-                            {{heartbeat.used_product}}
-                        </td>
-                        <td id="history-last_received">
-                            {{heartbeat.last_received}}
-                        </td>
-                        <td id="history-message">
-                            {{heartbeat.message}}
-                        </td>
-                        <td id="history-detail">
-                            {{heartbeat.detail}}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th class="th-sm">
+                                    Zuletzt erhalten
+                                </th>
+                                <th class="th-sm">
+                                    Lizenzschlüssel
+                                </th>
+                                <th class="th-sm">
+                                    Nachricht
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-tbody">
+                        </tbody>
+                    </table>
+                </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                        Schließen
+                    </button>
                 </div>
             </div>
         </div>
@@ -124,12 +110,14 @@
 
 {% block custom_js %}
     <script>
-        /* $(document).ready(function(){
-            $(".bar").click(function(){
-                $("#myModal").modal();
-            });
-        }); */
-        openModal = (id) => {
+        /**
+         * Sends an ajax request to get the heartbeats belonging to a given 'used product id'.
+         * After that it adds them to the modal table and opens it.
+         * 
+         * @param {int} id     used product id to get heartbeats of
+         * @param {int} title  modal title
+         */
+        openModal = (id, title) => {
             $.ajax({
                 type : "POST",
                 url  : "{% url 'heartbeat_history' %}",
@@ -139,20 +127,69 @@
                     dataType            : "json",
                 },
                 success: (result) => {
-                    (result.used_product).appendTo('#history-used_product');
-                    (result.last_received).appendTo('#history-last_received');
-                    (result.message).appendTo('#history-message');
-                    (result.detail).appendTo('#history-used_product');
+                    data = parseJson(result.heartbeats);
+                    insertTableData(data, title);
                     $("#myModal").modal();
                 },
                 failure: () => {
-                    console.log('Request failed!');
+                    console.error('Request failed!');
                 },
             });
         };
 
+        /**
+         * Inserts given data into the table.
+         * 
+         * @param {array} data   array with the table data
+         * @param {int}   title  modal title
+         */
+        insertTableData = (data, title) => {
+            deleteOldTableData();
 
-    /**
+            let tbody = document.getElementById('modal-tbody');
+            document.getElementById('modal-title').innerHTML = title;
+            if (data) {
+                for (row of data) {
+                    let tableRow = tbody.insertRow();
+                    tableRow.classList.add('modal-table-row');
+                    for (key in row) {
+                        if (key == 'id') {
+                            continue;
+                        }
+                        let cell = tableRow.insertCell();
+                        let text = document.createTextNode(row[key]);
+                        cell.appendChild(text);
+                    }
+                }
+            }
+        };
+
+        /**
+         * Deletes the old table data.
+         */
+        deleteOldTableData = () => {
+            let oldRows = Array.from(
+                document.getElementsByClassName('modal-table-row')
+            );
+            for (oldRow of oldRows) {
+                oldRow.remove();
+            }
+        };
+
+        /**
+         * Parses a string to an array of objects.
+         * 
+         * @param  {string} dataString  array as string
+         * @return {array}              parsed array
+         */
+        parseJson = (dataString) => {
+            if (!dataString || dataString == '[]') {
+                return null;
+            }
+            return JSON.parse(dataString);
+        };
+
+        /**
          * Executed after the page was load to show data table.
          */
         $(document).ready(function () {

@@ -258,18 +258,21 @@ table.dataTable thead .sorting_desc_disabled:before {
     padding-bottom: 0;
 }
 
-/* heartbeat-modal */
+/* heartbeat modal */
 .modal-dialog {
-    width: 360px;
-    height: 600px !important;
+    width: 75%;
+    max-width: none;
 }
 .modal-content {
-    height: 60%;
-    background-color: #BBD6EC;
+    width: 100%;
+    height: 67%;
 }
 .modal-header {
     background-color: #337AB7;
     padding: 16px;
     color: #fff;
-    border-bottom:2px dashed #337AB7;
+    border-bottom: 2px dashed #337AB7;
+}
+.modal-title {
+    font-size: 20pt;
 }

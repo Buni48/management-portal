@@ -56,7 +56,11 @@ class HeartbeatController:
         Returns:
         list: heartbeats
         """
-        return Heartbeat.objects.filter(used_product__id = id)
+        heartbeats = Heartbeat.objects.filter(used_product__id = id).values('id', 'last_received', 'message', 'detail')
+        for heartbeat in heartbeats:
+            heartbeat['last_received'] = heartbeat['last_received'].strftime(DATETIME_TYPE)
+
+        return list(heartbeats)
 
     @staticmethod
     def get_count_missing(used_products: list) -> int:

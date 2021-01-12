@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from .models import Heartbeat
 from licenses.models import LocationLicense, CustomerLicense, UsedSoftwareProduct
 from customers.models import Location
+import json
 
 
 def index(request: WSGIRequest) -> HttpResponseRedirect:
@@ -54,11 +55,12 @@ def history(request: WSGIRequest) -> JsonResponse:
     response = JsonResponse({})
     if request.is_ajax():
         id = request.POST.get('id', '')
-        heartbeats = HeartbeatController.get_heartbeats_for_used_product_id(id = id)
-        """ context    = {
-            'heartbeats': heartbeats.__dict__,
-        } """
-        response = JsonResponse(heartbeats.__dict__)
+        if len(id):
+            heartbeats = HeartbeatController.get_heartbeats_for_used_product_id(id = int(id))
+            context = {
+                'heartbeats': json.dumps(heartbeats),
+            }
+            response = JsonResponse(context)
     
     return response
 
