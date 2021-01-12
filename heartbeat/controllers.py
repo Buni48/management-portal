@@ -38,8 +38,17 @@ class HeartbeatController:
 
             usedProduct.product   = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
             usedProduct.location  = Location.objects.get(used_product__id = usedProduct.id)
-
         return usedProducts
+
+    @staticmethod
+    def getHeartbeat( id:int) -> list:
+        usedProducts = UsedSoftwareProduct.objects.all()
+        heartbeats= Heartbeat.objects.all()
+        for usedProduct in usedProducts:
+            heartbeats            = Heartbeat.objects.filter(used_product_id = usedProduct.id)
+
+        return heartbeats
+
 
     @staticmethod
     def getCountMissing(usedProducts: list) -> int:
