@@ -64,7 +64,10 @@ def readData(dir: str, abspathLog: str, abspathConfig: str):
     log.close()
 
     pattern = "[0-2]{1}[0-9]{1}[:][0-5]{1}[0-9]{1}\s[0-3]{1}[0-9]{1}[.][0-1]{1}[0-9]{1}[.][2]{1}[0-1]{1}[0-9]{2}"
-    meldung = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", meldung)[-1]
+    try:
+        meldung = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", meldung)[-1]
+    except:
+        meldung = ''
 
     config = open(abspathConfig, "r")
     lizenz = config.read()
