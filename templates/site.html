@@ -13,9 +13,14 @@
                         </a>
                     </li>
                     {% for heartbeat in heartbeats %}
-                        {% if heartbeat.received == False %}
+                        {% if heartbeat.valid == 0 %}
                             <li>
                                 <i class="fas fa-sm fa-times-circle"></i>
+                                {{heartbeat.location}}
+                            </li>
+                        {% elif heartbeat.valid == -1 %}
+                            <li>
+                                <i class="fas fa-sm fa-exclamation-circle text-danger"></i>
                                 {{heartbeat.location}}
                             </li>
                         {% endif %}

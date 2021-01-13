@@ -32,13 +32,15 @@ class HeartbeatController:
                 used_product.heartbeat     = Heartbeat.objects.get(used_product_id = used_product.id, last_received = last_received_max['last_received__max'])
                 duration                  = datetime.now(timezone.utc) - used_product.heartbeat.last_received
                 used_product.last_received = used_product.heartbeat.last_received.strftime(DATETIME_TYPE)
-                if (duration <= HEARTBEAT_DURATION):
-                    used_product.received = True
+                if duration > HEARTBEAT_DURATION:
+                    used_product.valid = 0
+                elif len(used_product.heartbeat.detail):
+                    used_product.valid = -1
                 else:
-                    used_product.received = False
+                    used_product.valid = 1
             except:
                 used_product.last_received = 'Noch nie'
-                used_product.received      = False
+                used_product.valid         = False
 
             used_product.product   = SoftwareProduct.objects.get(used_product__id = used_product.id)
             used_product.location  = Location.objects.get(used_product__id = used_product.id)
@@ -56,7 +58,7 @@ class HeartbeatController:
         Returns:
         list: heartbeats
         """
-        heartbeats = Heartbeat.objects.filter(used_product__id = id).values('id', 'last_received', 'message', 'detail')
+        heartbeats = Heartbeat.objects.filter(used_product__id = id).order_by('-last_received').values('id', 'last_received', 'message', 'detail')
         for heartbeat in heartbeats:
             heartbeat['last_received'] = heartbeat['last_received'].strftime(DATETIME_TYPE)
 
@@ -75,7 +77,7 @@ class HeartbeatController:
         """
         count = 0
         for used_product in used_products:
-            if (used_product.received == False):
+            if not used_product.valid == 1:
                 count += 1
 
         return count
@@ -96,7 +98,7 @@ class HeartbeatController:
             'valid'  : 0,
         }
         for used_product in used_products:
-            if used_product.received:
+            if used_product.valid == 1:
                 count['valid'] += 1
             else:
                 count['missing'] += 1

@@ -36,7 +36,7 @@
                     {% for used_product in used_products %}
                         <tr>
                             <td>
-                                <a id="bar" onclick="openModal('{{used_product.id}}', '{{used_product.location}} - {{used_product.product}}')">
+                                <a onclick="openModal('{{used_product.id}}', '{{used_product.location}} - {{used_product.product}}')">
                                     <i class="fas fa-history" title="Vergangene Heartbeats anzeigen"></i>
                                 </a>&nbsp;
                             </td>
@@ -51,10 +51,12 @@
                             </td>
                             <td>
                                 {{used_product.last_received}}&nbsp;
-                                {% if used_product.received %}
-                                    <i class="fas fa-check-circle" class="bar"></i>
+                                {% if used_product.valid == 1 %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% elif used_product.valid == 0 %}
+                                    <i class="fas fa-times-circle"></i>
                                 {% else %}
-                                    <i class="fas fa-times-circle" class="bar"></i>
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
                                 {% endif %}
                             </td>
                         </tr>
@@ -157,8 +159,19 @@
                             continue;
                         }
                         let cell = tableRow.insertCell();
-                        let text = document.createTextNode(row[key]);
+                        let text = document.createTextNode(row[key] + ' ');
                         cell.appendChild(text);
+                        if (key == 'last_received') {
+                            let symbol = document.createElement('i');
+                            symbol.classList.add('fas');
+                            if (row.detail) {
+                                symbol.classList.add('fa-exclamation-circle');
+                                symbol.classList.add('text-danger');
+                            } else {
+                                symbol.classList.add('fa-check-circle');
+                            }
+                            cell.appendChild(symbol);
+                        }
                     }
                 }
             }
