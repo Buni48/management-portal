@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'management_portal',
     'updates',
     'user_management',
+    #'dj_ansible',
 ]
 
 MIDDLEWARE = [
@@ -87,7 +88,7 @@ DATABASES = {
         'NAME': 'management_portal',
         'USER': 'root',
         'PASSWORD': 'test',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }

@@ -6,6 +6,10 @@ from customers.models import Location
 from management_portal.constants import LIMIT, DATETIME_TYPE, HEARTBEAT_DURATION
 
 class HeartbeatController:
+    """
+    The 'HeartbeatController' manages the heartbeat model.
+    This includes things like read and counts.
+    """
 
     @staticmethod
     def read(limit: int = LIMIT) -> list:
@@ -18,42 +22,85 @@ class HeartbeatController:
         Returns:
         list: Heartbeats
         """
-        usedProducts = UsedSoftwareProduct.objects.all()[:limit]
+        used_products = UsedSoftwareProduct.objects.all()[:limit]
 
-        for usedProduct in usedProducts:
-            heartbeats            = Heartbeat.objects.filter(used_product_id = usedProduct.id)
+        for used_product in used_products:
+            heartbeats            = Heartbeat.objects.filter(used_product_id = used_product.id)
             last_received_max     = heartbeats.aggregate(Max('last_received'))
 
             try:
-                usedProduct.heartbeat     = Heartbeat.objects.get(used_product_id = usedProduct.id, last_received = last_received_max['last_received__max'])
-                duration                  = datetime.now(timezone.utc) - usedProduct.heartbeat.last_received
-                usedProduct.last_received = usedProduct.heartbeat.last_received.strftime(DATETIME_TYPE)
-                if (duration <= HEARTBEAT_DURATION):
-                    usedProduct.received = True
+                used_product.heartbeat     = Heartbeat.objects.get(used_product_id = used_product.id, last_received = last_received_max['last_received__max'])
+                duration                  = datetime.now(timezone.utc) - used_product.heartbeat.last_received
+                used_product.last_received = used_product.heartbeat.last_received.strftime(DATETIME_TYPE)
+                if duration > HEARTBEAT_DURATION:
+                    used_product.valid = 0
+                elif len(used_product.heartbeat.detail):
+                    used_product.valid = -1
                 else:
-                    usedProduct.received = False
+                    used_product.valid = 1
             except:
-                usedProduct.last_received = 'Noch nie'
-                usedProduct.received      = False
+                used_product.last_received = 'Noch nie'
+                used_product.valid         = False
 
-            usedProduct.product   = SoftwareProduct.objects.get(used_product__id = usedProduct.id)
-            usedProduct.location  = Location.objects.get(used_product__id = usedProduct.id)
+            used_product.product   = SoftwareProduct.objects.get(used_product__id = used_product.id)
+            used_product.location  = Location.objects.get(used_product__id = used_product.id)
 
-        return usedProducts
+        return used_products
 
     @staticmethod
-    def getCountMissing(usedProducts: list) -> int:
+    def get_heartbeats_for_used_product_id(id: int) -> list:
+        """
+        Returns all heartbeats that belong to the used product.
+
+        Parameters:
+        id (int): used product id
+
+        Returns:
+        list: heartbeats
+        """
+        heartbeats = Heartbeat.objects.filter(used_product__id = id).order_by('-last_received').values('id', 'last_received', 'message', 'detail')
+        for heartbeat in heartbeats:
+            heartbeat['last_received'] = heartbeat['last_received'].strftime(DATETIME_TYPE)
+
+        return list(heartbeats)
+
+    @staticmethod
+    def get_count_missing(used_products: list) -> int:
         """
         Returns the amount of heartbeats not received in expected time.
 
         Parameters:
-        usedProducts (list): List of used products
+        used_products (list): List of used products
 
         Returns:
         int: Amount of missing heartbeats
         """
         count = 0
-        for usedProduct in usedProducts:
-            if (usedProduct.received == False):
+        for used_product in used_products:
+            if not used_product.valid == 1:
                 count += 1
+
+        return count
+
+    @staticmethod
+    def get_counts(used_products: list) -> dict:
+        """
+        Returns the amount of heartbeats recieved and not received in expected time.
+
+        Parameters:
+        used_products (list): List of used products
+
+        Returns:
+        dict: Amount of valid and missing heartbeats
+        """
+        count = {
+            'missing': 0,
+            'valid'  : 0,
+        }
+        for used_product in used_products:
+            if used_product.valid == 1:
+                count['valid'] += 1
+            else:
+                count['missing'] += 1
+
         return count

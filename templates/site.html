@@ -2,45 +2,59 @@
 {% load static %}
 
 {% block general_content %}
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="{% url 'heartbeat_list' %}">
-                        Heartbeats
-                    </a>
-                </li>
-                {% for heartbeat in heartbeats %}
-                    {% if heartbeat.received == False %}
-                        <li>
-                            <i class="fas fa-sm fa-times-circle"></i>
-                            {{heartbeat.location}}
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-        <div id="page-content-wrapper">
-            <!-- Page Content-->
-            {% block content %}
-            {% endblock content %}
+    {% if request.user.is_authenticated %}
+        <div id="wrapper">
+            <!-- Sidebar -->
+            <div id="sidebar-wrapper">
+                <ul class="sidebar-nav">
+                    <li class="sidebar-brand">
+                        <a href="{% url 'heartbeat_list' %}">
+                            Heartbeats
+                        </a>
+                    </li>
+                    {% for heartbeat in heartbeats %}
+                        {% if heartbeat.valid == 0 %}
+                            <li>
+                                <i class="fas fa-sm fa-times-circle"></i>
+                                {{heartbeat.location}}
+                            </li>
+                        {% elif heartbeat.valid == -1 %}
+                            <li>
+                                <i class="fas fa-sm fa-exclamation-circle text-danger"></i>
+                                {{heartbeat.location}}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="page-content-wrapper">
+                <!-- Page Content-->
+                {% endif %}
+                    {% block content %}
+                    {% endblock content %}
+                {% if request.user.is_authenticated %}
 
-            <!-- Sidebar Toggle -->
-            <button id="menu-toggle" class="btn btn-secondary">
-                <i id="toggleIcon" class="fa fa-angle-double-down"></i>
-                Heartbeats
-            </button>
-            <!-- Javascript -->
-            <script>
-                $("#menu-toggle").click((event) => {
-                    event.preventDefault();
-        
-                    $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
-                    $("#wrapper").toggleClass("toggled");
-                    $("#footer").toggleClass("hidden");
-                });
-            </script>
+                <!-- Sidebar Toggle -->
+                <button id="menu-toggle" class="btn btn-secondary">
+                    <i id="toggleIcon" class="fa fa-angle-double-down"></i>
+                    Heartbeats
+                </button>
+                <!-- Javascript -->
+                <script>
+                    /**
+                     * Toggles the sidebar on clicking the toggler.
+                     * 
+                     * @param {Event} event  click event
+                     */
+                    $("#menu-toggle").click((event) => {
+                        event.preventDefault();
+            
+                        $("#toggleIcon").toggleClass("fa fa-angle-double-down fa fa-angle-double-up");
+                        $("#wrapper").toggleClass("toggled");
+                        $("#footer").toggleClass("hidden");
+                    });
+                </script>
+            </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock general_content %}

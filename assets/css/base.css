@@ -191,7 +191,7 @@ nav {
 #charts {
     margin-top: 10%;
 }
-.chartTitle {
+.chart-title {
     padding-bottom: 6%;
     color:#585858;
     text-align: center;
@@ -252,4 +252,27 @@ table.dataTable thead .sorting_desc_disabled:before {
 
 .collapse show {
     background: blue;
+}
+
+.location-button {
+    padding-bottom: 0;
+}
+
+/* heartbeat modal */
+.modal-dialog {
+    width: 75%;
+    max-width: none;
+}
+.modal-content {
+    width: 100%;
+    height: 67%;
+}
+.modal-header {
+    background-color: #337AB7;
+    padding: 16px;
+    color: #fff;
+    border-bottom: 2px dashed #337AB7;
+}
+.modal-title {
+    font-size: 20pt;
 }
