@@ -30,7 +30,7 @@ class HeartbeatController:
 
             try:
                 used_product.heartbeat     = Heartbeat.objects.get(used_product_id = used_product.id, last_received = last_received_max['last_received__max'])
-                duration                  = datetime.now(timezone.utc) - used_product.heartbeat.last_received
+                duration                   = datetime.now(timezone.utc) - used_product.heartbeat.last_received
                 used_product.last_received = used_product.heartbeat.last_received.strftime(DATETIME_TYPE)
                 if duration > HEARTBEAT_DURATION:
                     used_product.valid = 0
@@ -40,7 +40,7 @@ class HeartbeatController:
                     used_product.valid = 1
             except:
                 used_product.last_received = 'Noch nie'
-                used_product.valid         = False
+                used_product.valid         = 0
 
             used_product.product   = SoftwareProduct.objects.get(used_product__id = used_product.id)
             used_product.location  = Location.objects.get(used_product__id = used_product.id)
