@@ -36,12 +36,22 @@
                     {% for used_product in used_products %}
                         <tr>
                             <td>
-                                <a onclick="openModal('{{used_product.id}}', '{{used_product.location}} - {{used_product.product}}')">
+                                {% if used_product.heartbeat.unknown_location %}
+                                    <a onclick="openModal('{{used_product.id}}', '{{used_product.location.customer}} - {{used_product.product}}')">
+                                {% else %}
+                                    <a onclick="openModal('{{used_product.id}}', '{{used_product.location}} - {{used_product.product}}')">
+                                {% endif %}
                                     <i class="fas fa-history" title="Vergangene Heartbeats anzeigen"></i>
                                 </a>&nbsp;
                             </td>
                             <td>
-                                {{used_product.location}}
+                                {% if used_product.heartbeat.unknown_location %}
+                                    <i class="fas fa-user"></i>
+                                    {{used_product.location.customer}}
+                                {% else %}
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{used_product.location}}
+                                {% endif %}
                             </td>
                             <td>
                                 {{used_product.product}}
