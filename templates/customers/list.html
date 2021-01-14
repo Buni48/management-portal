@@ -55,12 +55,6 @@
                 {% endfor %}
             </div>
             <script>
-                /**
-                 * Sends clicked customer as ajax request on click on customer in the search input.
-                 * After that you gonna be directed to the customer page of this customer.
-                 * 
-                 * @param {Event} event  event 'onchange'
-                 */
                 $('#search').on('change', (event) => {
                     $.ajax({
                         type : "POST", 
@@ -79,6 +73,7 @@
                             console.error('Request failed!');
                         }
                     });
+                    
                 });
             </script>
         {% else %}

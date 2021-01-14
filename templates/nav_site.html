@@ -75,10 +75,6 @@
         let footer = document.getElementById("footer");
         let stickyNavbar = navbar.offsetTop;
         let stickyFooter = navbar.offsetTop;
-
-        /**
-         * Sticks the navigation to the top and the footer to the bottom when the window scrolls.
-         */
         window.onscroll = () => {
             if (window.pageYOffset >= stickyNavbar) {
                 navbar.classList.add("sticky");

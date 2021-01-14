@@ -12,91 +12,207 @@
         {% if request.user.is_authenticated %}
             <h1 class="Lage">Derzeitige Lage des Portals</h1>
 
-             <div id="charts" class="row">
+             <div id = "charts" class="row">
                  <div class="col-4">
-                     <h4 class ="chart-title">Aktuelle Updates</h4>
-                     <canvas id="updates-chart"></canvas>
+                     <h4 class ="chartTitle"> Aktuelle Updates</h4>
+                     <canvas id="barChart1"> </canvas>
                  </div>
               <div class="col-4">
-                  <h4 class ="chart-title">Aktuelle Lizenzen</h4>
-                 <canvas id="licenses-chart"></canvas>
+                  <h4 class ="chartTitle"> Aktuelle Lizenzen</h4>
+                 <canvas id="barChart2"> </canvas>
              </div>
                  <div class="col-4">
-                    <h4 class ="chart-title">Aktuelle Heartbeats</h4>
-                    <canvas id="heartbeats-chart"></canvas>
+                           <h4 class ="chartTitle"> Aktuelle Heartbeats</h4>
+                           <canvas id="barChart3"> </canvas>
                  </div>
              </div>
 
-            <script>
-                /**
-                 * Generates a chart with the given parameters.
-                 * 
-                 * @param {string} chart   id
-                 * @param {string} label1  label of the red left bar
-                 * @param {string} label1  label of the right green bar
-                 * @param {string} data1   data of the red left bar
-                 * @param {string} data2   data of the right green bar
-                 */
-                generateChart = (id, label1, label2, data1, data2) => {
-                    let chart = document.getElementById(id).getContext('2d');
-                    new Chart(chart, {
-                        type: 'bar',
-                        data: {
-                            labels: [
-                                data1,
-                                data2,
-                            ],
-                            datasets: [{
-                                label: label1,
-                                data: [
-                                    data1,
-                                    data2,
-                                ],
-                                backgroundColor: [
-                                    'rgba(207, 0, 15, 1)',
-                                    'rgba(31, 58, 147, 1)',
-                                ],
-                                borderColor: [
-                                    'rgba(207, 0, 15, 1)',
-                                    'rgba(31, 58, 147, 1)',
-                                ],
-                            },
-                            {
-                                label: label2,
-                                backgroundColor : 'rgba(31, 58, 147, 1)',
-                                borderColor     : 'rgba(31, 58, 147, 1)',
-                            }],
-                        },
-                        options: {
-                            responsive          : true,
-                            maintainAspectRatio : true,
-                            scales              : {
-                                x: {
-                                    stacked: true,
-                                },
-                                y: {
-                                    stacked: true
-                                },
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero : true,
-                                        max         : 100,
-                                        stepSize    : 25,
-                                    },
-                                }],
-                                xAxes: [{
-                                    categoryPercentage: 0.1,
-                                    barPercentage     : 0.5,
-                                    display           : true,
-                                }],
-                            }
-                        }
-                    });
+        <script>
+           //bar
+           var ctxB = document.getElementById("barChart1").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["{{update_current}}","{{update_expired}}"],
+            datasets: [
+                {
+                    label: ['Updates nicht installiert'],
+                    data: [{{update_current}},{{update_expired}} ],
+                    backgroundColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
+                    borderColor: [
+                        'rgba(207, 0, 15, 1)',
+                        'rgba(31, 58, 147, 1)',
+                    ],
+                },
+                {
+                    label: 'Updates installiert',
+                    backgroundColor: 'rgba(31, 58, 147, 1)',
+                    borderColor:      'rgba(31, 58, 147, 1)',
                 }
-                generateChart('updates-chart', 'Updates nicht installiert', 'Updates installiert', '{{updates_count.old}}', '{{updates_count.current}}');
-                generateChart('licenses-chart', 'Lizenzen abgelaufen', 'Lizenzen aktuell', '{{licenses_count.expired}}', '{{licenses_count.valid}}');
-                generateChart('heartbeats-chart', 'Heartbeats nicht angekommen', 'Hearbeats angekommen', '{{heartbeats_count.missing}}', '{{heartbeats_count.valid}}');
-            </script>
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+
+            }
+
+        }
+
+    });
+
+         //bar2
+           var ctxB = document.getElementById("barChart2").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["{{licenses_expired}}","{{licenses_okay}}"],
+            datasets: [
+                {
+                         label: ['Lizenzen abgelaufen'],
+                         data: [{{licenses_expired}}, {{licenses_okay}}],
+                         backgroundColor: [
+                                            'rgba(207, 0, 15, 1)',
+                                             'rgba(31, 58, 147, 1)',
+                                           ],
+                         borderColor: [
+                                        'rgba(207, 0, 15, 1)',
+                                        'rgba(31, 58, 147, 1)',
+                                        ],
+
+                },
+                {
+
+
+                label: 'Lizenzen aktuell',
+                backgroundColor: 'rgba(31, 58, 147, 1)',
+                borderColor:      'rgba(31, 58, 147, 1)',
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+            }
+
+        }
+
+    });
+
+
+         //bar3
+           var ctxB = document.getElementById("barChart3").getContext('2d');
+           var myBarChart = new Chart(ctxB, {
+            type: 'bar',
+
+        data: {
+            labels: ["{{count_missing}}","{{count_okay}}"],
+            datasets: [
+                {
+                         label: ['Heartbeats nicht angekommen'],
+                         data: [{{count_missing}}, {{count_okay}}],
+                         backgroundColor: [
+                                            'rgba(207, 0, 15, 1)',
+                                             'rgba(31, 58, 147, 1)',
+                                           ],
+                         borderColor: [
+                                        'rgba(207, 0, 15, 1)',
+                                        'rgba(31, 58, 147, 1)',
+                                        ],
+
+                },
+                {
+
+
+                label: 'Hearbeats angekommen',
+                backgroundColor: 'rgba(31, 58, 147, 1)',
+                borderColor:      'rgba(31, 58, 147, 1)',
+                }
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                   x: {
+                       stacked: true,
+
+                   },
+                   y: {
+                    stacked: true
+
+                   },
+            yAxes: [{
+                ticks: {
+                beginAtZero: true,
+                max: 100,
+                stepSize: 25,
+                },
+            }],
+            xAxes: [{
+            categoryPercentage: 0.1,
+            barPercentage: 0.5,
+             display: true,
+
+            }]
+
+            }
+
+        }
+
+    });
+        </script>
+
+
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
             <button type="button">
