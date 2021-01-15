@@ -231,6 +231,10 @@ table.dataTable thead .sorting_desc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:before {
     bottom: .5em;
 }
+table.dataTable thead {
+    background-color: #408eca;
+    color: #fff;
+}
 
 .listname {
     margin-left: -3.5%;
@@ -268,10 +272,10 @@ table.dataTable thead .sorting_desc_disabled:before {
     height: 67%;
 }
 .modal-header {
-    background-color: #337AB7;
+    background-color: #408eca;
     padding: 16px;
     color: #fff;
-    border-bottom: 2px dashed #337AB7;
+    border-bottom: 2px dashed #408eca;
 }
 .modal-title {
     font-size: 20pt;
