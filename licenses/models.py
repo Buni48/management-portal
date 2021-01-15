@@ -6,22 +6,30 @@ class License(models.Model):
     It is abstract: There are customer and location licenses.
 
     Attributes:
-    key              (str)      : The license key
-    detail           (str)      : The detailed information about the license
-    start_date       (datetime) : The start date of the license
-    end_date         (datetime) : The end date of the license
-    module           (int)      : Foreign key for the software module the license is for
+    key             (str)     : The license key
+    detail          (str)     : The detailed information about the license
+    start_date      (datetime): The start date of the license
+    end_date        (datetime): The end date of the license
+    module          (int)     : Foreign key for the software module the license is for
+    replace_license (int)     : Foreign key for the license this one should replace in the future
     """
-    key              = models.CharField(max_length = 255, unique = True)
-    detail           = models.CharField(max_length = 2047)
-    start_date       = models.DateTimeField()
-    end_date         = models.DateTimeField()
-    module           = models.ForeignKey(
+    key             = models.CharField(max_length = 255, unique = True)
+    detail          = models.CharField(max_length = 2047)
+    start_date      = models.DateTimeField()
+    end_date        = models.DateTimeField()
+    module          = models.ForeignKey(
         to                  = 'SoftwareModule',
         on_delete           = models.CASCADE,
         related_name        = 'licenses',
         related_query_name  = 'license',
         null                = False,
+    )
+    replace_license = models.ForeignKey(
+        to                  = 'License',
+        on_delete           = models.SET_NULL,
+        related_name        = 'licenses',
+        related_query_name  = 'license',
+        null                = True,
     )
 
 class CustomerLicense(License):
