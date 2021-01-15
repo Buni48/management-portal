@@ -101,6 +101,12 @@
                 </a>
             </form>
             <script>
+                /**
+                 * Sends entered license data as ajax request on form submit.
+                 * After that you get a success or error message. On success you gonna be redirected to the license list page.
+                 * 
+                 * @param {Event} event  form submit event
+                 */
                 $('#form').on('submit', (event) => {
                     event.preventDefault();
                     $.ajax({

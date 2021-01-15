@@ -9,8 +9,195 @@
 {% block general_content %}
 <div class="content">
     {% if request.user.is_authenticated %}
-        <h1>Einstellungen</h1>
+        {% if message %}
+            <div id="alert-success" class="alert alert-success" role="alert">
+                {{message}}
+            </div>
+        {% else %}
+            <div id="alert-success" class="alert alert-success hidden-alert" role="alert"></div>
+        {% endif %}
+        <div id="alert-danger" class="alert alert-danger hidden-alert" role="alert"></div>
 
+        <h1>Einstellungen</h1>
+        <h2>Profil ändern</h2>
+        <form id="change_profile" method="post">
+            <div class="form-group">
+                <label for="username">Benutzername</label>
+                <input type="text"
+                    class="form-control"
+                    id="username"
+                    value="{{request.user.get_username}}"
+                    placeholder="Benutzernamen eingeben"
+                    maxlength="150"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="email">E-Mail-Adresse</label>
+                <input type="email"
+                    class="form-control"
+                    value="{{request.user.email}}"
+                    id="email"
+                    name="email"
+                    placeholder="E-Mail-Addresse eingeben"
+                    maxlength="64"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="first_name">Vorname</label>
+                <input type="text"
+                    class="form-control"
+                    id="first_name"
+                    value="{{request.user.first_name}}"
+                    placeholder="Vornamen eingeben"
+                    maxlength="150"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="last_name">Nachname</label>
+                <input type="text"
+                    class="form-control"
+                    id="last_name"
+                    value="{{request.user.last_name}}"
+                    placeholder="Nachnamen eingeben"
+                    maxlength="150"
+                    required
+                >
+            </div>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+            <a href="{% url 'home' %}">
+                <button type="button" class="btn btn-danger">
+                    Abbrechen
+                </button>
+            </a>
+        </form>
+        <br><br>
+        <p>
+            Zuletzt angemeldet: {{request.user.last_login}}<br>
+            Beigetreten: {{request.user.date_joined}}<br>
+            {% if request.user.is_staff %}
+                Status: Admin
+            {% else %}
+                Status: Kein Admin
+            {% endif %}
+        </p>
+        <h2>Passwort ändern</h2>
+        <form id="change_password" method="post">
+            <div class="form-group">
+                <label for="old_password">Altes Passwort</label>
+                <input type="password"
+                    class="form-control"
+                    id="old_password"
+                    placeholder="Altes Passwort eingeben"
+                    maxlength="128"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="new_password_1">Neues Passwort</label>
+                <input type="password"
+                    class="form-control"
+                    id="new_password_1"
+                    placeholder="Neues Passwort eingeben"
+                    maxlength="128"
+                    required
+                >
+            </div>
+            <div class="form-group">
+                <label for="new_password_2">Neues Passwort wiederholen</label>
+                <input type="password"
+                    class="form-control"
+                    id="new_password_2"
+                    placeholder="Neues Passwort erneut eingeben"
+                    maxlength="128"
+                    required
+                >
+            </div>
+            <button type="submit" class="btn btn-primary">Passwort speichern</button>
+            <a href="{% url 'home' %}">
+                <button type="button" class="btn btn-danger">
+                    Abbrechen
+                </button>
+            </a>
+        </form>
+        <!-- Javascript -->
+        <script>
+            /**
+             * Sends entered profile data as ajax request on form submit to save profile data.
+             * After that you get a success or error message.
+             * 
+             * @param {Event} event  form submit event
+             */
+            $('#change_profile').on('submit', (event) => {
+                event.preventDefault();
+
+                $.ajax({
+                    type : "POST", 
+                    url  : "{% url 'user_management:change_profile' %}",
+                    data : {
+                        username            : $('#username').val(),
+                        email               : $('#email').val(),
+                        first_name          : $('#first_name').val(),
+                        last_name           : $('#last_name').val(),
+                        csrfmiddlewaretoken : '{{ csrf_token }}',
+                        dataType            : "json",
+                    },
+                    success: (result) => {
+                        manageAlert(result.status, result.message);
+                    },
+                    failure: () => {
+                        console.log('Request failed!');
+                    },
+                });
+            });
+
+            /**
+             * Sends entered data as ajax request on form submit to change the password.
+             * After that you get a success or error message.
+             * 
+             * @param {Event} event  form submit event
+             */
+            $('#change_password').on('submit', (event) => {
+                event.preventDefault();
+
+                $.ajax({
+                    type : "POST", 
+                    url  : "{% url 'user_management:change_password' %}",
+                    data : {
+                        old_password        : $('#old_password').val(),
+                        new_password_1      : $('#new_password_1').val(),
+                        new_password_2      : $('#new_password_2').val(),
+                        csrfmiddlewaretoken : '{{ csrf_token }}',
+                        dataType            : "json",
+                    },
+                    success: (result) => {
+                        manageAlert(result.status, result.message);
+                    },
+                    failure: () => {
+                        console.log('Request failed!');
+                    },
+                });
+            });
+
+            /**
+             * Hides old alert and shows a success (by reload) or danger alert depending on the status.
+             * 
+             * @param {bool}   status   if success
+             * @param {string} message  message to show in alert
+             */
+            manageAlert = (status, message) => {
+                $('#alert-success').addClass('hidden-alert');
+                $('#alert-success').html('');
+                if (status) {
+                    document.location.reload(true);
+                } else {
+                    $('#alert-danger').removeClass('hidden-alert');
+                    $('#alert-danger').html(message);
+                }
+            };
+        </script>
     {% else %}
         <h1>Sie müssen sich erst anmelden.</h1>
         <button type="button">
