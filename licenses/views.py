@@ -61,6 +61,7 @@ def create(request: WSGIRequest) -> HttpResponse:
     context    = {
         'title'     : 'Lizenz erstellen',
         'heartbeats': heartbeats,
+        'licenses'  : licenses,
         'modules'   : modules,
         'locations' : locations,
         'customers' : customers,
@@ -111,24 +112,26 @@ def save(request: WSGIRequest) -> JsonResponse:
     """
     response = JsonResponse({})
     if request.is_ajax():
-        id          = request.POST.get('id', '')
-        key         = request.POST.get('key', '')
-        detail      = request.POST.get('detail', '')
-        start_date  = request.POST.get('start_date', '')
-        end_date    = request.POST.get('end_date', '')
-        module      = request.POST.get('module', '')
-        location    = request.POST.get('location', '')
-        customer    = request.POST.get('customer', '')
+        id            = request.POST.get('id', '')
+        key           = request.POST.get('key', '')
+        detail        = request.POST.get('detail', '')
+        start_date    = request.POST.get('start_date', '')
+        end_date      = request.POST.get('end_date', '')
+        module        = request.POST.get('module', '')
+        location      = request.POST.get('location', '')
+        customer      = request.POST.get('customer', '')
+        replace_later = request.POST.get('replace_later', 'False')
 
         status      = LicenseController.save(
-            id          = id,
-            key         = key,
-            detail      = detail,
-            start_date  = start_date,
-            end_date    = end_date,
-            module      = module,
-            location    = location,
-            customer    = customer,
+            id            = id,
+            key           = key,
+            detail        = detail,
+            start_date    = start_date,
+            end_date      = end_date,
+            module        = module,
+            location      = location,
+            customer      = customer,
+            replace_later = replace_later,
         )
         response = JsonResponse(status.__dict__)
         if status.status:
