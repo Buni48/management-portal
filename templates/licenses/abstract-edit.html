@@ -1,0 +1,61 @@
+{% extends "site.html" %}
+
+<!-- Title -->
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+<!-- Content -->
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <div id="alert" class="alert alert-danger hidden-alert" role="alert">
+            </div>
+            <h1>{{title}}</h1>
+            <form id="form" method="post">
+                <div class="form-group">
+                    <label for="key">Lizenzschlüssel</label>
+                    <input type="text"
+                        class="form-control"
+                        id="key"
+                        value="{{license.key}}"
+                        placeholder="Lizenzschlüssel eingeben"
+                        maxlength="255"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="detail">Details</label>
+                    <textarea class="form-control"
+                        id="detail"
+                        rows="5"
+                        placeholder="Details eingeben"
+                        maxlength="2047"
+                        required
+                    >{{license.detail}}</textarea>
+                </div>
+                {% block start_date %}
+                {% endblock start_date %}
+                <div class="form-group">
+                    <label for="end_date">Enddatum</label>
+                    <input type="date" class="form-control" id="end_date" value="{{license.end_date}}" required>
+                </div>
+                {% block assignments %}
+                {% endblock assignments %}
+                <button type="submit" class="btn btn-primary">Speichern</button>
+                <a href="{% url 'licenses_list' %}">
+                    <button type="button" class="btn btn-danger">
+                        Abbrechen
+                    </button>
+                </a>
+            </form>
+            {% block js %}
+            {% endblock js %}
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+        {% endif %}
+    </div>
+{% endblock content %}

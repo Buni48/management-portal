@@ -1,0 +1,49 @@
+{% extends "licenses/abstract-edit.html" %}
+
+{% block assignments %}
+    <p>Startdatum: {{old_license.start_date}}</p>
+    <p>Modul: {{old_license.module}}</p>
+    {% if old_license.location %}
+        <p>Standort: {{old_license.location}}</p>
+    {% else %}
+        <p>Kunde: {{old_license.customer}}</p>
+    {% endif %}
+    <p>Diese Lizenz wird in Zukunft die Lizenz mit dem Key "{{old_license.key}}" ersetzen.</p>
+{% endblock assignments %}
+
+{% block js %}
+    <script>
+        /**
+         * Sends entered license data as ajax request on form submit.
+         * After that you get a success or error message. On success you gonna be redirected to the license list page.
+         * 
+         * @param {Event} event  form submit event
+         */
+        $('#form').on('submit', (event) => {
+            event.preventDefault();
+            $.ajax({
+                type : "POST", 
+                url  : "{% url 'licenses_save' %}",
+                data : {
+                    id                  : '{{ old_license.id }}',
+                    key                 : $('#key').val(),
+                    detail              : $('#detail').val(),
+                    end_date            : $('#end_date').val(),
+                    csrfmiddlewaretoken : '{{ csrf_token }}',
+                    dataType            : "json",
+                },
+                success: (result) => {
+                    if (result.status) {
+                        document.location.href = "{% url 'licenses_list' %}";
+                    } else {
+                        $('#alert').removeClass('hidden-alert');
+                        $('#alert').html(result.message);
+                    }
+                },
+                failure: () => {
+                    console.log('Request failed!');
+                },
+            });
+        });
+    </script>
+{% endblock js %}
