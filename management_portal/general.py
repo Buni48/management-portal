@@ -51,19 +51,3 @@ class SaveStatus(Status):
     def __init__(self, status: bool = False, message: str = '', instances: dict = {}):
         super.__init__
         self.instances = instances
-
-
-"""
-Parses a string to a bool.
-
-Parameters:
-bool_as_string: string to parse
-
-Returns:
-bool: parsed bool
-"""
-def parse_string_to_bool(bool_as_string: str) -> bool:
-    if bool_as_string == 'True':
-        return True
-    else:
-        return False

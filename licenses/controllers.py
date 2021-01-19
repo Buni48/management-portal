@@ -2,7 +2,7 @@ from .models import License, CustomerLicense, LocationLicense, SoftwareProduct, 
 from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
-from management_portal.general import Status, SaveStatus, parse_string_to_bool
+from management_portal.general import Status, SaveStatus
 
 class LicenseController:
     """
@@ -82,29 +82,27 @@ class LicenseController:
 
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str, module: int,
-        location: int = 0, customer: int = 0, id: int = 0, replace_later: bool = False) -> Status:
+        location: int = 0, customer: int = 0, id: int = 0, replace_later: int = 0) -> Status:
         """
         Saves a license.
         By giving an id it edits this license otherwise it creates a new one.
         Give a location id to save a location license and a customer id to save a customer.
 
         Parameters:
-        key           (str) : license key
-        detail        (str) : license details
-        start_date    (str) : start date of the license
-        end_date      (str) : end date of the license
-        module        (int) : id of the belonging software module
-        location      (int) : id of the belonging customer's location
-        customer      (int) : id of the belonging customer
-        id            (int) : license id if license should been edited or replaced later
-        replace_later (bool): if replace license later
+        key           (str): license key
+        detail        (str): license details
+        start_date    (str): start date of the license
+        end_date      (str): end date of the license
+        module        (int): id of the belonging software module
+        location      (int): id of the belonging customer's location
+        customer      (int): id of the belonging customer
+        id            (int): license id if license should been edited
+        replace_later (int): license to replace later
 
         Returns:
         Status: save status
         """
         status        = Status()
-
-        replace_later = parse_string_to_bool(replace_later)
         status        = LicenseController.__check_validity(
             key           = key,
             detail        = detail,
@@ -118,7 +116,7 @@ class LicenseController:
         )
         if status.status:
             if replace_later:
-                status = LicenseController.__replace_later_license(
+                status = LicenseController.__future_license(
                     id       = id,
                     key      = key,
                     detail   = detail,
@@ -155,120 +153,6 @@ class LicenseController:
                 else:
                     status.status  = save_status.status
                     status.message = save_status.message
-
-        return status
-    
-    @staticmethod
-    def __replace_later_license(id: int, key: str, detail: str, end_date: str) -> Status:
-        """
-        If the license to create should be replace another in the future.
-
-        Parameters:
-        id            (int) : license id for the license to replace
-        key           (str) : license key
-        detail        (str) : license details
-        end_date      (str) : end date of the license
-
-        Returns:
-        Status: status
-        """
-        status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
-        try:
-            create_status = LicenseController.__replace_later_location_license(
-                id       = id,
-                key      = key,
-                detail   = detail,
-                end_date = end_date,
-            )
-        except:
-            try:
-                create_status = LicenseController.__replace_later_customer_license(
-                    id       = id,
-                    key      = key,
-                    detail   = detail,
-                    end_date = end_date,
-                )
-            except:
-                status.status  = False
-                status.message = 'Zu ersetzende Lizenz nicht gefunden.'
-        
-        if create_status and not create_status.status:
-            status.status  = False
-            status.message = 'Zu ersetzende Lizenz nicht gefunden.'
-
-        return status
-
-    @staticmethod
-    def __replace_later_location_license(id: int, key: str, detail: str, end_date: str) -> Status:
-        """
-        Creates the location license to replace.
-
-        Parameters:
-        id            (int) : license id for the license to replace
-        key           (str) : license key
-        detail        (str) : license details
-        end_date      (str) : end date of the license
-
-        Returns:
-        Status: status
-        """
-        status = Status(True)
-        old_license = LocationLicense.objects.get(license_ptr_id = id)
-        if old_license.start_date >= end_date:
-            status.status  = False
-            status.message = 'Enddatum muss später als Anfangsdatum sein.'
-        else:
-            try:
-                new_license = LocationLicense(
-                    key             = key,
-                    detail          = detail,
-                    start_date      = old_license.end_date,
-                    end_date        = end_date,
-                    module          = old_license.module,
-                    replace_license = old_license,
-                    location        = old_license.location,
-                )
-                new_license.save()
-            except:
-                status.status  = False
-                status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
-
-        return status
-
-    @staticmethod
-    def __replace_later_customer_license(id: int, key: str, detail: str, end_date: str) -> Status:
-        """
-        Creates the customer license to replace.
-
-        Parameters:
-        id            (int) : license id for the license to replace
-        key           (str) : license key
-        detail        (str) : license details
-        end_date      (str) : end date of the license
-
-        Returns:
-        Status: status
-        """
-        status = Status(True)
-        old_license = CustomerLicense.objects.get(license_ptr_id = id)
-        if old_license.start_date >= end_date:
-            status.status  = False
-            status.message = 'Enddatum muss später als Anfangsdatum sein.'
-        else:
-            try:
-                new_license = CustomerLicense(
-                    key             = key,
-                    detail          = detail,
-                    start_date      = old_license.end_date,
-                    end_date        = end_date,
-                    module          = old_license.module,
-                    replace_license = old_license,
-                    customer        = old_license.customer,
-                )
-                new_license.save()
-            except:
-                status.status  = False
-                status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
         return status
 
@@ -343,9 +227,9 @@ class LicenseController:
         Status: edit status
         """
         status        = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
-        update_status = None
+        edit_status = None
         try:
-            update_status = LicenseController.__update_location_license(
+            edit_status = LicenseController.__edit_location_license(
                 id          = id,
                 key         = key,
                 detail      = detail,
@@ -357,7 +241,7 @@ class LicenseController:
             )
         except:
             try:
-                update_status = LicenseController.__update_customer_license(
+                edit_status = LicenseController.__edit_customer_license(
                     id          = id,
                     key         = key,
                     detail      = detail,
@@ -371,7 +255,7 @@ class LicenseController:
                 status.status  = False
                 status.message = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
 
-        if update_status and not update_status.status:
+        if edit_status and not edit_status.status:
             status.status = False
             status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
 
@@ -390,7 +274,10 @@ class LicenseController:
         """
         status = Status(True, 'Die Lizenz wurde erfolgreich gelöscht.')
         try:
-            license = LocationLicense.objects.get(license_ptr_id = id)
+            license         = LocationLicense.objects.get(license_ptr_id = id)
+            future_licenses = LocationLicense.objects.exclude(replace_license__isnull = True)
+            for future_license in future_licenses:
+                future_license.delete()
             LicenseController.__delete_redundant_used_product(
                 location = license.location,
                 module   = license.module,
@@ -398,7 +285,10 @@ class LicenseController:
             license.delete()
         except:
             try:
-                license = CustomerLicense.objects.get(license_ptr_id = id)
+                license         = CustomerLicense.objects.get(license_ptr_id = id)
+                future_licenses = CustomerLicense.objects.exclude(replace_license__isnull = True)
+                for future_license in future_licenses:
+                    future_license.delete()
                 locations = Location.objects.filter(customer = license.customer)
                 for location in locations:
                     LicenseController.__delete_redundant_used_product(
@@ -437,7 +327,7 @@ class LicenseController:
 
     @staticmethod
     def __check_validity(key: str, detail: str, start_date: str, end_date: str,
-        module: int, location: int, customer: int, id: int, replace_later: bool) -> Status:
+        module: int, location: int, customer: int, id: int, replace_later: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
 
@@ -470,7 +360,7 @@ class LicenseController:
             status.message = 'Bitte Enddatum angeben.'
         elif start_date >= end_date:
             status.message = 'Enddatum muss später als Anfangsdatum sein.'
-        elif not module:
+        elif not module and not replace_later:
             status.message = 'Bitte Modul angeben.'
         elif customer and location:
             status.message = 'Bitte nur Kunde ODER Standort zuweisen.'
@@ -478,8 +368,6 @@ class LicenseController:
             status.message = 'Bitte Kunde oder Standort zuweisen.'
         elif replace_later and (customer or location or module or start_date):
             status.message = 'Bei ersetzender Lizenz bitte nicht Kunde, Standort, Modul oder Anfangsdatum zuweisen.'
-        elif replace_later and not id:
-            status.message = 'Bitte zu ersetzende Lizenz angeben.'
         else:
             licenses = LicenseController.read()
             for license in licenses:
@@ -528,6 +416,259 @@ class LicenseController:
                     status.status                = True
                 except:
                     status.message               = 'Zugewiesenen Kunden nicht gefunden.'
+
+        return status
+
+    @staticmethod
+    def __future_license(replace_license: int, key: str, detail: str, end_date: str, id: int = 0) -> Status:
+        """
+        If the license to create should be replace another in the future.
+
+        Parameters:
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+        id              (int): license id if license should been edited
+
+        Returns:
+        Status: status
+        """
+        status = None
+
+        if id:
+            status = LicenseController.__edit_future_license(
+                id              = id,
+                replace_license = replace_license,
+                key             = key,
+                detail          = detail,
+                end_date        = end_date,
+            )
+        else:
+            status = LicenseController.__create_future_license(
+                replace_license = replace_license,
+                key             = key,
+                detail          = detail,
+                end_date        = end_date,
+            )
+
+        return status
+
+    @staticmethod
+    def __create_future_license(replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        If the license to create should be replace another in the future.
+
+        Parameters:
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
+        try:
+            create_status = LicenseController.__create_future_location_license(
+                replace_license = replace_license,
+                key             = key,
+                detail          = detail,
+                end_date        = end_date,
+            )
+        except:
+            try:
+                create_status = LicenseController.__create_future_customer_license(
+                    replace_license = replace_license,
+                    key             = key,
+                    detail          = detail,
+                    end_date        = end_date,
+                )
+            except:
+                status.set_unexpected('Zu ersetzende Lizenz nicht gefunden.')
+        
+        if create_status and not create_status.status:
+            status.set_unexpected(create_status.message)
+
+        return status
+
+    @staticmethod
+    def __edit_future_license(id: int, replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        If the license to edit should be replace another in the future.
+
+        Parameters:
+        id              (int): license id of the license to edit
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: edit status
+        """
+        status = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
+        try:
+            edit_status = LicenseController.__edit_future_location_license(
+                id              = id,
+                replace_license = replace_license,
+                key             = key,
+                detail          = detail,
+                end_date        = end_date,
+            )
+        except:
+            try:
+                edit_status = LicenseController.__edit_future_customer_license(
+                    id              = id,
+                    replace_license = replace_license,
+                    key             = key,
+                    detail          = detail,
+                    end_date        = end_date,
+                )
+            except:
+                status.set_unexpected('Zu bearbeitende Lizenz nicht gefunden.')
+        
+        if edit_status and not edit_status.status:
+            status.set_unexpected(edit_status.message)
+
+        return status
+
+    @staticmethod
+    def __create_future_location_license(replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        Creates the location license to replace.
+
+        Parameters:
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True)
+        old_license = LocationLicense.objects.get(license_ptr_id = replace_license)
+        if old_license.start_date >= end_date:
+            status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
+        else:
+            try:
+                new_license = LocationLicense(
+                    key             = key,
+                    detail          = detail,
+                    start_date      = old_license.end_date,
+                    end_date        = end_date,
+                    module          = old_license.module,
+                    replace_license = old_license,
+                    location        = old_license.location,
+                )
+                new_license.save()
+            except:
+                status.set_unexpected()
+
+        return status
+
+    @staticmethod
+    def __create_future_customer_license(replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        Creates the customer license to replace.
+
+        Parameters:
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: status
+        """
+        status = Status(True)
+        old_license = CustomerLicense.objects.get(license_ptr_id = replace_license)
+        if old_license.start_date >= end_date:
+            status.status  = False
+            status.message = 'Enddatum muss später als Anfangsdatum sein.'
+        else:
+            try:
+                new_license = CustomerLicense(
+                    key             = key,
+                    detail          = detail,
+                    start_date      = old_license.end_date,
+                    end_date        = end_date,
+                    module          = old_license.module,
+                    replace_license = old_license,
+                    customer        = old_license.customer,
+                )
+                new_license.save()
+            except:
+                status.set_unexpected()
+
+        return status
+    
+    @staticmethod
+    def __edit_future_location_license(id: int, replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        Edits the location license to replace.
+
+        Parameters:
+        id              (int): license id of the license to edit
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: edit status
+        """
+        status = Status(True)
+        license = LocationLicense.objects.get(id = id)
+        try:
+            old_license = LocationLicense.objects.get(license_ptr_id = replace_license)
+            if old_license.start_date >= end_date:
+                status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
+            else:
+                try:
+                    license.key      = key
+                    license.detail   = detail
+                    license.end_date = end_date
+                    license.save()
+                except:
+                    status.set_unexpected()
+        except:
+            status.set_unexpected('Zu ersetzende Lizenz nicht gefunden.')
+
+        return status
+
+    @staticmethod
+    def __edit_future_customer_license(id: int, replace_license: int, key: str, detail: str, end_date: str) -> Status:
+        """
+        Edits the customer license to replace.
+
+        Parameters:
+        id              (int): license id of the license to edit
+        replace_license (int): license id of the license to replace
+        key             (str): license key
+        detail          (str): license details
+        end_date        (str): end date of the license
+
+        Returns:
+        Status: edit status
+        """
+        status = Status(True)
+        license = CustomerLicense.objects.get(id = id)
+        try:
+            old_license = CustomerLicense.objects.get(license_ptr_id = replace_license)
+            if old_license.start_date >= end_date:
+                status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
+            else:
+                try:
+                    license.key      = key
+                    license.detail   = detail
+                    license.end_date = end_date
+                    license.save()
+                except:
+                    status.set_unexpected()
+        except:
+            status.set_unexpected('Zu ersetzende Lizenz nicht gefunden.')
 
         return status
 
@@ -745,10 +886,10 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __update_location_license(id: int, key: str, detail: str,
+    def __edit_location_license(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
         """
-        Updates a location license if a location is passed.
+        edits a location license if a location is passed.
         If a customer is given instead the old location license gonna be deleted and a customer license is gonna be created instead.
         In this case the used products for the other locations will be also created.
 
@@ -763,7 +904,7 @@ class LicenseController:
         customer    (Customer)      : belonging customer
 
         Returns:
-        Status: update status
+        Status: edit status
         """
         status = Status(True)
         location_license = LocationLicense.objects.get(license_ptr_id = id)
@@ -803,10 +944,10 @@ class LicenseController:
         return status
 
     @staticmethod
-    def __update_customer_license(id: int, key: str, detail: str,
+    def __edit_customer_license(id: int, key: str, detail: str,
         start_date: str, end_date: str, module, location, customer) -> Status:
         """
-        Updates a customer license if a customer is passed.
+        edits a customer license if a customer is passed.
         If a location is given instead the old customer license gonna be deleted and a location license is gonna be created instead.
         In this case the used products for the old customer's locations will be also deleted and the new one will be created.
 
@@ -821,7 +962,7 @@ class LicenseController:
         customer    (Customer)      : belonging customer
 
         Returns:
-        Status: update status
+        Status: edit status
         """
         status = Status(True)
         customer_license = CustomerLicense.objects.get(license_ptr_id = id)

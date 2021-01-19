@@ -61,7 +61,6 @@ def create(request: WSGIRequest) -> HttpResponse:
     context    = {
         'title'     : 'Lizenz erstellen',
         'heartbeats': heartbeats,
-        'licenses'  : licenses,
         'modules'   : modules,
         'locations' : locations,
         'customers' : customers,
@@ -97,6 +96,57 @@ def edit(request: WSGIRequest, id: int = 0) -> HttpResponse:
         'customers' : customers,
     }
     return render(request, 'licenses/edit.html', context)
+
+def create_replace_license(request: WSGIRequest, old_license_id: int = 0) -> HttpResponse:
+    """
+    When the replace license create is called.
+    Renders the form to create the replacing license with the given id of the license to replace. 
+
+    Parameters:
+    request        (WSGIRequest): url request of the user
+    old_license_id (int)        : id of the license to replace
+
+    Returns:
+    HttpResponse: form to create replacing license
+    """
+    if old_license_id < 1:
+        return redirect('licenses_list')
+
+    old_license = LicenseController.get_license_by_id(id = old_license_id)
+    heartbeats  = HeartbeatController.read()
+    context     = {
+        'title'      : 'Zukunftslizenz erstellen',
+        'old_license': old_license,
+        'heartbeats' : heartbeats,
+    }
+    return render(request, 'licenses/edit-replace.html', context)
+
+def edit_replace_license(request: WSGIRequest, id: int = 0, old_license_id: int = 0) -> HttpResponse:
+    """
+    When the replace license edit is called.
+    Renders the form to edit the replacing license with the given id of the license to replace and the license to edit. 
+
+    Parameters:
+    request        (WSGIRequest): url request of the user
+    id             (int)        : id of the license to edit
+    old_license_id (int)        : id of the license to replace
+
+    Returns:
+    HttpResponse: form to edit replacing license
+    """
+    if id < 1 or old_license_id < 1:
+        return redirect('licenses_list')
+
+    license     = LicenseController.get_license_by_id(id = id)
+    old_license = LicenseController.get_license_by_id(id = old_license_id)
+    heartbeats  = HeartbeatController.read()
+    context     = {
+        'title'      : 'Zukunftslizenz bearbeiten',
+        'license'    : license,
+        'old_license': old_license,
+        'heartbeats' : heartbeats,
+    }
+    return render(request, 'licenses/edit-replace.html', context)
 
 def save(request: WSGIRequest) -> JsonResponse:
     """
