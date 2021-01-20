@@ -121,7 +121,7 @@ def create_replace_license(request: WSGIRequest, old_license_id: int = 0) -> Htt
     }
     return render(request, 'licenses/edit-replace.html', context)
 
-def edit_replace_license(request: WSGIRequest, id: int = 0, old_license_id: int = 0) -> HttpResponse:
+def edit_replace_license(request: WSGIRequest, old_license_id: int = 0, id: int = 0) -> HttpResponse:
     """
     When the replace license edit is called.
     Renders the form to edit the replacing license with the given id of the license to replace and the license to edit. 
@@ -206,5 +206,25 @@ def delete(request: WSGIRequest, id: int = 0) -> HttpResponseRedirect:
         status = LicenseController.delete(id = id)
         response.set_cookie('license_status_status' , status.status , 7)
         response.set_cookie('license_status_message', status.message, 7)
+
+    return response
+
+def settings(request: WSGIRequest) -> JsonResponse:
+    """
+    When the license settings is called as an ajax request.
+    Gets information about current and future license by current license id.
+
+    Parameters:
+    request (WSGIRequest): ajax request
+
+    Returns:
+    JsonResponse: license information
+    """
+    response = JsonResponse({})
+    if request.is_ajax():
+        id = request.POST.get('id', '')
+
+        licenses = LicenseController.get_settings_information(id = id)
+        response = JsonResponse(licenses)
 
     return response

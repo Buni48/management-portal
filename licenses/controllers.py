@@ -3,6 +3,7 @@ from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
 from management_portal.general import Status, SaveStatus
+import json
 
 class LicenseController:
     """
@@ -324,6 +325,54 @@ class LicenseController:
                 count['valid'] += 1
 
         return count
+
+    @staticmethod
+    def get_settings_information(id: int) -> dict:
+        """
+        Returns the information needed for the license settings.
+        This includes the current and the future license.
+
+        Parameters:
+        id (int): license id
+
+        Returns:
+        dict: current and future license
+        """
+        settings = {
+            'current': LicenseController.get_license_by_id(id = id),
+            'future' : LicenseController.get_future_license(id = id),
+        }
+        if settings['current']:
+            settings['current']           = settings['current'].__dict__
+            settings['current']['_state'] = ''
+            settings['current']           = json.dumps(settings['current'])
+        else:
+            settings['current'] = ''
+        if settings['future']:
+            settings['future']           = settings['future'].__dict__
+            settings['future']['_state'] = ''
+            settings['future']           = json.dumps(settings['future'])
+        else:
+            settings['future'] = ''
+
+        return settings
+
+    @staticmethod
+    def get_future_license(id: int):
+        """
+        Returns the future license to a given id.
+        Returns 'None', if no future license exists.
+
+        Parameters:
+        id (int): license id
+
+        Returns:
+        License: future license
+        """
+        try:
+            return License.objects.get(replace_license__id = id)
+        except:
+            return None
 
     @staticmethod
     def __check_validity(key: str, detail: str, start_date: str, end_date: str,

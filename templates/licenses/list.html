@@ -65,6 +65,9 @@
                                 </a>&nbsp;
                                 <a href="{% url 'licenses_delete' id=license.id %}" class="text-danger">
                                     <i class="fas fa-trash" title="Lizenz löschen"></i>
+                                </a>&nbsp;
+                                <a onclick="openSettings('{{license.id}}')">
+                                    <i class="fas fa-cog" title="Lizenz verwalten"></i>
                                 </a>
                             </td>
                             <td>
@@ -105,6 +108,100 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <!-- Modal -->
+            <div class="modal fade" id="settings" role="dialog">
+                <div class="modal-dialog">
+                <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 id="modal-title" class="modal-title">Lizenz verwalten</h1>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Current License-->
+                            <h4>Aktuelle Lizenz</h4>
+                            <table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th class="th-sm">
+                                            Aktionen
+                                        </th>
+                                        <th class="th-sm">
+                                            Lizenzschlüssel
+                                        </th>
+                                        <th class="th-sm">
+                                            Anfangsdatum
+                                        </th>
+                                        <th class="th-sm">
+                                            Enddatum
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modal-tbody">
+                                    <tr>
+                                        <td class="td-sm">
+                                            <a id="current_edit" href="">
+                                                <i class="fas fa-edit" title="Aktuelle Lizenz bearbeiten"></i>
+                                            </a>&nbsp;
+                                            <a id="current_delete" href="" class="text-danger">
+                                                <i class="fas fa-trash" title="Aktuelle Lizenz löschen"></i>
+                                            </a>&nbsp;
+                                        </td>
+                                        <td id="current_key" class="td-sm"></td>
+                                        <td id="current_start_date" class="td-sm"></td>
+                                        <td id="current_end_date" class="td-sm"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!-- Future License -->
+                            <h4>Zukunfslizenz</h4>
+                            <table id="future_table" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th class="th-sm">
+                                            Aktionen
+                                        </th>
+                                        <th class="th-sm">
+                                            Lizenzschlüssel
+                                        </th>
+                                        <th class="th-sm">
+                                            Anfangsdatum
+                                        </th>
+                                        <th class="th-sm">
+                                            Enddatum
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modal-tbody">
+                                    <tr>
+                                        <td class="td-sm">
+                                            <a id="future_edit" href="">
+                                                <i class="fas fa-edit" title="Aktuelle Lizenz bearbeiten"></i>
+                                            </a>&nbsp;
+                                            <a id="future_delete" href="" class="text-danger">
+                                                <i class="fas fa-trash" title="Aktuelle Lizenz löschen"></i>
+                                            </a>&nbsp;
+                                        </td>
+                                        <td id="future_key" class="td-sm"></td>
+                                        <td id="future_start_date" class="td-sm"></td>
+                                        <td id="future_end_date" class="td-sm"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <a id="future_create" class="hidden" href="">
+                                <button type="button" class="btn btn-primary">
+                                    + Zukunftslizenz hinzufügen
+                                </button>
+                            </a>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                Schließen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         {% else %}
             <h1>Sie müssen sich erst anmelden.</h1>
@@ -118,6 +215,100 @@
 
 {% block custom_js %}
     <script>
+        /**
+         * Sends an ajax request to get the current and future license.
+         * After that it adds these information to the modal and opens it.
+         * 
+         * @param {int} id  current license id
+         */
+        openSettings = (id) => {
+            $.ajax({
+                type : "POST",
+                url  : "{% url 'licenses_settings' %}",
+                data : {
+                    id                  : id,
+                    csrfmiddlewaretoken : '{{ csrf_token }}',
+                    dataType            : "json",
+                },
+                success: (result) => {
+                    let data = parseResult(result);
+                    console.log(data);
+                    insertTableData(data);
+                    $("#settings").modal();
+                },
+                failure: () => {
+                    console.error('Request failed!');
+                },
+            });
+        };
+
+        /**
+         * Parses a string to an array of objects.
+         * 
+         * @param  {string} dataString  array as string
+         * @return {array}              parsed array
+         */
+         parseJson = (dataString) => {
+            if (!dataString || dataString == '[]') {
+                return null;
+            }
+            return JSON.parse(dataString);
+        };
+
+        /**
+         * Parses  the result to an object.
+         * 
+         * @param  {string} result  object of object as string
+         * @return {array}  parsed object
+         */
+        parseResult = (result) => {
+            for (let [key, value] of Object.entries(result)) {
+                if (value) {
+                    result[key] = parseJson(value);
+                }
+            }
+            return result;
+        };
+
+        insertTableData = (data) => {
+            createLinks(data.current.id, data.future.id ?? 0);
+            for (let [key, value] of Object.entries(data)) {
+                if (value) {
+                    if (key == 'future') {
+                        document.getElementById('future_table').classList.remove('hidden');
+                        document.getElementById('create_future_license').classList.add('hidden');
+                    }
+                    console.log(value);
+                    document.getElementById(key + '_key').innerHTML        = value.key;
+                    document.getElementById(key + '_start_date').innerHTML = value.start_date;
+                    document.getElementById(key + '_end_date').innerHTML   = value.end_date;
+                } else if (key == 'future') {
+                    document.getElementById('future_table').classList.add('hidden');
+                    document.getElementById('future_create').classList.remove('hidden');
+                }
+            }
+        };
+
+        createLinks = (current_id, future_id) => {
+            let href = "{% url 'licenses_edit' id=0 %}";
+            document.getElementById('current_edit').setAttribute('href', href.replace('0', current_id));
+            href     = "{% url 'licenses_delete' id=0 %}"
+            document.getElementById('current_delete').setAttribute('href', href.replace('0', current_id));
+            if (future_id) {
+                href = "{% url 'licenses_edit_replace' old_license_id=0 id=0 %}";
+                href = href.replace('0', current_id).replace('/0', '/' + future_id);
+                document.getElementById('future_edit').setAttribute('href', href);
+                href     = "{% url 'licenses_delete' id=0 %}"
+                document.getElementById('current_delete').setAttribute('href', href.replace('0', future_id));
+            } else {
+                href = "{% url 'licenses_create_replace' old_license_id=0 %}";
+                document.getElementById('future_create').setAttribute('href', href.replace('0', current_id));
+            }
+        };
+
+        /**
+         * Executed after the page was load to show data table.
+         */
         $(document).ready(function () {
             $('#selectedColumn').DataTable({
                 "aaSorting": [],
