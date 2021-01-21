@@ -276,7 +276,7 @@
                 if (value) {
                     if (key == 'future') {
                         document.getElementById('future_table').classList.remove('hidden');
-                        document.getElementById('create_future_license').classList.add('hidden');
+                        document.getElementById('future_create').classList.add('hidden');
                     }
                     console.log(value);
                     document.getElementById(key + '_key').innerHTML        = value.key;
@@ -299,7 +299,7 @@
                 href = href.replace('0', current_id).replace('/0', '/' + future_id);
                 document.getElementById('future_edit').setAttribute('href', href);
                 href     = "{% url 'licenses_delete' id=0 %}"
-                document.getElementById('current_delete').setAttribute('href', href.replace('0', future_id));
+                document.getElementById('future_delete').setAttribute('href', href.replace('0', future_id));
             } else {
                 href = "{% url 'licenses_create_replace' old_license_id=0 %}";
                 document.getElementById('future_create').setAttribute('href', href.replace('0', current_id));

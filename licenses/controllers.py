@@ -3,6 +3,7 @@ from customers.models import Customer, Location
 from datetime import datetime, timezone, timedelta
 from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
 from management_portal.general import Status, SaveStatus
+from datetime import datetime, timezone, timedelta
 import json
 
 class LicenseController:
@@ -83,45 +84,46 @@ class LicenseController:
 
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str, module: int,
-        location: int = 0, customer: int = 0, id: int = 0, replace_later: int = 0) -> Status:
+        location: int = 0, customer: int = 0, id: int = 0, replace_license: int = 0) -> Status:
         """
         Saves a license.
         By giving an id it edits this license otherwise it creates a new one.
         Give a location id to save a location license and a customer id to save a customer.
 
         Parameters:
-        key           (str): license key
-        detail        (str): license details
-        start_date    (str): start date of the license
-        end_date      (str): end date of the license
-        module        (int): id of the belonging software module
-        location      (int): id of the belonging customer's location
-        customer      (int): id of the belonging customer
-        id            (int): license id if license should been edited
-        replace_later (int): license to replace later
+        key             (str): license key
+        detail          (str): license details
+        start_date      (str): start date of the license
+        end_date        (str): end date of the license
+        module          (int): id of the belonging software module
+        location        (int): id of the belonging customer's location
+        customer        (int): id of the belonging customer
+        id              (int): license id if license should been edited
+        replace_license (int): license id of the license to replace
 
         Returns:
         Status: save status
         """
         status        = Status()
         status        = LicenseController.__check_validity(
-            key           = key,
-            detail        = detail,
-            start_date    = start_date,
-            end_date      = end_date,
-            module        = module,
-            location      = location,
-            customer      = customer,
-            id            = id,
-            replace_later = replace_later,
+            key             = key,
+            detail          = detail,
+            start_date      = start_date,
+            end_date        = end_date,
+            module          = module,
+            location        = location,
+            customer        = customer,
+            id              = id,
+            replace_license = replace_license,
         )
         if status.status:
-            if replace_later:
+            if replace_license:
                 status = LicenseController.__future_license(
-                    id       = id,
-                    key      = key,
-                    detail   = detail,
-                    end_date = end_date,
+                    replace_license = replace_license,
+                    id              = id,
+                    key             = key,
+                    detail          = detail,
+                    end_date        = end_date,
                 )
             else:
                 save_status  = LicenseController.__check_foreign_keys(
@@ -349,9 +351,11 @@ class LicenseController:
         else:
             settings['current'] = ''
         if settings['future']:
-            settings['future']           = settings['future'].__dict__
-            settings['future']['_state'] = ''
-            settings['future']           = json.dumps(settings['future'])
+            settings['future']               = settings['future'].__dict__
+            settings['future']['_state']     = ''
+            settings['future']['start_date'] = settings['future']['start_date'].strftime(DATE_TYPE)
+            settings['future']['end_date']   = settings['future']['end_date'].strftime(DATE_TYPE)
+            settings['future']               = json.dumps(settings['future'])
         else:
             settings['future'] = ''
 
@@ -376,20 +380,20 @@ class LicenseController:
 
     @staticmethod
     def __check_validity(key: str, detail: str, start_date: str, end_date: str,
-        module: int, location: int, customer: int, id: int, replace_later: int) -> Status:
+        module: int, location: int, customer: int, id: int, replace_license: int) -> Status:
         """
         Checks if all necessary attributes to save a license are set and valid.
 
         Parameters:
-        key           (str) : license key
-        detail        (str) : license details
-        start_date    (str) : start date of the license
-        end_date      (str) : end date of the license
-        module        (int) : id of the belonging software module
-        location      (int) : id of the belonging customer's location
-        customer      (int) : id of the belonging customer
-        id            (int) : license id if license should been edited
-        replace_later (bool): if replace license later
+        key             (str): license key
+        detail          (str): license details
+        start_date      (str): start date of the license
+        end_date        (str): end date of the license
+        module          (int): id of the belonging software module
+        location        (int): id of the belonging customer's location
+        customer        (int): id of the belonging customer
+        id              (int): license id if license should been edited
+        replace_license (int): license id of the license to replace
 
         Returns:
         Status: status
@@ -403,19 +407,19 @@ class LicenseController:
             status.message = 'Bitte Details angeben.'
         elif len(detail) > 2047:
             status.message = 'Details dürfen maximal 2047 Zeichen lang sein.'
-        elif not len(start_date) and not replace_later:
+        elif not len(start_date) and not replace_license:
             status.message = 'Bitte Anfangsdatum angeben.'
         elif not len(end_date):
             status.message = 'Bitte Enddatum angeben.'
         elif start_date >= end_date:
             status.message = 'Enddatum muss später als Anfangsdatum sein.'
-        elif not module and not replace_later:
+        elif not module and not replace_license:
             status.message = 'Bitte Modul angeben.'
         elif customer and location:
             status.message = 'Bitte nur Kunde ODER Standort zuweisen.'
-        elif not customer and not location:
+        elif not customer and not location and not replace_license:
             status.message = 'Bitte Kunde oder Standort zuweisen.'
-        elif replace_later and (customer or location or module or start_date):
+        elif replace_license and (customer or location or module or start_date):
             status.message = 'Bei ersetzender Lizenz bitte nicht Kunde, Standort, Modul oder Anfangsdatum zuweisen.'
         else:
             licenses = LicenseController.read()
@@ -517,7 +521,8 @@ class LicenseController:
         Returns:
         Status: create status
         """
-        status = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
+        status        = Status(True, 'Die Lizenz wurde erfolgreich angelegt.')
+        create_status = None
         try:
             create_status = LicenseController.__create_future_location_license(
                 replace_license = replace_license,
@@ -556,7 +561,8 @@ class LicenseController:
         Returns:
         Status: edit status
         """
-        status = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
+        status      = Status(True, 'Die Lizenz wurde erfolgreich aktualisiert.')
+        edit_status = None
         try:
             edit_status = LicenseController.__edit_future_location_license(
                 id              = id,
@@ -596,9 +602,13 @@ class LicenseController:
         Returns:
         Status: create status
         """
-        status = Status(True)
+        status      = Status(True)
         old_license = LocationLicense.objects.get(license_ptr_id = replace_license)
-        if old_license.start_date >= end_date:
+        dates_valid = LicenseController.__check_dates_validity(
+            end_date_string = end_date,
+            start_date      = old_license.end_date,
+        )
+        if not dates_valid:
             status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
         else:
             try:
@@ -633,9 +643,12 @@ class LicenseController:
         """
         status = Status(True)
         old_license = CustomerLicense.objects.get(license_ptr_id = replace_license)
-        if old_license.start_date >= end_date:
-            status.status  = False
-            status.message = 'Enddatum muss später als Anfangsdatum sein.'
+        dates_valid = LicenseController.__check_dates_validity(
+            end_date_string = end_date,
+            start_date      = old_license.end_date,
+        )
+        if not dates_valid:
+            status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
         else:
             try:
                 new_license = CustomerLicense(
@@ -672,7 +685,11 @@ class LicenseController:
         license = LocationLicense.objects.get(id = id)
         try:
             old_license = LocationLicense.objects.get(license_ptr_id = replace_license)
-            if old_license.start_date >= end_date:
+            dates_valid = LicenseController.__check_dates_validity(
+                end_date_string = end_date,
+                start_date      = old_license.end_date,
+            )
+            if not dates_valid:
                 status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
             else:
                 try:
@@ -706,7 +723,11 @@ class LicenseController:
         license = CustomerLicense.objects.get(id = id)
         try:
             old_license = CustomerLicense.objects.get(license_ptr_id = replace_license)
-            if old_license.start_date >= end_date:
+            dates_valid = LicenseController.__check_dates_validity(
+                end_date_string = end_date,
+                start_date      = old_license.end_date,
+            )
+            if not dates_valid:
                 status.set_unexpected('Enddatum muss später als Anfangsdatum sein.')
             else:
                 try:
@@ -720,6 +741,29 @@ class LicenseController:
             status.set_unexpected('Zu ersetzende Lizenz nicht gefunden.')
 
         return status
+    
+    @staticmethod
+    def __check_dates_validity(end_date_string: str, start_date: datetime) -> bool:
+        """
+        Checks if the end date given as a string is later than the start date.
+
+        end_date_string (str)     : license end date as string
+        start_date      (datetime): license start date
+
+        Returns:
+        bool: if valid
+        """
+        end_date = datetime.now(timezone.utc)
+        date_parts = end_date_string.split('-')
+        end_date = datetime(
+            int(date_parts[0]),
+            int(date_parts[1]),
+            int(date_parts[2]),
+            0, 0, 0,
+            tzinfo=timezone.utc,
+        )
+        difference = end_date - start_date
+        return difference > timedelta(0)
 
     @staticmethod
     def __create_location_license(key: str, detail: str,

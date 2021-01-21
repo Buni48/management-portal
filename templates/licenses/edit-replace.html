@@ -1,7 +1,7 @@
 {% extends "licenses/abstract-edit.html" %}
 
 {% block assignments %}
-    <p>Startdatum: {{old_license.start_date}}</p>
+    <p>Startdatum: {{old_license.end_date}}</p>
     <p>Modul: {{old_license.module}}</p>
     {% if old_license.location %}
         <p>Standort: {{old_license.location}}</p>
@@ -25,7 +25,8 @@
                 type : "POST", 
                 url  : "{% url 'licenses_save' %}",
                 data : {
-                    id                  : '{{ old_license.id }}',
+                    id                  : '{{ license.id }}',
+                    replace_license     : '{{ old_license.id }}',
                     key                 : $('#key').val(),
                     detail              : $('#detail').val(),
                     end_date            : $('#end_date').val(),
