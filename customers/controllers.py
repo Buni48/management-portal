@@ -280,12 +280,12 @@ class LocationController:
         list: filtered locations
         """
         if contains:
-            locations = Location.objects.filter(name__icontains = word).values('id', 'name', 'postcode', 'city')
+            locations = Location.objects.filter(name__icontains = word).values('id', 'name', 'postcode', 'city', 'customer_id')
         else:
-            locations = Location.objects.filter(name__iexact = word).values('id', 'name', 'postcode', 'city')
+            locations = Location.objects.filter(name__iexact = word).values('id', 'name', 'postcode', 'city', 'customer_id')
         
         for location in locations:
-            customer             = Customer.objects.get(id = location['id'])
+            customer             = Customer.objects.get(id = location['customer_id'])
             location['customer'] = customer.name
 
         return list(locations)
@@ -582,29 +582,53 @@ class ContactPersonController:
 
         if contains:
             if len(words) == 2:
-                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0], last_name__icontains = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0], last_name__icontains = words[1]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1], last_name__icontains = words[0]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts     = list(chain(contacts_one, contacts_two))
             elif len(words) == 3:
-                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0] + words[1], last_name__icontains = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1] + words[2], last_name__icontains = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_one = ContactPerson.objects.filter(first_name__icontains = words[0] + words[1], last_name__icontains = words[2]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_two = ContactPerson.objects.filter(first_name__icontains = words[1] + words[2], last_name__icontains = words[0]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts     = list(chain(contacts_one, contacts_two))
             else:
-                contacts_by_first_name = ContactPerson.objects.filter(first_name__icontains = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
-                contacts_by_last_name  = ContactPerson.objects.filter(last_name__icontains  = word).values('id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'product__name')
+                contacts_by_first_name = ContactPerson.objects.filter(first_name__icontains = word).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_by_last_name  = ContactPerson.objects.filter(last_name__icontains  = word).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts               = list(chain(contacts_by_first_name, contacts_by_last_name))
         else:
             if len(words) == 2:
-                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0], last_name__iexact = words[1]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0], last_name__iexact = words[1]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1], last_name__iexact = words[0]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts     = list(chain(contacts_one, contacts_two))
             elif len(words) == 3:
-                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0] + words[1], last_name__iexact = words[2]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1] + words[2], last_name__iexact = words[0]).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_one = ContactPerson.objects.filter(first_name__iexact = words[0] + words[1], last_name__iexact = words[2]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_two = ContactPerson.objects.filter(first_name__iexact = words[1] + words[2], last_name__iexact = words[0]).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts     = list(chain(contacts_one, contacts_two))
             else:
-                contacts_by_first_name = ContactPerson.objects.filter(first_name__iexact = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
-                contacts_by_last_name  = ContactPerson.objects.filter(last_name__iexact  = word).values('id', 'first_name', 'last_name', 'location__name', 'product__name')
+                contacts_by_first_name = ContactPerson.objects.filter(first_name__iexact = word).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
+                contacts_by_last_name  = ContactPerson.objects.filter(last_name__iexact  = word).values(
+                    'id', 'first_name', 'last_name', 'location__name', 'location__customer__name', 'location__customer__id', 'product__name',
+                )
                 contacts               = list(chain(contacts_by_first_name, contacts_by_last_name))
 
         for contact in contacts:
