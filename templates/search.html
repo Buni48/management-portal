@@ -62,12 +62,30 @@
             </div>
 
             <script>
+                /**
+                 * Check validity of search word when a key was pressed.
+                 * 
+                 * @param {KeyboardEvent} event  event 'onkeyup'
+                 */
                 $('#search_word').on('keyup', (event) => {
                     checkValidity();
                 });
+
+                /**
+                 * Check contains checkbox when checkbox was clicked on.
+                 * 
+                 * @param {Event} event  event 'onclick'
+                 */
                 $('#contains').on('click', (event) => {
                     checkContains();
                 });
+
+                /**
+                 * Sends search word and if contains as ajax request on form submit.
+                 * On success the needed tables will be generated.
+                 * 
+                 * @param {Event} event  form submit event
+                 */
                 $('#form').on('submit', (event) => {
                     event.preventDefault();
             
@@ -89,6 +107,26 @@
                     });
                 });
 
+                /**
+                 * Checks the validity of the search input field.
+                 * Disables the submit button and adds a notice of the invalidity, if the input field is invalid.
+                 */
+                 checkValidity = () => {
+                    let value     = document.getElementById('search_word').value;
+                    let button    = document.getElementById('button');
+                    let paragraph = document.getElementById('invalid');
+                    if (value.length < 3 || value.length > 100) {
+                        button.classList.add('disabled');
+                        paragraph.classList.remove('hidden');
+                    } else {
+                        button.classList.remove('disabled');
+                        paragraph.classList.add('hidden');
+                    }
+                };
+
+                /**
+                 * Checks the contains checkbox and sets the value if the button was pressed.
+                 */
                 checkContains = () => {
                     let checkbox = document.getElementById('contains');
                     let value    = checkbox.value;
@@ -99,6 +137,12 @@
                     }
                 };
 
+                /**
+                 * Generates all necessary tables and deletes all unneeded ones with given data.
+                 * The data is an object of tables to generate with an array string of table lines.
+                 * 
+                 * @param {Object} data  data with tables to generate
+                 */
                 generateTables = (data) => {
                     if (!Object.entries(data).length) {
                         return;
@@ -109,6 +153,12 @@
                     }
                 };
 
+                /**
+                 * Parses a string to an array of objects.
+                 * 
+                 * @param  {string} dataString  array as string
+                 * @return {array}              parsed array
+                 */
                 parseJson = (dataString) => {
                     if (!dataString || dataString == '[]') {
                         return null;
@@ -116,6 +166,12 @@
                     return JSON.parse(dataString);
                 };
 
+                /**
+                 * Generates a table by given data array and it's name.
+                 * 
+                 * @param {array}  data  array of objects to save in the table
+                 * @param {string} name  table name
+                 */
                 generateTable = (data, name) => {
                     let thead = document.getElementById(name + '-thead');
                     if (data) {
@@ -136,6 +192,13 @@
                     }
                 };
 
+                /**
+                 * Generates the table head.
+                 * 
+                 * @param {HTMLElement} table  table element
+                 * @param {array}       keys   table column names
+                 * @param {string}      name   table name
+                 */
                 generateTableHead = (table, keys, name) => {
                     let thead = table.createTHead();
                     thead.setAttribute('id', name + '-thead');
@@ -152,6 +215,13 @@
                     }
                 };
 
+                /**
+                 * Generates the table body.
+                 * 
+                 * @param {HTMLElement} table  table element
+                 * @param {array}       data   table data
+                 * @param {string}      name   table name
+                 */
                 generateTableBody = (table, data, name) => {
                     let tbody = table.createTBody();
                     tbody.setAttribute('id', name + '-tbody');
@@ -168,6 +238,13 @@
                     }
                 };
 
+                /**
+                 * Deletes the table body.
+                 * If you parse a table head it deletes it also.
+                 * 
+                 * @param {string}      name   table name
+                 * @param {HTMLElement} thead  table head element
+                 */
                 deleteTable = (name, thead = null) => {
                     let tbody = document.getElementById(name + '-tbody');
                     tbody.remove();
@@ -176,6 +253,12 @@
                     }
                 };
 
+                /**
+                 * Parses a key for table head names.
+                 * 
+                 * @param  {string} key  key to parse
+                 * @return {string}      parsed key
+                 */
                 parseKey = (key) => {
                     if (typeof key !== 'string') {
                         return '';
@@ -189,6 +272,12 @@
                     return key;
                 };
 
+                /**
+                 * Translates a key from english to german for table head names.
+                 * 
+                 * @param  {string} key  key to translate
+                 * @return {string}      translated key
+                 */
                 translateKey = (key) => {
                     key = key.replace('Customer number', 'Kundennummer');
                     key = key.replace('Postcode', 'PLZ');
@@ -201,19 +290,6 @@
                     key = key.replace('Category', 'Kategorie');
 
                     return key;
-                }
-
-                checkValidity = () => {
-                    let value     = document.getElementById('search_word').value;
-                    let button    = document.getElementById('button');
-                    let paragraph = document.getElementById('invalid');
-                    if (value.length < 3 || value.length > 100) {
-                        button.classList.add('disabled');
-                        paragraph.classList.remove('hidden');
-                    } else {
-                        button.classList.remove('disabled');
-                        paragraph.classList.add('hidden');
-                    }
                 };
             </script>
 
