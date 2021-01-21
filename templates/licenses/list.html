@@ -63,7 +63,7 @@
                                 <a href="{% url 'licenses_edit' id=license.id %}">
                                     <i class="fas fa-edit" title="Lizenz bearbeiten"></i>
                                 </a>&nbsp;
-                                <a href="{% url 'licenses_delete' id=license.id %}" class="text-danger">
+                                <a onclick="loeschenAlert('{{license.id}}')" class="text-danger">
                                     <i class="fas fa-trash" title="Lizenz löschen"></i>
                                 </a>&nbsp;
                                 <a onclick="openSettings('{{license.id}}')">
@@ -319,5 +319,18 @@
             });
             $('.dataTables_length').addClass('bs-select');
         });
+
+
+
+   function loeschenAlert(id) {
+
+       if (confirm("Möchten Sie diese Lizenz wirklich löschen?")) {
+             let link = "{% url 'licenses_delete' id=0 %}"
+             document.getElementById("loeschen").href = link.replace("0", id);
+       } else {
+       document.getElementById("loeschen").href = "";
+       }
+   }
+
     </script>
 {% endblock custom_js %}

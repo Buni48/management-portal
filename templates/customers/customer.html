@@ -32,8 +32,8 @@
                         <i class="fas fa-edit"></i>
                     </button>
                 </a>
-                <a href="{% url 'customers_delete' id=customer.id %}">
-                    <button type="button" class="btn btn-danger">
+                <a id="loeschen">
+                    <button onclick="loeschenAlert()" type="button" class="btn btn-danger">
                         <i class="fas fa-trash"></i>
                     </button>
                 </a>
@@ -91,7 +91,16 @@
             </button>
         {% endif %}
     </div>
+
 <script>
+
+    function loeschenAlert() {
+       if (confirm("Möchten Sie den Kunden {{customer.name}} wirklich löschen?")) {
+             document.getElementById("loeschen").href = "{% url 'customers_delete' id=customer.id %}";
+       } else {
+       document.getElementById("loeschen").href = "";
+       }
+   }
 
 </script>
 {% endblock content %}
