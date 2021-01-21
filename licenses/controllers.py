@@ -23,18 +23,23 @@ class LicenseController:
         Returns:
         list: licenses
         """
-        licenses = License.objects.all().order_by('end_date')[:limit]
+        licenses = License.objects.filter(replace_license__isnull = True).order_by('end_date')[:limit]
 
         for license in licenses:
-            duration = license.end_date - datetime.now(timezone.utc)
             license.start_date = license.start_date.strftime(DATE_TYPE)
-            license.end_date   = license.end_date.strftime(DATE_TYPE)
-            if (duration > LICENSE_EXPIRE_WARNING):
-                license.valid = 1
-            elif (duration > timedelta(seconds = 0)):
-                license.valid = 0
-            else:
-                license.valid = -1
+            try:
+                future_license   = License.objects.get(replace_license = license.id)
+                license.end_date = future_license.end_date.strftime(DATE_TYPE)
+                license.valid    = 2
+            except:
+                duration         = license.end_date - datetime.now(timezone.utc)
+                license.end_date = license.end_date.strftime(DATE_TYPE)
+                if (duration > LICENSE_EXPIRE_WARNING):
+                    license.valid = 1
+                elif (duration > timedelta(seconds = 0)):
+                    license.valid = 0
+                else:
+                    license.valid = -1
 
             license.product  = SoftwareProduct.objects.get(id = license.module.product_id)
             try:
@@ -429,10 +434,10 @@ class LicenseController:
         elif replace_license and (customer or location or module or start_date):
             status.message = 'Bei ersetzender Lizenz bitte nicht Kunde, Standort, Modul oder Anfangsdatum zuweisen.'
         else:
-            licenses = LicenseController.read()
+            licenses = License.objects.all()
             for license in licenses:
                 if key == license.key and not id == str(license.id):
-                    status.message = 'Diese Lizenzschlüssel wird bereits verwendet.'
+                    status.message = 'Dieser Lizenzschlüssel wird bereits verwendet.'
                     break
             if not len(status.message):
                 status.status = True
