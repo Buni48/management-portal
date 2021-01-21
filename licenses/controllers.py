@@ -281,10 +281,13 @@ class LicenseController:
             future_licenses = LocationLicense.objects.exclude(replace_license__isnull = True)
             for future_license in future_licenses:
                 future_license.delete()
-            LicenseController.__delete_redundant_used_product(
-                location = license.location,
-                module   = license.module,
-            )
+            try:
+                LicenseController.__delete_redundant_used_product(
+                    location = license.location,
+                    module   = license.module,
+                )
+            except:
+                pass
             license.delete()
         except:
             try:
@@ -294,10 +297,13 @@ class LicenseController:
                     future_license.delete()
                 locations = Location.objects.filter(customer = license.customer)
                 for location in locations:
-                    LicenseController.__delete_redundant_used_product(
-                        location = location,
-                        module   = license.module,
-                    )
+                    try:
+                        LicenseController.__delete_redundant_used_product(
+                            location = location,
+                            module   = license.module,
+                        )
+                    except:
+                        pass
                 license.delete()
             except:
                 status.status  = False
@@ -351,11 +357,9 @@ class LicenseController:
         else:
             settings['current'] = ''
         if settings['future']:
-            settings['future']               = settings['future'].__dict__
-            settings['future']['_state']     = ''
-            settings['future']['start_date'] = settings['future']['start_date'].strftime(DATE_TYPE)
-            settings['future']['end_date']   = settings['future']['end_date'].strftime(DATE_TYPE)
-            settings['future']               = json.dumps(settings['future'])
+            settings['future']           = settings['future'].__dict__
+            settings['future']['_state'] = ''
+            settings['future']           = json.dumps(settings['future'])
         else:
             settings['future'] = ''
 
@@ -374,7 +378,9 @@ class LicenseController:
         License: future license
         """
         try:
-            return License.objects.get(replace_license__id = id)
+            license             = License.objects.get(replace_license__id = id)
+            license.start_date  = license.start_date.strftime(DATE_TYPE)
+            license.end_date    = license.end_date.strftime(DATE_TYPE)
         except:
             return None
 
