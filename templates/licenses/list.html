@@ -232,7 +232,6 @@
                 },
                 success: (result) => {
                     let data = parseResult(result);
-                    console.log(data);
                     insertTableData(data);
                     $("#settings").modal();
                 },
@@ -283,7 +282,6 @@
                         document.getElementById('future_table').classList.remove('hidden');
                         document.getElementById('future_create').classList.add('hidden');
                     }
-                    console.log(value);
                     document.getElementById(key + '_key').innerHTML        = value.key;
                     document.getElementById(key + '_start_date').innerHTML = value.start_date;
                     document.getElementById(key + '_end_date').innerHTML   = value.end_date;

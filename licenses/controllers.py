@@ -381,6 +381,7 @@ class LicenseController:
             license             = License.objects.get(replace_license__id = id)
             license.start_date  = license.start_date.strftime(DATE_TYPE)
             license.end_date    = license.end_date.strftime(DATE_TYPE)
+            return license
         except:
             return None
 
