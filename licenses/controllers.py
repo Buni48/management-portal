@@ -205,12 +205,10 @@ class LicenseController:
                     customer    = customer,
                 )
         except:
-            status.status  = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         if create_status and not create_status.status:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         return status
 
@@ -260,12 +258,10 @@ class LicenseController:
                     customer    = customer,
                 )
             except:
-                status.status  = False
-                status.message = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
+                status.set_unexpected('Die zu bearbeitende Lizenz wurde nicht gefunden.')
 
         if edit_status and not edit_status.status:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         return status
     
@@ -311,8 +307,7 @@ class LicenseController:
                         pass
                 license.delete()
             except:
-                status.status  = False
-                status.message = 'Die zu löschende wurde Lizenz nicht gefunden.'
+                status.set_unexpected('Die zu löschende wurde Lizenz nicht gefunden.')
 
         return status
 

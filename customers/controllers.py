@@ -187,8 +187,7 @@ class CustomerController:
             )
             customer.save()
         except:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
         
         return status
     
@@ -212,8 +211,7 @@ class CustomerController:
             customer.name            = name
             customer.save()
         except:
-            status.status = False
-            status.message = 'Der zu bearbeitende Kunde wurde nicht gefunden.'
+            status.set_unexpected('Der zu bearbeitende Kunde wurde nicht gefunden.')
         
         return status
     
@@ -404,12 +402,10 @@ class LocationController:
                 location = location,
             )
         except:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         if up_status and not up_status.status:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         return status
 
@@ -447,8 +443,7 @@ class LocationController:
             location.customer       = customer
             location.save()
         except:
-            status.status = False
-            status.message = 'Der zu bearbeitende Standort wurde nicht gefunden.'
+            status.set_unexpected('Der zu bearbeitende Standort wurde nicht gefunden.')
 
         return status
 
