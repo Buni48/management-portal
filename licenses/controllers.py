@@ -23,18 +23,23 @@ class LicenseController:
         Returns:
         list: licenses
         """
-        licenses = License.objects.all().order_by('end_date')[:limit]
+        licenses = License.objects.filter(replace_license__isnull = True).order_by('end_date')[:limit]
 
         for license in licenses:
-            duration = license.end_date - datetime.now(timezone.utc)
             license.start_date = license.start_date.strftime(DATE_TYPE)
-            license.end_date   = license.end_date.strftime(DATE_TYPE)
-            if (duration > LICENSE_EXPIRE_WARNING):
-                license.valid = 1
-            elif (duration > timedelta(seconds = 0)):
-                license.valid = 0
-            else:
-                license.valid = -1
+            try:
+                future_license   = License.objects.get(replace_license = license.id)
+                license.end_date = future_license.end_date.strftime(DATE_TYPE)
+                license.valid    = 2
+            except:
+                duration         = license.end_date - datetime.now(timezone.utc)
+                license.end_date = license.end_date.strftime(DATE_TYPE)
+                if (duration > LICENSE_EXPIRE_WARNING):
+                    license.valid = 1
+                elif (duration > timedelta(seconds = 0)):
+                    license.valid = 0
+                else:
+                    license.valid = -1
 
             license.product  = SoftwareProduct.objects.get(id = license.module.product_id)
             try:
@@ -200,12 +205,10 @@ class LicenseController:
                     customer    = customer,
                 )
         except:
-            status.status  = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         if create_status and not create_status.status:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         return status
 
@@ -255,12 +258,10 @@ class LicenseController:
                     customer    = customer,
                 )
             except:
-                status.status  = False
-                status.message = 'Die zu bearbeitende Lizenz wurde nicht gefunden.'
+                status.set_unexpected('Die zu bearbeitende Lizenz wurde nicht gefunden.')
 
         if edit_status and not edit_status.status:
-            status.status = False
-            status.message = 'Es ist ein unerwarteter Fehler aufgetreten.'
+            status.set_unexpected()
 
         return status
     
@@ -306,8 +307,7 @@ class LicenseController:
                         pass
                 license.delete()
             except:
-                status.status  = False
-                status.message = 'Die zu löschende wurde Lizenz nicht gefunden.'
+                status.set_unexpected('Die zu löschende wurde Lizenz nicht gefunden.')
 
         return status
 
@@ -429,10 +429,10 @@ class LicenseController:
         elif replace_license and (customer or location or module or start_date):
             status.message = 'Bei ersetzender Lizenz bitte nicht Kunde, Standort, Modul oder Anfangsdatum zuweisen.'
         else:
-            licenses = LicenseController.read()
+            licenses = License.objects.all()
             for license in licenses:
                 if key == license.key and not id == str(license.id):
-                    status.message = 'Diese Lizenzschlüssel wird bereits verwendet.'
+                    status.message = 'Dieser Lizenzschlüssel wird bereits verwendet.'
                     break
             if not len(status.message):
                 status.status = True

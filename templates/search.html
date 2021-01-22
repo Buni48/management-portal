@@ -204,7 +204,7 @@
                     thead.setAttribute('id', name + '-thead');
                     let row = thead.insertRow();
                     for (let key of keys) {
-                        if (key == 'id') {
+                        if (key.endsWith('id')) {
                             continue;
                         }
                         let th = document.createElement('th');
@@ -225,17 +225,45 @@
                 generateTableBody = (table, data, name) => {
                     let tbody = table.createTBody();
                     tbody.setAttribute('id', name + '-tbody');
-                    for (let element of data) {
+                    for (let rowData of data) {
                         let row = tbody.insertRow();
-                        for (key in element) {
-                            if (key == 'id') {
+                        addLinks(row, rowData, name);
+                        for (key in rowData) {
+                            if (key.endsWith('id')) {
                                 continue;
                             }
                             let cell = row.insertCell();
-                            let text = document.createTextNode(element[key]);
+                            let text = document.createTextNode(rowData[key]);
                             cell.appendChild(text);
                         }
                     }
+                };
+
+                /**
+                 * Adds link to the belonging customer to a row.
+                 * 
+                 * @param {HtmlElement} row      row element
+                 * @param {Object}      rowData  table row data
+                 * @param {string}      name     table name
+                 */
+                addLinks = (row, rowData, name) => {
+                    if (name == 'customers') {
+                        row.setAttribute('onclick', 'goToCustomer(' + rowData.id + ')');
+                    } else if (name == 'locations') {
+                        row.setAttribute('onclick', 'goToCustomer(' + rowData.customer_id + ')');
+                    } else if (name == 'contact_persons') {
+                        row.setAttribute('onclick', 'goToCustomer(' + rowData.location__customer__id + ')');
+                    }
+                };
+
+                /**
+                 * Navigates to a customer by given id.
+                 * 
+                 * @param {int} id  customer id
+                 */
+                goToCustomer = (id) => {
+                    let href = "{% url 'customer' id=0 %}";
+                    document.location.href =  href.replace('0', id);
                 };
 
                 /**
