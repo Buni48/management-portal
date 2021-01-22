@@ -309,7 +309,7 @@ class LocationController:
         """
         Saves a customer's location.
 
-        Parameter:
+        Parameters:
         name          (str): location name
         email_address (str): email address of the location
         phone_number  (str): phone number of the location
@@ -370,7 +370,7 @@ class LocationController:
         """
         Creates a customer's location and used products if customer licenses existing.
 
-        Parameter:
+        Parameters:
         name          (str)     : location name
         email_address (str)     : email address of the location
         phone_number  (str)     : phone number of the location
@@ -415,7 +415,7 @@ class LocationController:
         """
         Saves a customer's location.
 
-        Parameter:
+        Parameters:
         id            (int)     : location id
         name          (str)     : location name
         email_address (str)     : email address of the location
@@ -475,7 +475,7 @@ class LocationController:
         """
         Checks the completeness and validity of location data to save.
 
-        Parameter:
+        Parameters:
         name          (str): location name
         email_address (str): email address of the location
         phone_number  (str): phone number of the location
@@ -537,7 +537,7 @@ class LocationController:
         """
         Creates used products for given location if the given customer has customer licenses.
 
-        Parameter:
+        Parameters:
         customer (Customer): customer to check licenses for
         location (Location): location to create used products for
 
@@ -564,6 +564,40 @@ class ContactPersonController:
     """
     The 'ContactPersonController' manages the contact person model.
     """
+
+    @staticmethod
+    def get_contact_persons_by_id(id: int) -> list:
+        """
+        Returns the contact person to a given id.
+        Returns 'None', if not exists.
+
+        Parameters:
+        id (int): id of the contact person
+
+        Returns:
+        list: contact person
+        """
+        try:
+            contact_person = ContactPerson.objects.get(id = id)
+        except:
+            contact_person = None
+        
+        return contact_person
+
+    @staticmethod
+    def get_contact_persons_by_location(location_id: int) -> list:
+        """
+        Returns the filtered contact persons, filtering by location.
+        Pass a location id to filter.
+
+        Parameters:
+        location_id (int): id of the location to filter by
+
+        Returns:
+        list: filtered contact persons
+        """
+        contact_persons = ContactPerson.objects.filter(location__id = location_id).values('id', 'first_name', 'last_name', 'email_address', 'phone_number')
+        return list(contact_persons)
 
     @staticmethod
     def get_contact_persons_by_name(word: str, contains: bool = False) -> list:
@@ -636,3 +670,170 @@ class ContactPersonController:
                 contact['product__name'] = 'Nicht zugewiesen'
 
         return list(contacts)
+
+    @staticmethod
+    def save(first_name: str, last_name: str, email_address: str, phone_number: str, location: int, id: int = 0) -> Status:
+        """
+        Saves a location's contact person.
+
+        Parameters:
+        first_name    (str)     : contact person first name
+        last_name     (str)     : contact person last name
+        email_address (str)     : email address of the contact person
+        phone_number  (str)     : phone number of the contact person
+        location      (Location): belonging location
+        id            (int)     : contact person id if edit
+
+        Returns:
+        Status: save status
+        """
+        status = ContactPersonController.__check_validity(
+            first_name    = first_name,
+            last_name     = last_name,
+            email_address = email_address,
+            phone_number  = phone_number,
+            location      = location,
+        )
+        if status.status:
+            try:
+                location = Location.objects.get(id = location)
+            except:
+                status.set_unexpected('Standort nicht gefunden.')
+            if status.status:
+                if id:
+                    status = ContactPersonController.edit(
+                        id            = id,
+                        first_name    = first_name,
+                        last_name     = last_name,
+                        email_address = email_address,
+                        phone_number  = phone_number,
+                        location      = location,
+                    )
+                else:
+                    status = ContactPersonController.create(
+                        first_name    = first_name,
+                        last_name     = last_name,
+                        email_address = email_address,
+                        phone_number  = phone_number,
+                        location      = location,
+                    )
+
+        return status
+
+    @staticmethod
+    def create(first_name: str, last_name: str, email_address: str, phone_number: str, location: Location) -> Status:
+        """
+        Creates a location's contact person.
+
+        Parameters:
+        first_name    (str)     : contact person first name
+        last_name     (str)     : contact person last name
+        email_address (str)     : email address of the contact person
+        phone_number  (str)     : phone number of the contact person
+        location      (Location): belonging location
+
+        Returns:
+        Status: create status
+        """
+        status = Status(True, 'Der Ansprechpartner ' + first_name + ' ' + last_name + ' wurde erfolgreich angelegt.')
+        try:
+            contact_person = ContactPerson(
+                first_name    = first_name,
+                last_name     = last_name,
+                email_address = email_address,
+                phone_number  = phone_number,
+                location      = location,
+            )
+            contact_person.save()
+        except:
+            status.set_unexpected()
+
+        return status
+
+    @staticmethod
+    def edit(id: int, first_name: str, last_name: str, email_address: str, phone_number: str, location: Location) -> Status:
+        """
+        Edits a location's contact person.
+
+        Parameters:
+        id            (int)     : contact person id
+        first_name    (str)     : contact person first name
+        last_name     (str)     : contact person last name
+        email_address (str)     : email address of the contact person
+        phone_number  (str)     : phone number of the contact person
+        location      (Location): belonging location
+
+        Returns:
+        Status: edit status
+        """
+        status = Status(True, 'Der Ansprechpartner ' + first_name + ' ' + last_name + ' wurde erfolgreich aktualisiert.')
+        try:
+            contact_person = ContactPerson.objects.get(id = id)
+            contact_person.first_name    = first_name
+            contact_person.last_name     = last_name
+            contact_person.email_address = email_address
+            contact_person.phone_number  = phone_number
+            contact_person.save()
+        except:
+            status.set_unexpected('Zu bearbeitenden Ansprechpartner nicht gefunden.')
+
+        return status
+
+    @staticmethod
+    def delete(id: int) -> Status:
+        """
+        Deletes a location's contact person by given id.
+
+        Parameters:
+        id (int): contact person id
+
+        Returns:
+        status: delete status
+        """
+        status = Status(True, 'Der Ansprechpartner wurde erfolgreich gelöscht.')
+        try:
+            contact_person = ContactPerson.objects.get(id = id)
+            contact_person.delete()
+        except:
+            status.set_unexpected('Zu löschenden Ansprechpartner nicht gefunden.')
+
+        return status
+
+    @staticmethod
+    def __check_validity(first_name: str, last_name: str, email_address: str, phone_number: str, location: int) -> Status:
+        """
+        Saves a location's contact person.
+
+        Parameters:
+        first_name    (str)     : contact person first name
+        last_name     (str)     : contact person last name
+        email_address (str)     : email address of the contact person
+        phone_number  (str)     : phone number of the contact person
+        location      (Location): belonging location
+
+        Returns:
+        Status: status
+        """
+        status = Status()
+        if not len(first_name):
+            status.message = 'Bitte Vornamen angeben.'
+        elif not len(last_name):
+            status.message = 'Bitte Nachnamen angeben.'
+        elif not len(email_address):
+            status.message = 'Bitte E-Mail-Adresse angeben.'
+        elif not len(phone_number):
+            status.message = 'Bitte Telefonnummer angeben.'
+        elif len(first_name) > 64:
+            status.message = 'Vorname darf maximal 64 Zeichen lang sein.'
+        elif len(last_name) > 64:
+            status.message = 'Nachname darf maximal 64 Zeichen lang sein.'
+        elif len(email_address) > 64:
+            status.message = 'E-Mail-Adresse darf maximal 64 Zeichen lang sein.'
+        elif len(phone_number) > 64:
+            status.message = 'Telefonnummer darf maximal 64 Zeichen lang sein.'
+        elif not location:
+            status.message = 'Bitte Standort zuweisen.'
+        else:
+            status.status = True
+
+        return status

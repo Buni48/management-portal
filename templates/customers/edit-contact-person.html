@@ -1,0 +1,116 @@
+{% extends "site.html" %}
+
+{% block title %}
+    {{title}}
+{% endblock title %}
+
+{% block content %}
+    <div class="content">
+        {% if request.user.is_authenticated %}
+            <div id="alert" class="alert alert-danger hidden-alert" role="alert">
+            </div>
+            <h1 id="title">{{title}}</h1>
+
+            <form id="form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">Vorname</label>
+                    <input type="text"
+                        class="form-control"
+                        value="{{contact_person.first_name}}"
+                        id="first_name"
+                        name="first_name"
+                        placeholder="Vornamen eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="name">Vorname</label>
+                    <input type="text"
+                        class="form-control"
+                        value="{{contact_person.last_name}}"
+                        id="last_name"
+                        name="last_name"
+                        placeholder="Nachnamen eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="name">E-Mail-Adresse</label>
+                    <input type="email"
+                        class="form-control"
+                        value="{{contact_person.email_address}}"
+                        id="email_address"
+                        name="email_address"
+                        placeholder="E-Mail-Addresse eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <div class="form-group">
+                    <label for="name">Telefonnummer</label>
+                    <input type="text"
+                        class="form-control"
+                        value="{{contact_person.phone_number}}"
+                        id="phone_number"
+                        name="phone_number"
+                        placeholder="Telefonnummer eingeben"
+                        maxlength="64"
+                        required
+                    >
+                </div>
+                <p>Dieser Ansprechpartner gehört zum Standort "{{location.name}}" des Kunden "{{location.customer}}".</p>
+                <button type="submit" class="btn btn-primary">Speichern</button>
+                <a href="{% url 'customer' id=customer.id %}">
+                    <button type="button" class="btn btn-danger">
+                        Abbrechen
+                    </button>
+                </a>
+            </form>
+            <script>
+                /**
+                 * Sends entered location data as ajax request on form submit.
+                 * After that you get a success or error message. On success you gonna be redirected to the customer page.
+                 * 
+                 * @param {Event} event  form submit event
+                 */
+                $('#form').on('submit', (event) => {
+                    event.preventDefault();
+
+                    $.ajax({
+                        type : "POST", 
+                        url  : "{% url 'contact_persons_save' %}",
+                        data : {
+                            location            : '{{ location.id }}',
+                            id                  : '{{ contact_person.id }}',
+                            first_name          : $('#first_name').val(),
+                            last_name           : $('#last_name').val(),
+                            email_address       : $('#email_address').val(),
+                            phone_number        : $('#phone_number').val(),
+                            csrfmiddlewaretoken : '{{ csrf_token }}',
+                            dataType            : "json",
+                        },
+                        success: (result) => {
+                            if (result.status) {
+                                document.location.href = "{% if customer.id %}{% url 'customer' id=customer.id %}{% else %}{% url 'customers_list' %}{% endif %}";
+                            } else {
+                                $('#alert').removeClass('hidden-alert');
+                                $('#alert').html(result.message);
+                            }
+                        },
+                        failure: () => {
+                            console.log('Request failed!');
+                        },
+                    });
+                });
+            </script>
+        {% else %}
+            <h1>Sie müssen sich erst anmelden.</h1>
+            <button type="button">
+                <a href="{% url 'login' %}">Anmelden</a>
+            </button>
+        {% endif %}
+    </div>
+{% endblock content %}
