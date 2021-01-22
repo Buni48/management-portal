@@ -7,20 +7,23 @@ import hashlib
 import requests
 
 """
-Globale Url des Management-Portals mit der subdirectory /heartbeat welche REST (POST) Abfragen bearbeitet
+Global url of the management portal with the subdirectory '/heartbeat' which handles REST (POST) requests
 """
 URL = "http://localhost:8000/heartbeat/"
-"""
-dir: Root Ordner von dem aus angefangen wird nach dem /Kundenscripts subordner zu suchen
-zaehler: Hilfsvariable für rekursiven Methodenaufruf mit anderem Root Ordner
 
-"""
-def searchFiles(dir: str, zaehler = 0):
+def searchFiles(dir: str, counter: int = 0):
+    """
+    Searches files in 'Kundenscripts' directory.
+
+    Parameters:
+    dir     (str): root folder where the search for the sub-directory '/Kundenscripts' starts
+    counter (int): helper variable for recursive function call with another root directory
+    """
     global URL
-    abspathLog = ""
+    abspathLog    = ""
     abspathConfig = ""
 
-    if zaehler == 2:
+    if counter == 2:
         return
 
     for root, dirs, files in os.walk(dir):
@@ -28,74 +31,79 @@ def searchFiles(dir: str, zaehler = 0):
         if os.path.basename(root) != 'Kundenscripts':
             continue
 
-        abspathLog = str(files[files.index('LOG.txt')])
+        abspathLog    = str(files[files.index('LOG.txt')])
         abspathConfig = str(files[files.index('config.txt')])
-        path = open("./path.txt", "w")
+        path          = open("./path.txt", "w")
         path.write(os.path.abspath(root))
         path.close()
         break
 
     if not abspathLog and not abspathConfig:
-        searchFiles("D:/", zaehler + 1)
+        searchFiles("D:/", counter + 1)
 
     PARAMS = readData(str(os.path.abspath(root)), abspathLog, abspathConfig)
     print(PARAMS)
 
-    #encrypted = hashlib.sha256('1234').hexdigest()
-    #print(encrypted)
-
     requests.post(url=URL, data=PARAMS)
 
-"""
-Liest die Daten aus config.txt und LOG.txt aus und speichert sie im PARAMS dict
-
-@return dictionary
-"""
 def readData(dir: str, abspathLog: str, abspathConfig: str):
+    """
+    Liest die Daten aus config.txt und LOG.txt aus und speichert sie im PARAMS dict
+    Reads data of 'config.txt' and 'LOG.txt' and returns it.
+
+    Parameters:
+    dir           (str): directory to get data from
+    abspathLog    (str): log
+    abspathConfig (str): config
+
+    Returns:
+    dict: data
+    """
     if not dir or not abspathLog or not abspathConfig:
         return None
 
-    abspathLog = dir + "\\" + abspathLog
+    abspathLog    = dir + "\\" + abspathLog
     abspathConfig = dir + "\\" + abspathConfig
     print(abspathLog + "      " + abspathConfig)
 
-    log = open(abspathLog, "r")
-    meldung = str(log.read())
+    log     = open(abspathLog, "r")
+    message = str(log.read())
     log.close()
 
     pattern = "[0-2]{1}[0-9]{1}[:][0-5]{1}[0-9]{1}\s[0-3]{1}[0-9]{1}[.][0-1]{1}[0-9]{1}[.][2]{1}[0-1]{1}[0-9]{2}"
     try:
-        meldung = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", meldung)[-1]
+        message = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", message)[-1]
     except:
-        meldung = ''
+        message = ''
 
     config = open(abspathConfig, "r")
-    lizenz = config.read()
+    license = config.read()
     config.close()
 
     PARAMS = {
-        "key": lizenz,
-        "log": meldung
+        "key": license,
+        "log": message
     }
 
     return PARAMS
 
-"""
-Sendet den Request an die Heartbeat API
-"""
 def directRequest(dir: str):
+    """
+    Sends a request to the heartbeat API.
+
+    Parameters:
+    dir (str): directory to get data from
+    """
     PARAMS = readData(dir, "LOG.txt", "config.txt")
-    #print(PARAMS)
-    #print("URL:                   " + URL)
     requests.post(url= URL, data= PARAMS)
 
-"""
-Führt den Heartbeat Request aus und prüft vorher ob path.txt einen Inhalt besitzt, 
-um basierend darauf zwei verschiedene Wege zu gehen (searchFiles/directRequest)
-"""
 def execute():
+    """
+    Executes the heartbeat request and checks before if a path exists in 'path.txt' already.
+    If it exists it sends directly the requests, if not it searchs for it before.
+    """
     try:
-        path = open("./path.txt", "r")
+        path        = open("./path.txt", "r")
         abspathPath = path.read()
         path.close()
     except FileNotFoundError:
@@ -106,9 +114,8 @@ def execute():
     else:
         directRequest(abspathPath)
 
+# Loop to send requests after a specific time.
 schedule.every(1).seconds.do(execute)
-
 while True:
     schedule.run_pending()
     time.sleep(1)
-
