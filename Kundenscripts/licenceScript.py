@@ -125,15 +125,8 @@ def overwrite(request):
     try:
         config = open("KundenScripts\config.txt","w")
         config.truncate(0) #leert den Inhalt der config-Datei
-        config.write(request) #schreibt neue Lizenz "newLicense"(aus response) in die config
+        config.write(request.data) #schreibt neue Lizenz "newLicense"(aus response) in die config
         config.close()
     except:
         pass
-
-
-
-"""
-To-Do:
-- Triggermechanismus einfügen (Frage: muss es alle 2h passieren?)
-"""
 
