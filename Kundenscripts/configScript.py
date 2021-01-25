@@ -1,10 +1,12 @@
 import schedule
 import time
-from datetime import datetime
 import re
 import os
-import hashlib
 import requests
+
+"""
+Dieser configScript dient zur Testzwecken, bei der Überprüfung ob Heartbeats erfolgreich empfangen wurden
+"""
 
 """
 Global url of the management portal with the subdirectory '/heartbeat' which handles REST (POST) requests

@@ -1,6 +1,10 @@
 .LOG
 
-12:53 30.12.2020
-Erfolgreich
-12:54 30.12.2020
-Error Bueni 11.01.21
+15:50 04.12.2020
+[SUCCESS] Keine Fehler
+15:50 04.12.2020
+[ERROR] Kommunikationsfehler
+	Serververbindung inaktiv
+	Code: 500
+22:22 25.01.2021
+

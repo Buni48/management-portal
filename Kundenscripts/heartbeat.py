@@ -1,23 +1,17 @@
-import schedule
+import random
 import time
-from datetime import datetime
 import re
 import os
-import hashlib
 import requests
 import string
 from ctypes import windll
 import subprocess
 
 
-
-
 """
 Globale Url des Management-Portals mit der subdirectory /heartbeat welche REST (POST) Abfragen bearbeitet
 """
 URL = "http://localhost:8000/heartbeat/"
-
-
 
 """
 dir: Root Ordner von dem aus angefangen wird nach dem /Kundenscripts subordner zu suchen
@@ -31,8 +25,8 @@ def searchFiles(dir, zaehler = 0):
     #print(dir[zaehler] + ":/")
     #print(zaehler)
     for root, dirs, files in os.walk(dir[zaehler] + ":/"):
-        print(files)
-        #print(root)
+        # print(files)
+        # print(root)
         if os.path.basename(root) != 'Kundenscripts':
             continue
 
@@ -49,14 +43,8 @@ def searchFiles(dir, zaehler = 0):
             return
         searchFiles(dir, zaehler)
 
-
     PARAMS = readData(str(os.path.abspath(root)), abspathLog, abspathConfig)
     print(PARAMS)
-
-
-    #encrypted = hashlib.sha256('1234').hexdigest()
-    #print(encrypted)
-
     requests.post(url=URL, data=PARAMS)
 
 """
@@ -66,7 +54,7 @@ Liest die Daten aus config.txt und LOG.txt aus und speichert sie im PARAMS dict
 """
 def readData(dir: str, abspathLog: str, abspathConfig: str):
     if not dir or not abspathLog or not abspathConfig:
-        return {}
+        return None
 
     abspathLog = dir + "\\" + abspathLog
     abspathConfig = dir + "\\" + abspathConfig
@@ -87,8 +75,8 @@ def readData(dir: str, abspathLog: str, abspathConfig: str):
     config.close()
 
     PARAMS = {
-        "lizenzschluessel": lizenz,
-        "meldung": meldung
+        "key": lizenz,
+        "log": meldung
     }
 
     return PARAMS
@@ -98,10 +86,7 @@ Sendet den Request an die Heartbeat API
 """
 def directRequest(dir: str):
     PARAMS = readData(dir, "LOG.txt", "config.txt")
-    #print(PARAMS)
-    #print("URL:                   " + URL)
     requests.post(url= URL, data= PARAMS)
-
 """
 Findet alle existierenden Laufwerke und speichert diese in drives[]
 """
@@ -134,10 +119,29 @@ def execute():
     else:
         directRequest(abspathPath)
 
-time.sleep(10)
+#Periodisch mit Zufall alle 24h versetzt
+zufall=int(random.uniform(1, 100))
+zeit= 1439+zufall
+time.sleep(zeit)
+execute()
 
+"""
+Führt beim ersten .exe start die .bat File aus mit dem festlegten Timer 
+die in der .bat File fest geschrieben und ausgelöst wird 
+"""
 firstTime = open("initial.txt", "r").read()
+firstTime = firstTime.replace("\n", "")
 
 if firstTime.lower() == "false":
     subprocess.call([r'.\autostart.bat'])
     open("initial.txt", "w").write("True")
+
+
+"""
+Automatiserter Heartbeat push mit der While schleife, zur test Zwecken 
+"""
+#schedule.every(1).seconds.do(execute)
+
+#while True:
+#    schedule.run_pending()
+#    time.sleep(1)

@@ -1,9 +1,7 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .controllers import HeartbeatController
-from datetime import datetime
 from rest_framework.decorators import api_view
 from .models import Heartbeat
 from licenses.models import LocationLicense, CustomerLicense, UsedSoftwareProduct
