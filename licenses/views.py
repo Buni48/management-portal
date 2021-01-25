@@ -10,6 +10,7 @@ from heartbeat.models import Heartbeat
 from .controllers import LicenseController, SoftwareModuleController
 from customers.controllers import CustomerController, LocationController
 from .models import LocationLicense, UsedSoftwareProduct, CustomerLicense
+import json
 
 
 def index(request: WSGIRequest) -> HttpResponseRedirect:
@@ -288,7 +289,73 @@ def licence(request):
 
     return JsonResponse({})
 
-def compare(request):
-    x = licence(request)
+@api_view(["POST"])
+def lizenzHeartbeat(request):
+    beat = {
+        "lizenzschluessel": request.POST.get("lizenzschluessel")
+    }
 
-  #  if x ==
+    """""""""
+    #Instanziere alle nötigen Attribute für einen Heartbeat
+    """""""""
+    license = License.objects.get(key=beat["lizenzschluessel"])
+
+    kundeSoftware = license.KundeHatSoftware
+    datum = datetime.date.today()
+    #startdate = license.gültig_von
+    enddate = license.gültig_bis
+
+    if enddate < datum and license.replace_key:
+        return JsonResponse(json.dumps({"lizenz" : license.replace_key.license_key, "exist": True}), safe=False)
+
+    elif enddate > datum or license.replace_key == None:
+        return JsonResponse(json.dumps({"lizenz": "", "exist": False}), safe=False)
+
+    else:
+        '''
+        try:
+            location_license = license.objects.get(key=beat["key"])
+            print(location_license.key)
+            used_software_product = KundeHatSoftware.objects.get(
+                location = location_license.location,
+                product  = location_license.module.product,
+            )
+            Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"])
+        except:
+            try:
+                customer_license = license.objects.get(key=beat["key"])
+                print(customer_license.key)
+                locations = Location.objects.filter(customer = customer_license.customer)
+                for location in locations:
+                    used_software_product = UsedSoftwareProduct.objects.get(
+                        location = location,
+                        product  = customer_license.module.product,
+                    )
+                    break
+                Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"], unknown_location = True)
+            except:
+                pass
+        '''
+    Heartbeat.objects.create(kundeSoftware=kundeSoftware, lizenzschluessel=beat["lizenzschluessel"],
+                             meldung=beat["meldung"],
+                             datum=datum)
+    return Response(beat["lizenzschluessel"])
+
+
+
+# API für das überschreiben der Lizenzen
+@api_view(["POST"])
+def lizenzSave(request):
+
+    if request.data["bool"] == "True":
+
+        replace = Lizenz.objects.get(license_key=request.data["new"])
+        gueltig_von = replace.gültig_von
+        gueltig_bis = replace.gültig_bis
+
+        Lizenz.objects.get(license_key=request.data["new"], replace_key=None).delete()
+        Lizenz.objects.filter(license_key=request.data["old"]).update(license_key=request.data["new"], gültig_von=gueltig_von, gültig_bis=gueltig_bis, replace_key=None)
+
+
+
+    return JsonResponse({})
