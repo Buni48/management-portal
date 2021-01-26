@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'management_portal',
     'updates',
     'user_management',
-    #'dj_ansible',
 ]
 
 MIDDLEWARE = [

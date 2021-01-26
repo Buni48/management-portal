@@ -62,12 +62,18 @@ def history(request: WSGIRequest) -> JsonResponse:
     
     return response
 
-# API für den Empfang des Heartbeats
 @api_view(["POST"])
-def heartbeat(request):
+def heartbeat(request: WSGIRequest) -> JsonResponse:
+    """
+    This function should be triggered by a request from the customer's heartbeat script.
+    It saves the heartbeat sent into the database including errors if existing.
 
-    print(request.data)
+    Parameters:
+    request (WSGIRequest): post request from the license script
 
+    Returns:
+    JsonResponse: empty
+    """
     beat = {
         "key": request.POST.get('key'),
         "log": request.POST.get('log')
@@ -75,27 +81,33 @@ def heartbeat(request):
 
     beat["key"] = beat["key"].replace("\n", "")
 
-    # Filtern des genutztes_produkt_ID
     try:
         location_license = LocationLicense.objects.get(key=beat["key"])
-        print(location_license.key)
-        used_software_product = UsedSoftwareProduct.objects.get(
+        used_product     = UsedSoftwareProduct.objects.get(
             location = location_license.location,
             product  = location_license.module.product,
         )
-        Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"])
+        Heartbeat.objects.create(
+            used_product=used_product,
+            message=beat["key"],
+            detail=beat["log"],
+        )
     except:
         try:
             customer_license = CustomerLicense.objects.get(key=beat["key"])
-            print(customer_license.key)
-            locations = Location.objects.filter(customer = customer_license.customer)
+            locations        = Location.objects.filter(customer = customer_license.customer)
             for location in locations:
-                used_software_product = UsedSoftwareProduct.objects.get(
+                used_product = UsedSoftwareProduct.objects.get(
                     location = location,
                     product  = customer_license.module.product,
                 )
                 break
-            Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"], unknown_location = True)
+            Heartbeat.objects.create(
+                used_product=used_product,
+                message=beat["key"],
+                detail=beat["log"],
+                unknown_location = True,
+            )
         except:
             pass
 

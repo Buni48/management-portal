@@ -46,10 +46,10 @@
                             </td>
                             <td>
                                 {% if used_product.heartbeat.unknown_location %}
-                                    <i class="fas fa-user"></i>
+                                    <i class="fas fa-user" title="Kunde"></i>
                                     {{used_product.location.customer}}
                                 {% else %}
-                                    <i class="fas fa-map-marker-alt"></i>
+                                    <i class="fas fa-map-marker-alt" title="Standort"></i>
                                     {{used_product.location}}
                                 {% endif %}
                             </td>
@@ -62,11 +62,11 @@
                             <td>
                                 {{used_product.last_received}}&nbsp;
                                 {% if used_product.valid == 1 %}
-                                    <i class="fas fa-check-circle"></i>
+                                    <i class="fas fa-check-circle" title="Heartbeat ohne Fehlermeldung angekommen"></i>
                                 {% elif used_product.valid == 0 %}
-                                    <i class="fas fa-times-circle"></i>
+                                    <i class="fas fa-times-circle" title="Heartbeat nicht angekommen"></i>
                                 {% else %}
-                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                    <i class="fas fa-exclamation-circle text-danger" title="Heartbeat mit Fehlermeldung angekommen"></i>
                                 {% endif %}
                             </td>
                         </tr>

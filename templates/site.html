@@ -15,12 +15,12 @@
                     {% for heartbeat in heartbeats %}
                         {% if heartbeat.valid == 0 %}
                             <li>
-                                <i class="fas fa-sm fa-times-circle"></i>
+                                <i class="fas fa-sm fa-times-circle" title="Heartbeat nicht angekommen"></i>
                                 {{heartbeat.location}}
                             </li>
                         {% elif heartbeat.valid == -1 %}
                             <li>
-                                <i class="fas fa-sm fa-exclamation-circle text-danger"></i>
+                                <i class="fas fa-sm fa-exclamation-circle text-danger" title="Heartbeat mit Fehlermeldung angekommen"></i>
                                 {{heartbeat.location}}
                             </li>
                         {% endif %}
