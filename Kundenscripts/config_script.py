@@ -5,7 +5,7 @@ import os
 import requests
 
 """
-Dieser configScript dient zur Testzwecken, bei der Überprüfung ob Heartbeats erfolgreich empfangen wurden
+This config script is there to test if heartbeats have been received successfully
 """
 
 """
@@ -13,7 +13,7 @@ Global url of the management portal with the subdirectory '/heartbeat' which han
 """
 URL = "http://localhost:8000/heartbeat/"
 
-def searchFiles(dir: str, counter: int = 0):
+def search_files(dir: str, counter: int = 0):
     """
     Searches files in 'Kundenscripts' directory.
 
@@ -41,22 +41,21 @@ def searchFiles(dir: str, counter: int = 0):
         break
 
     if not abspathLog and not abspathConfig:
-        searchFiles("D:/", counter + 1)
+        search_files("D:/", counter + 1)
 
-    PARAMS = readData(str(os.path.abspath(root)), abspathLog, abspathConfig)
+    PARAMS = read_data(str(os.path.abspath(root)), abspathLog, abspathConfig)
     print(PARAMS)
 
     requests.post(url=URL, data=PARAMS)
 
-def readData(dir: str, abspathLog: str, abspathConfig: str):
+def read_data(dir: str, abspathLog: str, abspathConfig: str):
     """
-    Liest die Daten aus config.txt und LOG.txt aus und speichert sie im PARAMS dict
     Reads data of 'config.txt' and 'LOG.txt' and returns it.
 
     Parameters:
     dir           (str): directory to get data from
-    abspathLog    (str): log
-    abspathConfig (str): config
+    abspathLog    (str): log file
+    abspathConfig (str): config file with license key within
 
     Returns:
     dict: data
@@ -89,14 +88,14 @@ def readData(dir: str, abspathLog: str, abspathConfig: str):
 
     return PARAMS
 
-def directRequest(dir: str):
+def direct_request(dir: str):
     """
     Sends a request to the heartbeat API.
 
     Parameters:
     dir (str): directory to get data from
     """
-    PARAMS = readData(dir, "LOG.txt", "config.txt")
+    PARAMS = read_data(dir, "LOG.txt", "config.txt")
     requests.post(url= URL, data= PARAMS)
 
 def execute():
@@ -112,9 +111,9 @@ def execute():
         abspathPath = ""
 
     if not abspathPath:
-        searchFiles("C:/")
+        search_files("C:/")
     else:
-        directRequest(abspathPath)
+        direct_request(abspathPath)
 
 # Loop to send requests after a specific time.
 schedule.every(1).seconds.do(execute)

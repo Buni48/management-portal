@@ -239,7 +239,7 @@ def settings(request: WSGIRequest) -> JsonResponse:
 
 @api_view(["POST"])
 def license_heartbeat(request: WSGIRequest) -> JsonResponse:
-    key     = request.POST.get("lizenzschluessel").replace('\n', '')
+    key     = request.POST.get("key").replace('\n', '')
     license = None
 
     try:
@@ -248,15 +248,15 @@ def license_heartbeat(request: WSGIRequest) -> JsonResponse:
         return JsonResponse({})
     
     current_date = datetime.now(timezone.utc)
-    context = {
-        "lizenz" : '',
+    context      = {
+        "key"    : '',
         "exist"  : False,
     }
 
     if license and (license.end_date < current_date):
         try:
             future_license = License.objects.get(replace_license__key = license.key)
-            context['lizenz'] = future_license.key
+            context['key'] = future_license.key
             context['exist']  = True
         except:
             pass
@@ -266,7 +266,7 @@ def license_heartbeat(request: WSGIRequest) -> JsonResponse:
 # API für das überschreiben der Lizenzen
 @api_view(["POST"])
 def license_heartbeat_save(request: WSGIRequest) -> JsonResponse:
-    new_exists = request.POST.get('bool', '')
+    new_exists = request.POST.get('new_exists', '')
 
     if new_exists == "True":
         new_key = request.POST.get('new', '').replace('\n', '')
