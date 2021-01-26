@@ -61,31 +61,29 @@ class LicenseController:
         return licenses
 
     @staticmethod
-    def get_license_by_id(id: int):
+    def get_license_by_id(id: int, use_slash_dates: bool = False):
         """
         Returns the location or customer license to a given id.
         Returns 'None', if no license exists.
 
         Parameters:
-        id (int): license id
+        id              (int) : license id
+        use_slash_dates (bool): if slash dates should be used
 
         Returns:
         License: location or customer license
         """
         try:
             license            = LocationLicense.objects.get(license_ptr_id = id)
-            license.start_date = license.start_date.strftime(DATE_TYPE_JS)
-            license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
+            license.stringify_dates(use_slash = use_slash_dates)
         except:
             try:
                 license            = CustomerLicense.objects.get(license_ptr_id = id)
-                license.start_date = license.start_date.strftime(DATE_TYPE_JS)
-                license.end_date   = license.end_date.strftime(DATE_TYPE_JS)
+                license.stringify_dates(use_slash = use_slash_dates)
             except:
                 license = None
         
         return license
-
 
     @staticmethod
     def save(key: str, detail: str, start_date: str, end_date: str, module: int,
@@ -347,7 +345,7 @@ class LicenseController:
         dict: current and future license
         """
         settings = {
-            'current': LicenseController.get_license_by_id(id = id),
+            'current': LicenseController.get_license_by_id(id = id, use_slash_dates = True),
             'future' : LicenseController.get_future_license(id = id),
         }
         if settings['current']:
@@ -378,9 +376,8 @@ class LicenseController:
         License: future license
         """
         try:
-            license             = License.objects.get(replace_license__id = id)
-            license.start_date  = license.start_date.strftime(DATE_TYPE)
-            license.end_date    = license.end_date.strftime(DATE_TYPE)
+            license = License.objects.get(replace_license__id = id)
+            license.stringify_dates(use_slash = True)
             return license
         except:
             return None

@@ -1,4 +1,5 @@
 from django.db import models
+from management_portal.constants import LIMIT, DATE_TYPE, DATE_TYPE_JS, LICENSE_EXPIRE_WARNING
 
 class License(models.Model):
     """
@@ -31,6 +32,25 @@ class License(models.Model):
         related_query_name  = 'license',
         null                = True,
     )
+
+    def stringify_dates(self, use_slash: bool = False):
+        """
+        Stringifies start and end date of the license.
+
+        Parameters:
+        use_slash (bool): if slash should used as seperator
+
+        Returns:
+        License: updated license
+        """
+        if use_slash:
+            self.start_date = self.start_date.strftime(DATE_TYPE)
+            self.end_date   = self.end_date.strftime(DATE_TYPE)
+        else:
+            self.start_date = self.start_date.strftime(DATE_TYPE_JS)
+            self.end_date   = self.end_date.strftime(DATE_TYPE_JS)
+
+        return license
 
 class CustomerLicense(License):
     """
