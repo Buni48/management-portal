@@ -239,6 +239,17 @@ def settings(request: WSGIRequest) -> JsonResponse:
 
 @api_view(["POST"])
 def license_heartbeat(request: WSGIRequest) -> JsonResponse:
+    """
+    This function should be triggered by a request from the customer's license script.
+    It checks if the license is (still) valid by given key.
+    If a newer license is there it sends the key of it in the response.
+
+    Parameters:
+    request (WSGIRequest): post request from the license script
+
+    Returns:
+    JsonResponse: new license key if needed
+    """
     key     = request.POST.get("key").replace('\n', '')
     license = None
 
@@ -255,17 +266,28 @@ def license_heartbeat(request: WSGIRequest) -> JsonResponse:
 
     if license and (license.end_date < current_date):
         try:
-            future_license = License.objects.get(replace_license__key = license.key)
-            context['key'] = future_license.key
+            future_license    = License.objects.get(replace_license__key = license.key)
+            context['key']    = future_license.key
             context['exist']  = True
         except:
             pass
 
     return JsonResponse(context)
 
-# API für das überschreiben der Lizenzen
 @api_view(["POST"])
 def license_heartbeat_save(request: WSGIRequest) -> JsonResponse:
+    """
+    This function should be triggered by a request from the customer's license script.
+    It replaces the new given license with the old one and deletes the future license.
+    If the license is a customer license the replacement only happens if all locations
+    already have the new license.
+
+    Parameters:
+    request (WSGIRequest): post request from the license script
+
+    Returns:
+    JsonResponse: new license key if needed
+    """
     new_exists = request.POST.get('new_exists', '')
 
     if new_exists == "True":

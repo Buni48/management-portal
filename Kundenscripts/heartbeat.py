@@ -7,90 +7,99 @@ import string
 from ctypes import windll
 import subprocess
 
-
 """
-Globale Url des Management-Portals mit der subdirectory /heartbeat welche REST (POST) Abfragen bearbeitet
+Global url of the management portal with the subdirectory '/heartbeat' which handles REST (POST) requests
 """
 URL = "http://localhost:8000/heartbeat/"
 
-"""
-dir: Root Ordner von dem aus angefangen wird nach dem /Kundenscripts subordner zu suchen
-zaehler: Hilfsvariable für rekursiven Methodenaufruf mit anderem Root Ordner
-"""
-def searchFiles(dir, zaehler = 0):
-    global URL
-    abspathLog = ""
-    abspathConfig = ""
+def search_files(dir: list, counter: int = 0):
+    """
+    Searches files in 'Kundenscripts' directory.
 
-    #print(dir[zaehler] + ":/")
-    #print(zaehler)
-    for root, dirs, files in os.walk(dir[zaehler] + ":/"):
-        # print(files)
-        # print(root)
+    Parameters:
+    dir     (list): list of drives to search for the sub-directory '/Kundenscripts'
+    counter (int) : helper variable for recursive function call with another root directory
+    """
+    global URL
+    abspath_log    = ""
+    abspath_config = ""
+
+    for root, dirs, files in os.walk(dir[counter] + ":/"):
         if os.path.basename(root) != 'Kundenscripts':
             continue
 
-        abspathLog = str(files[files.index('LOG.txt')])
-        abspathConfig = str(files[files.index('config.txt')])
-        path = open("./path.txt", "w")
+        abspath_log    = str(files[files.index('LOG.txt')])
+        abspath_config = str(files[files.index('config.txt')])
+        path           = open("./path.txt", "w")
         path.write(os.path.abspath(root))
         path.close()
         break
 
-    if not abspathLog and not abspathConfig:
-        zaehler += 1
-        if zaehler == len(dir):
+    if not abspath_log and not abspath_config:
+        counter += 1
+        if counter == len(dir):
             return
-        searchFiles(dir, zaehler)
+        search_files(dir, counter)
 
-    PARAMS = readData(str(os.path.abspath(root)), abspathLog, abspathConfig)
-    print(PARAMS)
+    PARAMS = read_data(str(os.path.abspath(root)), abspath_log, abspath_config)
     requests.post(url=URL, data=PARAMS)
 
-"""
-Liest die Daten aus config.txt und LOG.txt aus und speichert sie im PARAMS dict
+def read_data(dir: str, abspath_log: str, abspath_config: str):
+    """
+    Reads data of 'config.txt' and 'LOG.txt' and returns it.
 
-@return dictionary
-"""
-def readData(dir: str, abspathLog: str, abspathConfig: str):
-    if not dir or not abspathLog or not abspathConfig:
+    Parameters:
+    dir            (str): directory to get data from
+    abspath_log    (str): log file
+    abspath_config (str): config file with license key within
+
+    Returns:
+    dict: data
+    """
+    if not dir or not abspath_log or not abspath_config:
         return None
 
-    abspathLog = dir + "\\" + abspathLog
-    abspathConfig = dir + "\\" + abspathConfig
-    print(abspathLog + "      " + abspathConfig)
+    abspath_log    = dir + "\\" + abspath_log
+    abspath_config = dir + "\\" + abspath_config
 
-    log = open(abspathLog, "r")
-    meldung = str(log.read())
+    log     = open(abspath_log, "r")
+    message = str(log.read())
     log.close()
 
     pattern = "[0-2]{1}[0-9]{1}[:][0-5]{1}[0-9]{1}\s[0-3]{1}[0-9]{1}[.][0-1]{1}[0-9]{1}[.][2]{1}[0-1]{1}[0-9]{2}"
     try:
-        meldung = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", meldung)[-1]
+        message = re.findall(pattern + "\s[\[\]a-zA-Z0-9_ ]*", message)[-1]
     except:
-        meldung = ''
+        message = ''
 
-    config = open(abspathConfig, "r")
-    lizenz = config.read()
+    config  = open(abspath_config, "r")
+    license = config.read()
     config.close()
 
     PARAMS = {
-        "key": lizenz,
-        "log": meldung
+        "key": license,
+        "log": message,
     }
 
     return PARAMS
 
-"""
-Sendet den Request an die Heartbeat API
-"""
-def directRequest(dir: str):
-    PARAMS = readData(dir, "LOG.txt", "config.txt")
+def direct_request(dir: str):
+    """
+    Sends a request to the heartbeat API.
+
+    Parameters:
+    dir (str): directory to get data from
+    """
+    PARAMS = read_data(dir, "LOG.txt", "config.txt")
     requests.post(url= URL, data= PARAMS)
-"""
-Findet alle existierenden Laufwerke und speichert diese in drives[]
-"""
+
 def get_drives():
+    """
+    Finds all existing drives and returns them.
+
+    Returns:
+    list: drives
+    """
     drives = []
     bitmask = windll.kernel32.GetLogicalDrives()
     for letter in string.ascii_uppercase:
@@ -100,48 +109,35 @@ def get_drives():
 
     return drives
 
-"""
-Führt den Heartbeat Request aus und prüft vorher ob path.txt einen Inhalt besitzt (den absoluten Pfad), 
-um darauf basierend zwei verschiedene Wege zu gehen (searchFiles oder directRequest)
-"""
 def execute():
+    """
+    Executes the heartbeat request and checks before if a path exists in 'path.txt' already.
+    If it exists it sends directly the requests, if not it searchs for it before.
+    """
     drives = get_drives()
-    print(drives)
+
     try:
-        path = open("./path.txt", "r")
+        path        = open("./path.txt", "r")
         abspathPath = path.read()
         path.close()
     except FileNotFoundError:
         abspathPath = ""
 
     if not abspathPath:
-        searchFiles(drives)
+        search_files(drives)
     else:
-        directRequest(abspathPath)
+        direct_request(abspathPath)
 
-#Periodisch mit Zufall alle 24h versetzt
-zufall=int(random.uniform(1, 100))
-zeit= 1439+zufall
-time.sleep(zeit)
+# Periodically with coincidence all 24 hours
+random_var  = int(random.uniform(1, 100))
+duration    = 1439 + random_var
+time.sleep(duration)
 execute()
 
-"""
-Führt beim ersten .exe start die .bat File aus mit dem festlegten Timer 
-die in der .bat File fest geschrieben und ausgelöst wird 
-"""
+# Executes during the first start .bat file to trigger timer.
 firstTime = open("initial.txt", "r").read()
 firstTime = firstTime.replace("\n", "")
 
 if firstTime.lower() == "false":
     subprocess.call([r'.\autostart.bat'])
     open("initial.txt", "w").write("True")
-
-
-"""
-Automatiserter Heartbeat push mit der While schleife, zur test Zwecken 
-"""
-#schedule.every(1).seconds.do(execute)
-
-#while True:
-#    schedule.run_pending()
-#    time.sleep(1)
