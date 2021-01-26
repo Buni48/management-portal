@@ -7,7 +7,7 @@ import json
 """
 Globale Url des Management-Portals mit der subdirectory /heartbeat welche REST (POST) Abfragen bearbeitet
 """
-URL = "http://localhost:8000/licenses/"
+URL = "http://localhost:8000/licenses/license-heartbeat"
 
 """
 dir: Root Ordner von dem aus angefangen wird nach dem /Kundenscripts subordner zu suchen
@@ -88,10 +88,9 @@ def directRequest(dir: str):
     """
 
     PARAMS = readData(dir, "config.txt")
-    x = requests.post(url= URL, data= PARAMS)
-    save = overwrite(json.loads(x.json()))
-
-    requests.post(url="http://localhost:8000/lizenzheartbeat/lizenzsave", data=save)
+    response = requests.post(url= URL, data= PARAMS)
+    save = overwrite(response.json())
+    requests.post(url="http://localhost:8000/licenses/license-heartbeat/save", data=save)
 
 
 
@@ -145,14 +144,14 @@ def overwrite(lizenz):
     if lizenz["exist"] == True:
         try:
             config = open("./config.txt", "r")
-            old = config.read()
+            old    = config.read()
             config.close()
 
             config = open("./config.txt", "w")
-            config.write(lizenz)
+            config.write(lizenz['lizenz'])
             config.close()
 
-            new = lizenz
+            new       = lizenz['lizenz']
             overwrite = True
         except:
             pass

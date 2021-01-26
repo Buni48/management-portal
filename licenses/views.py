@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.utils.datetime_safe import datetime, date
+from datetime import datetime, timezone
 from rest_framework.decorators import api_view
 
 from customers.models import Location
@@ -9,7 +9,7 @@ from heartbeat.controllers import HeartbeatController
 from heartbeat.models import Heartbeat
 from .controllers import LicenseController, SoftwareModuleController
 from customers.controllers import CustomerController, LocationController
-from .models import LocationLicense, UsedSoftwareProduct, CustomerLicense
+from .models import LocationLicense, UsedSoftwareProduct, CustomerLicense, License
 import json
 
 
@@ -237,125 +237,66 @@ def settings(request: WSGIRequest) -> JsonResponse:
 
     return response
 
-# API für das Zuweisen der Lizenzen
 @api_view(["POST"])
-def licence(request):
+def license_heartbeat(request: WSGIRequest) -> JsonResponse:
+    key     = request.POST.get("lizenzschluessel").replace('\n', '')
+    license = None
 
-    print(request.data)
-
-    beat = {
-        "key": request.POST.get('key'),
-    }
-
-    beat["key"] = beat["key"].replace("\n", "")
-
-    # Filtern des genutztes_produkt_ID
-    location_license = LocationLicense.objects.get(key=beat["key"])
-    startdate = datetime.datetime(location_license.start_date)
-    enddate = datetime.datetime(location_license.end_date)
-
-    #zum Ausprobieren
-    print("d1 is greater than d2 : ", startdate > enddate)
-
-    if enddate > date.today() and location_license.replace_license:
-        return JsonResponse({location_license.replace_license})
-
-    elif enddate > date.today() or location_license.replace_license == None:
+    try:
+        license = License.objects.get(key = key)
+    except:
         return JsonResponse({})
-
-    else:
-        try:
-            location_license = LocationLicense.objects.get(key=beat["key"])
-            print(location_license.key)
-            used_software_product = UsedSoftwareProduct.objects.get(
-                location = location_license.location,
-                product  = location_license.module.product,
-            )
-            Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"])
-        except:
-            try:
-                customer_license = CustomerLicense.objects.get(key=beat["key"])
-                print(customer_license.key)
-                locations = Location.objects.filter(customer = customer_license.customer)
-                for location in locations:
-                    used_software_product = UsedSoftwareProduct.objects.get(
-                        location = location,
-                        product  = customer_license.module.product,
-                    )
-                    break
-                Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"], unknown_location = True)
-            except:
-                pass
-
-    return JsonResponse({})
-
-@api_view(["POST"])
-def lizenzHeartbeat(request):
-    beat = {
-        "lizenzschluessel": request.POST.get("lizenzschluessel")
+    
+    current_date = datetime.now(timezone.utc)
+    context = {
+        "lizenz" : '',
+        "exist"  : False,
     }
 
-    """""""""
-    #Instanziere alle nötigen Attribute für einen Heartbeat
-    """""""""
-    license = License.objects.get(key=beat["lizenzschluessel"])
-
-    kundeSoftware = license.KundeHatSoftware
-    datum = datetime.date.today()
-    #startdate = license.gültig_von
-    enddate = license.gültig_bis
-
-    if enddate < datum and license.replace_key:
-        return JsonResponse(json.dumps({"lizenz" : license.replace_key.license_key, "exist": True}), safe=False)
-
-    elif enddate > datum or license.replace_key == None:
-        return JsonResponse(json.dumps({"lizenz": "", "exist": False}), safe=False)
-
-    else:
-        '''
+    if license and (license.end_date < current_date):
         try:
-            location_license = license.objects.get(key=beat["key"])
-            print(location_license.key)
-            used_software_product = KundeHatSoftware.objects.get(
-                location = location_license.location,
-                product  = location_license.module.product,
-            )
-            Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"])
+            future_license = License.objects.get(replace_license__key = license.key)
+            context['lizenz'] = future_license.key
+            context['exist']  = True
         except:
-            try:
-                customer_license = license.objects.get(key=beat["key"])
-                print(customer_license.key)
-                locations = Location.objects.filter(customer = customer_license.customer)
-                for location in locations:
-                    used_software_product = UsedSoftwareProduct.objects.get(
-                        location = location,
-                        product  = customer_license.module.product,
-                    )
-                    break
-                Heartbeat.objects.create(used_product=used_software_product, message=beat["key"], detail=beat["log"], unknown_location = True)
-            except:
-                pass
-        '''
-    Heartbeat.objects.create(kundeSoftware=kundeSoftware, lizenzschluessel=beat["lizenzschluessel"],
-                             meldung=beat["meldung"],
-                             datum=datum)
-    return Response(beat["lizenzschluessel"])
+            pass
 
-
+    return JsonResponse(context)
 
 # API für das überschreiben der Lizenzen
 @api_view(["POST"])
-def lizenzSave(request):
+def license_heartbeat_save(request: WSGIRequest) -> JsonResponse:
+    new_exists = request.POST.get('bool', '')
 
-    if request.data["bool"] == "True":
+    if new_exists == "True":
+        new_key = request.POST.get('new', '').replace('\n', '')
+        old_key = request.POST.get('old', '').replace('\n', '')
 
-        replace = Lizenz.objects.get(license_key=request.data["new"])
-        gueltig_von = replace.gültig_von
-        gueltig_bis = replace.gültig_bis
-
-        Lizenz.objects.get(license_key=request.data["new"], replace_key=None).delete()
-        Lizenz.objects.filter(license_key=request.data["old"]).update(license_key=request.data["new"], gültig_von=gueltig_von, gültig_bis=gueltig_bis, replace_key=None)
-
-
+        try:
+            new_license                 = LocationLicense.objects.get(key = new_key)
+            old_license                 = LocationLicense.objects.get(key = old_key)
+            old_license.key             = new_license.key
+            old_license.detail          = new_license.detail
+            old_license.start_date      = new_license.start_date
+            old_license.end_date        = new_license.end_date
+            new_license.delete()
+            old_license.save()
+        except:
+            try:
+                new_license = CustomerLicense.objects.get(key = new_key)
+                new_license.replace_count += 1
+                total_count = len(Location.objects.filter(customer = new_license.customer))
+                if new_license.replace_count >= total_count:
+                    old_license                 = CustomerLicense.objects.get(key = old_key)
+                    old_license.key             = new_license.key
+                    old_license.detail          = new_license.detail
+                    old_license.start_date      = new_license.start_date
+                    old_license.end_date        = new_license.end_date
+                    new_license.delete()
+                    old_license.save()
+                else:
+                    new_license.save()
+            except:
+                pass
 
     return JsonResponse({})

@@ -40,7 +40,8 @@ class CustomerLicense(License):
     license_ptr (int): Primary key identifier for all licenses
     customer    (int): Foreign key for the customer which uses the license
     """
-    customer = models.ForeignKey(
+    replace_count   = models.IntegerField(default = 0)
+    customer        = models.ForeignKey(
         to                  = 'customers.Customer',
         on_delete           = models.CASCADE,
         related_name        = 'customer_licenses',

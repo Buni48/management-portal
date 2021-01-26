@@ -11,4 +11,6 @@ urlpatterns = [
     path('save/', views.save, name = 'licenses_save'),
     path('delete/<int:id>/', views.delete, name = 'licenses_delete'),
     path('settings/', views.settings, name = 'licenses_settings'),
+    path('license-heartbeat', views.license_heartbeat, name="licenses_heartbeat"),
+    path('license-heartbeat/save', views.license_heartbeat_save, name="licenses_heartbeat_save"),
 ]
