@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module updates.controllers</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="updates.html"><font color="#ffffff">updates</font></a>.controllers</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:d%3A%5Cpython%5Cuip%5Cmanagement_portal%5Cupdates%5Ccontrollers.py">d:\python\uip\management_portal\updates\controllers.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="updates.controllers.html#UpdateController">UpdateController</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="UpdateController">class <strong>UpdateController</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;'<a href="#UpdateController">UpdateController</a>'&nbsp;manages&nbsp;the&nbsp;update&nbsp;model.<br>
+This&nbsp;includes&nbsp;things&nbsp;like&nbsp;read&nbsp;and&nbsp;counts.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Static methods defined here:<br>
+<dl><dt><a name="UpdateController-get_counts"><strong>get_counts</strong></a>(used_products: list) -&gt; dict</dt><dd><tt>Returns&nbsp;the&nbsp;amount&nbsp;of&nbsp;used&nbsp;products&nbsp;recieved&nbsp;which&nbsp;are&nbsp;current&nbsp;or&nbsp;old.<br>
+&nbsp;<br>
+Parameters:<br>
+used_products&nbsp;(list):&nbsp;List&nbsp;of&nbsp;used&nbsp;products<br>
+&nbsp;<br>
+Returns:<br>
+dict:&nbsp;Amount&nbsp;of&nbsp;current&nbsp;and&nbsp;old&nbsp;used&nbsp;products</tt></dd></dl>
+
+<dl><dt><a name="UpdateController-read"><strong>read</strong></a>(limit: int = 1000) -&gt; list</dt><dd><tt>Returns&nbsp;used&nbsp;products&nbsp;including&nbsp;information&nbsp;about&nbsp;product,&nbsp;location&nbsp;and&nbsp;if&nbsp;the&nbsp;used&nbsp;product&nbsp;uses&nbsp;the&nbsp;current&nbsp;software&nbsp;version.<br>
+&nbsp;<br>
+Parameters:<br>
+limit&nbsp;(int):&nbsp;Maximum&nbsp;number&nbsp;of&nbsp;objects&nbsp;to&nbsp;load&nbsp;(default:&nbsp;1000)<br>
+&nbsp;<br>
+Returns:<br>
+list:&nbsp;used&nbsp;products</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>DATE_TYPE</strong> = '%Y/%m/%d'<br>
+<strong>LIMIT</strong> = 1000</td></tr></table>
+</body></html>

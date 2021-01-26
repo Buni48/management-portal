@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module user_management.controllers</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="user_management.html"><font color="#ffffff">user_management</font></a>.controllers</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:d%3A%5Cpython%5Cuip%5Cmanagement_portal%5Cuser_management%5Ccontrollers.py">d:\python\uip\management_portal\user_management\controllers.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="user_management.controllers.html#UserController">UserController</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="UserController">class <strong>UserController</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>The&nbsp;'<a href="#UserController">UserController</a>'&nbsp;manages&nbsp;the&nbsp;django&nbsp;user&nbsp;model.<br>
+This&nbsp;includes&nbsp;things&nbsp;like&nbsp;changing&nbsp;profile&nbsp;information&nbsp;and&nbsp;passwords.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Static methods defined here:<br>
+<dl><dt><a name="UserController-change_password"><strong>change_password</strong></a>(id: int, old_password: str, new_password_1: str, new_password_2: str)</dt><dd><tt>Updates&nbsp;the&nbsp;password&nbsp;if&nbsp;all&nbsp;data&nbsp;is&nbsp;valid.<br>
+It&nbsp;returns&nbsp;a&nbsp;status&nbsp;<a href="builtins.html#object">object</a>.<br>
+&nbsp;<br>
+Parameters:<br>
+id&nbsp;(int)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;user&nbsp;id<br>
+old_password&nbsp;(str)&nbsp;&nbsp;:&nbsp;old&nbsp;password<br>
+new_password_1&nbsp;(str):&nbsp;new&nbsp;password<br>
+new_password_2&nbsp;(str):&nbsp;new&nbsp;password&nbsp;again<br>
+&nbsp;<br>
+Returns:<br>
+Status:&nbsp;update&nbsp;status</tt></dd></dl>
+
+<dl><dt><a name="UserController-change_profile"><strong>change_profile</strong></a>(id: int, username: str, email: str, first_name: str, last_name: str)</dt><dd><tt>Updates&nbsp;the&nbsp;profile&nbsp;data&nbsp;with&nbsp;the&nbsp;given&nbsp;data&nbsp;if&nbsp;all&nbsp;data&nbsp;is&nbsp;valid.<br>
+It&nbsp;returns&nbsp;a&nbsp;status&nbsp;<a href="builtins.html#object">object</a>.<br>
+&nbsp;<br>
+Parameters:<br>
+id&nbsp;(int)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;user&nbsp;id<br>
+username&nbsp;(str)&nbsp;&nbsp;:&nbsp;the&nbsp;user's&nbsp;unique&nbsp;username<br>
+email&nbsp;(str)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;email&nbsp;address<br>
+first_name&nbsp;(str):&nbsp;the&nbsp;user's&nbsp;first&nbsp;name<br>
+last_name&nbsp;(str)&nbsp;:&nbsp;the&nbsp;user's&nbsp;last&nbsp;name<br>
+&nbsp;<br>
+Returns:<br>
+Status:&nbsp;update&nbsp;status</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module management_portal.views</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="management_portal.html"><font color="#ffffff">management_portal</font></a>.views</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:d%3A%5Cpython%5Cuip%5Cmanagement_portal%5Cmanagement_portal%5Cviews.py">d:\python\uip\management_portal\pydoc\management_portal\views.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="json.html">json</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-home"><strong>home</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponse</dt><dd><tt>When&nbsp;home&nbsp;is&nbsp;called.&nbsp;Renders&nbsp;the&nbsp;homepage&nbsp;with&nbsp;the&nbsp;charts.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponse:&nbsp;homepage</tt></dd></dl>
+ <dl><dt><a name="-index"><strong>index</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponseRedirect</dt><dd><tt>When&nbsp;the&nbsp;website&nbsp;root&nbsp;is&nbsp;called.<br>
+If&nbsp;the&nbsp;user&nbsp;is&nbsp;logged&nbsp;in&nbsp;it&nbsp;redirects&nbsp;to&nbsp;the&nbsp;homepage.<br>
+If&nbsp;the&nbsp;user&nbsp;is&nbsp;logged&nbsp;out&nbsp;it&nbsp;redirects&nbsp;to&nbsp;the&nbsp;login&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponseRedirect:&nbsp;redirection&nbsp;to&nbsp;the&nbsp;homepage&nbsp;or&nbsp;login&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-login"><strong>login</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponseRedirect</dt><dd><tt>Redirects&nbsp;to&nbsp;the&nbsp;login&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponseRedirect:&nbsp;redirection&nbsp;to&nbsp;the&nbsp;login&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-logout"><strong>logout</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponseRedirect</dt><dd><tt>Redirects&nbsp;to&nbsp;the&nbsp;logout&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponseRedirect:&nbsp;redirection&nbsp;to&nbsp;the&nbsp;logout&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-search"><strong>search</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponse</dt><dd><tt>When&nbsp;the&nbsp;search&nbsp;is&nbsp;called.&nbsp;Renders&nbsp;the&nbsp;global&nbsp;search&nbsp;form.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponse:&nbsp;global&nbsp;search&nbsp;form</tt></dd></dl>
+ <dl><dt><a name="-search_result"><strong>search_result</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.JsonResponse</dt><dd><tt>When&nbsp;the&nbsp;search&nbsp;result&nbsp;is&nbsp;called&nbsp;as&nbsp;an&nbsp;ajax&nbsp;request.<br>
+Searches&nbsp;for&nbsp;customers,&nbsp;locations,&nbsp;contact&nbsp;persons,&nbsp;software&nbsp;products&nbsp;and&nbsp;software&nbsp;modules&nbsp;by&nbsp;a&nbsp;given&nbsp;search&nbsp;word.<br>
+It&nbsp;returns&nbsp;all&nbsp;the&nbsp;search&nbsp;results&nbsp;grouped&nbsp;by&nbsp;tables.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;ajax&nbsp;request<br>
+&nbsp;<br>
+Returns:<br>
+JsonResponse:&nbsp;serach&nbsp;result</tt></dd></dl>
+</td></tr></table>
+</body></html>

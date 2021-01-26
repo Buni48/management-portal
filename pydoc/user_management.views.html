@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module user_management.views</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="user_management.html"><font color="#ffffff">user_management</font></a>.views</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:d%3A%5Cpython%5Cuip%5Cmanagement_portal%5Cuser_management%5Cviews.py">d:\python\uip\management_portal\user_management\views.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="django.contrib.messages.html">django.contrib.messages</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-authentication"><strong>authentication</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponseRedirect</dt><dd><tt>Does&nbsp;the&nbsp;authentification.<br>
+If&nbsp;authentification&nbsp;is&nbsp;successful&nbsp;it&nbsp;redirects&nbsp;to&nbsp;the&nbsp;homepage.<br>
+Otherwise&nbsp;it&nbsp;redirects&nbsp;to&nbsp;the&nbsp;login&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponseRedirect:&nbsp;redirection&nbsp;to&nbsp;the&nbsp;login&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-change_password"><strong>change_password</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.JsonResponse</dt><dd><tt>When&nbsp;the&nbsp;password&nbsp;change&nbsp;is&nbsp;called&nbsp;as&nbsp;an&nbsp;ajax&nbsp;request.<br>
+Changes&nbsp;the&nbsp;password&nbsp;sent&nbsp;if&nbsp;valid&nbsp;and&nbsp;complete&nbsp;and&nbsp;returns&nbsp;the&nbsp;status.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;ajax&nbsp;save&nbsp;request<br>
+&nbsp;<br>
+Returns:<br>
+JsonResponse:&nbsp;save&nbsp;status</tt></dd></dl>
+ <dl><dt><a name="-change_profile"><strong>change_profile</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.JsonResponse</dt><dd><tt>When&nbsp;the&nbsp;profile&nbsp;change&nbsp;is&nbsp;called&nbsp;as&nbsp;an&nbsp;ajax&nbsp;request.<br>
+Saves&nbsp;the&nbsp;profile&nbsp;data&nbsp;sent&nbsp;if&nbsp;valid&nbsp;and&nbsp;complete&nbsp;and&nbsp;returns&nbsp;the&nbsp;status.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;ajax&nbsp;save&nbsp;request<br>
+&nbsp;<br>
+Returns:<br>
+JsonResponse:&nbsp;save&nbsp;status</tt></dd></dl>
+ <dl><dt><a name="-logged_out"><strong>logged_out</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponse</dt><dd><tt>When&nbsp;the&nbsp;logged&nbsp;out&nbsp;is&nbsp;called&nbsp;(usually&nbsp;after&nbsp;logout).<br>
+Renders&nbsp;the&nbsp;logged&nbsp;out&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponse:&nbsp;logged&nbsp;out&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-login"><strong>login</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponse</dt><dd><tt>When&nbsp;the&nbsp;login&nbsp;is&nbsp;called.&nbsp;Renders&nbsp;the&nbsp;login&nbsp;page&nbsp;form.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponse:&nbsp;login&nbsp;page&nbsp;form</tt></dd></dl>
+ <dl><dt><a name="-logout"><strong>logout</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponseRedirect</dt><dd><tt>Loggs&nbsp;out&nbsp;the&nbsp;user&nbsp;and&nbsp;redirects&nbsp;to&nbsp;the&nbsp;logged&nbsp;out&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponseRedirect:&nbsp;redirection&nbsp;to&nbsp;the&nbsp;logged&nbsp;out&nbsp;page</tt></dd></dl>
+ <dl><dt><a name="-settings"><strong>settings</strong></a>(request: django.core.handlers.wsgi.WSGIRequest) -&gt; django.http.response.HttpResponse</dt><dd><tt>When&nbsp;the&nbsp;settings&nbsp;are&nbsp;called.&nbsp;Renders&nbsp;the&nbsp;user&nbsp;settings&nbsp;page.<br>
+&nbsp;<br>
+Parameters:<br>
+request&nbsp;(WSGIRequest):&nbsp;url&nbsp;request&nbsp;of&nbsp;the&nbsp;user<br>
+&nbsp;<br>
+Returns:<br>
+HttpResponse:&nbsp;user&nbsp;settings&nbsp;page</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>DATETIME_TYPE</strong> = '%Y/%m/%d %H:%M:%S'</td></tr></table>
+</body></html>
